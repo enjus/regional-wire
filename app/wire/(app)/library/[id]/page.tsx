@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminSupabase } from '@/lib/platform-admin'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -21,13 +22,16 @@ export default async function StoryDetailPage({ params }: PageProps) {
 
   const { data: currentUser } = await supabase
     .from('users')
-    .select('organization_id')
+    .select('organization_id, is_platform_admin')
     .eq('id', user.id)
     .single()
 
   if (!currentUser) redirect('/register')
 
-  const { data: story } = await supabase
+  const isPlatformAdmin = (currentUser as { organization_id: string | null; is_platform_admin?: boolean }).is_platform_admin === true
+  const queryClient = isPlatformAdmin ? createAdminSupabase() : supabase
+
+  const { data: story } = await queryClient
     .from('stories')
     .select(
       `
@@ -42,7 +46,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
   if (!story) notFound()
 
   // Can't access own org's story for republication package (but can still view via dashboard)
-  const isOwnOrg = story.organization_id === currentUser.organization_id
+  const isOwnOrg = !isPlatformAdmin && story.organization_id === currentUser.organization_id
   const embargoed = story.status === 'embargoed' && isEmbargoActive(story.embargo_lifts_at)
   const org = story.organizations as { id: string; name: string; website_url: string; republication_guidance: string | null } | null
   const assets = (story.story_assets ?? []) as {

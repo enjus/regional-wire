@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminSupabase } from '@/lib/platform-admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Story } from '@/lib/types'
@@ -29,29 +30,35 @@ export default async function LibraryPage({ searchParams }: PageProps) {
 
   const { data: currentUser } = await supabase
     .from('users')
-    .select('organization_id')
+    .select('organization_id, is_platform_admin')
     .eq('id', user.id)
     .single()
 
   if (!currentUser) redirect('/register')
+
+  const isPlatformAdmin = (currentUser as { organization_id: string | null; is_platform_admin?: boolean }).is_platform_admin === true
+  const queryClient = isPlatformAdmin ? createAdminSupabase() : supabase
+  const currentOrgId = currentUser.organization_id ?? ''
 
   const page = parseInt(params.page ?? '1', 10)
   const offset = (page - 1) * PAGE_SIZE
   const tab = params.tab ?? 'library'
 
   // Fetch all approved orgs for filter dropdown
-  const { data: orgs } = await supabase
+  const orgsQuery = queryClient
     .from('organizations')
     .select('id, name')
     .eq('status', 'approved')
-    .neq('id', currentUser.organization_id)
     .order('name')
+  const { data: orgs } = currentOrgId
+    ? await orgsQuery.neq('id', currentOrgId)
+    : await orgsQuery
 
   // ----------------------------------------------------------------
   // Headline feed tab
   // ----------------------------------------------------------------
   if (tab === 'headlines') {
-    let headlineQuery = supabase
+    let headlineQuery = queryClient
       .from('feed_headlines')
       .select('*, organizations(id, name)', { count: 'exact' })
       .order('published_at', { ascending: false })
@@ -66,13 +73,14 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     const headlineUrls = (headlines ?? []).map((h) => h.url).filter(Boolean)
     const libraryByUrl: Record<string, { id: string; published_at: string }> = {}
     if (headlineUrls.length > 0) {
-      const { data: matchedStories } = await supabase
+      let matchedQuery = queryClient
         .from('stories')
         .select('id, canonical_url, published_at')
         .in('canonical_url', headlineUrls)
         .in('status', ['available', 'embargoed'])
-        .neq('organization_id', currentUser.organization_id)
-      for (const s of matchedStories ?? []) {
+      if (currentOrgId) matchedQuery = matchedQuery.neq('organization_id', currentOrgId)
+      const { data: matchedStories } = await matchedQuery
+      for (const s of (matchedStories ?? []) as { id: string; canonical_url: string | null; published_at: string }[]) {
         if (s.canonical_url) libraryByUrl[s.canonical_url] = { id: s.id, published_at: s.published_at }
       }
     }
@@ -80,7 +88,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <LibraryHeader />
-        <LibraryFilters orgs={orgs ?? []} currentOrgId={currentUser.organization_id} />
+        <LibraryFilters orgs={orgs ?? []} currentOrgId={currentOrgId} />
         <TabNav active="headlines" />
 
         {!headlines?.length ? (
@@ -167,7 +175,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   // ----------------------------------------------------------------
   // Main library tab
   // ----------------------------------------------------------------
-  let query = supabase
+  let query = queryClient
     .from('stories')
     .select(
       `
@@ -177,7 +185,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     `,
       { count: 'exact' }
     )
-    .neq('organization_id', currentUser.organization_id)
+  if (currentOrgId) query = query.neq('organization_id', currentOrgId)
     .in('status', ['available', 'embargoed'])
     .order('published_at', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1)
@@ -193,7 +201,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <LibraryHeader />
-      <LibraryFilters orgs={orgs ?? []} currentOrgId={currentUser.organization_id} />
+      <LibraryFilters orgs={orgs ?? []} currentOrgId={currentOrgId} />
       <TabNav active="library" />
 
       {!stories?.length ? (
