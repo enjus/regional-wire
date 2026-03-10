@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') ?? '/library'
+  const redirect = searchParams.get('redirect') ?? '/auth/landing'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,8 +32,7 @@ function LoginForm() {
       return
     }
 
-    router.push(redirect)
-    router.refresh()
+    window.location.href = redirect
   }
 
   return (

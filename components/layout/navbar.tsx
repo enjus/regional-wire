@@ -30,19 +30,19 @@ export default async function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
         <div className="flex items-center gap-8">
           <Link
-            href="/library"
+            href="/wire/library"
             className="font-serif text-lg font-bold tracking-tight hover:text-white/90 transition-colors"
           >
             Regional Wire
           </Link>
           <nav className="hidden sm:flex items-center gap-6 text-sm text-white/75">
-            <Link href="/library" className="hover:text-white transition-colors">
+            <Link href="/wire/library" className="hover:text-white transition-colors">
               Library
             </Link>
-            <Link href="/dashboard" className="hover:text-white transition-colors">
+            <Link href="/wire/dashboard" className="hover:text-white transition-colors">
               Dashboard
             </Link>
-            <Link href="/directory" className="hover:text-white transition-colors">
+            <Link href="/wire/directory" className="hover:text-white transition-colors">
               Directory
             </Link>
           </nav>

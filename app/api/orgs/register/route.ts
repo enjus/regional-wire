@@ -7,7 +7,7 @@ import { sendOrgRegistrationNotification } from '@/lib/email'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, website_url, email_domain, contact_emails, description } = body
+    const { name, website_url, email_domain, contact_emails, description, republication_guidance } = body
 
     if (!name || !website_url || !email_domain || !contact_emails?.length) {
       return NextResponse.json(
@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
         email_domain: domain,
         contact_emails: validContacts,
         description: description?.trim() || null,
+        republication_guidance: republication_guidance?.trim() || null,
         status: 'pending',
       })
       .select()

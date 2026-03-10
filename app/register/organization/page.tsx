@@ -9,6 +9,7 @@ export default function RegisterOrganizationPage() {
   const [domain, setDomain] = useState('')
   const [contacts, setContacts] = useState([''])
   const [description, setDescription] = useState('')
+  const [republication_guidance, setRepublicationGuidance] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -48,6 +49,7 @@ export default function RegisterOrganizationPage() {
         email_domain: domain.toLowerCase().replace(/^@/, ''),
         contact_emails: validContacts,
         description,
+        republication_guidance,
       }),
     })
 
@@ -213,6 +215,22 @@ export default function RegisterOrganizationPage() {
                 rows={3}
                 className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
                 placeholder="We cover local government, education, and business news in the greater Springfield area."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-wire-navy mb-1">
+                Additional republication guidance
+              </label>
+              <p className="text-xs text-wire-slate mb-1">
+                Any specific requirements for newsrooms republishing your stories — e.g. preferred credit line, geo restrictions, or contact preferences. Displayed alongside standard republication rules.
+              </p>
+              <textarea
+                value={republication_guidance}
+                onChange={(e) => setRepublicationGuidance(e.target.value)}
+                rows={3}
+                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+                placeholder="Please credit us as 'The Daily Tribune' and notify editor@dailytribune.com when you publish."
               />
             </div>
 

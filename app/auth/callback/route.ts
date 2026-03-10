@@ -7,7 +7,7 @@ type CookieOption = Record<string, unknown>
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/library'
+  const next = searchParams.get('next') ?? '/wire/library'
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing-code`)
@@ -44,6 +44,15 @@ export async function GET(request: NextRequest) {
     .single()
 
   if (existingUser) {
+    // Redirect platform admins to their dedicated dashboard
+    const { data: record } = await supabase
+      .from('users')
+      .select('is_platform_admin')
+      .eq('id', data.user.id)
+      .single()
+    if (record?.is_platform_admin) {
+      return NextResponse.redirect(`${origin}/platform-admin`)
+    }
     return NextResponse.redirect(`${origin}${next}`)
   }
 

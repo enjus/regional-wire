@@ -23,21 +23,38 @@ export async function middleware(request: NextRequest) {
   }
 
   // ----------------------------------------------------------------
-  // Public routes: skip auth
+  // Public routes: skip auth entirely
   // ----------------------------------------------------------------
   const publicPaths = [
     '/login',
     '/register',
     '/auth/callback',
+    '/auth/landing',
+    '/auth/reset-password',
+    '/auth/update-password',
     '/api/orgs/register',
     '/api/auth/register',
+    '/api/cron',
   ]
   if (publicPaths.some((p) => pathname.startsWith(p))) {
     return NextResponse.next()
   }
 
+  // Only /wire/*, /platform-admin/*, and authenticated API routes require a session
+  const requiresAuth =
+    pathname.startsWith('/wire') ||
+    pathname.startsWith('/platform-admin') ||
+    (pathname.startsWith('/api/') &&
+      !pathname.startsWith('/api/orgs/register') &&
+      !pathname.startsWith('/api/auth/register') &&
+      !pathname.startsWith('/api/cron'))
+
+  if (!requiresAuth) {
+    return NextResponse.next()
+  }
+
   // ----------------------------------------------------------------
-  // All other routes: refresh Supabase session
+  // Protected routes: refresh Supabase session
   // ----------------------------------------------------------------
   let supabaseResponse = NextResponse.next({ request })
 
@@ -68,8 +85,6 @@ export async function middleware(request: NextRequest) {
 
   // Not authenticated — redirect to login
   if (!user) {
-    // Allow root page to handle its own redirect
-    if (pathname === '/') return supabaseResponse
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', pathname)

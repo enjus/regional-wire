@@ -46,21 +46,21 @@ export default function NavbarClient({ displayName, orgName }: Props) {
             </div>
             <div className="py-1">
               <Link
-                href="/dashboard"
+                href="/wire/dashboard"
                 onClick={() => setOpen(false)}
                 className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
               >
                 Dashboard
               </Link>
               <Link
-                href="/dashboard/stories/new"
+                href="/wire/dashboard/stories/new"
                 onClick={() => setOpen(false)}
                 className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
               >
                 Upload story
               </Link>
               <Link
-                href="/dashboard/settings"
+                href="/wire/dashboard/settings"
                 onClick={() => setOpen(false)}
                 className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
               >
