@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { checkBasicAuth } from './lib/utils'
+import { checkBasicAuth, verifyAdminToken } from './lib/utils'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -9,6 +9,15 @@ export async function middleware(request: NextRequest) {
   // Admin routes: HTTP Basic Auth
   // ----------------------------------------------------------------
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    // Allow token-signed approve/reject links from email (no Basic Auth needed)
+    const tokenRouteMatch = pathname.match(/^\/api\/admin\/orgs\/([^/]+)\/(approve|reject)$/)
+    if (tokenRouteMatch) {
+      const token = request.nextUrl.searchParams.get('token')
+      if (token && verifyAdminToken(tokenRouteMatch[1], tokenRouteMatch[2], token)) {
+        return NextResponse.next()
+      }
+    }
+
     const authHeader = request.headers.get('authorization')
     if (!checkBasicAuth(authHeader)) {
       return new NextResponse('Unauthorized', {
@@ -30,8 +39,6 @@ export async function middleware(request: NextRequest) {
     '/register',
     '/auth/callback',
     '/auth/landing',
-    '/auth/reset-password',
-    '/auth/update-password',
     '/api/orgs/register',
     '/api/auth/register',
     '/api/cron',

@@ -7,7 +7,9 @@ type CookieOption = Record<string, unknown>
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/wire/library'
+  const rawNext = searchParams.get('next') ?? '/wire/library'
+  // Only allow relative paths to prevent open redirect attacks
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/wire/library'
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing-code`)

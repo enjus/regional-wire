@@ -71,6 +71,7 @@ export function checkBasicAuth(authHeader: string | null): boolean {
 
 // Strip HTML elements that are non-republishable or CMS-hostile:
 // interactive embeds, scripts, styles, forms, and media that can't transfer.
+// Also strips event handlers and javascript: hrefs to prevent XSS.
 export function sanitizeStoryHtml(html: string): string {
   return html
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
@@ -81,6 +82,11 @@ export function sanitizeStoryHtml(html: string): string {
     .replace(/<form\b[^>]*>[\s\S]*?<\/form>/gi, '')
     .replace(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi, '')
     .replace(/<img\b[^>]*>/gi, '')
+    .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, '')
+    // Strip event handler attributes (onclick, onload, onerror, etc.)
+    .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
+    // Strip javascript: and data: URIs from href/src/action attributes
+    .replace(/\b(href|src|action)\s*=\s*(?:"(javascript|data):[^"]*"|'(javascript|data):[^']*')/gi, '')
 }
 
 export function generateRepublicationPackage(
@@ -95,6 +101,7 @@ export function generateRepublicationPackage(
   assets: {
     asset_type: string
     file_url: string
+    displayUrl?: string
     caption?: string | null
     credit?: string | null
     is_primary: boolean
@@ -125,7 +132,7 @@ export function generateRepublicationPackage(
     lines.push('[ASSETS]')
 
     if (primaryImage) {
-      lines.push(`Primary image: ${primaryImage.file_url}`)
+      lines.push(`Primary image: ${primaryImage.displayUrl ?? primaryImage.file_url}`)
       if (primaryImage.caption) lines.push(`  Caption: ${primaryImage.caption}`)
       if (primaryImage.credit) lines.push(`  Credit: ${primaryImage.credit}`)
     }
@@ -134,7 +141,7 @@ export function generateRepublicationPackage(
       lines.push('')
       lines.push('[ADDITIONAL IMAGES]')
       for (const img of additionalImages) {
-        const parts = [img.file_url]
+        const parts = [img.displayUrl ?? img.file_url]
         if (img.caption) parts.push(`Caption: ${img.caption}`)
         if (img.credit) parts.push(`Credit: ${img.credit}`)
         lines.push(`  ${parts.join(' | ')}`)
@@ -144,7 +151,7 @@ export function generateRepublicationPackage(
     if (video) {
       lines.push('')
       lines.push('[VIDEO]')
-      const parts = [video.file_url]
+      const parts = [video.displayUrl ?? video.file_url]
       if (video.caption) parts.push(`Caption: ${video.caption}`)
       if (video.credit) parts.push(`Credit: ${video.credit}`)
       lines.push(`  ${parts.join(' | ')}`)
