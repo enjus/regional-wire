@@ -10,7 +10,7 @@ function getResend(): Resend {
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-const FROM_ADDRESS = 'Regional Wire <onboarding@resend.dev>'
+const FROM_ADDRESS = 'Regional Wire <noreply@updates.nwnewswire.com>'
 
 // ----------------------------------------------------------------
 // 1. New org registration — notify platform admin

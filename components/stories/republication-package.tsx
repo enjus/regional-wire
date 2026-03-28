@@ -7,6 +7,7 @@ interface Asset {
   id: string
   asset_type: string
   file_url: string
+  displayUrl?: string
   caption: string | null
   credit: string | null
   is_primary: boolean
@@ -187,9 +188,6 @@ export default function RepublicationPackage({
         </button>
       </div>
 
-      <pre className="bg-wire-bg border border-wire-border rounded p-4 text-xs text-wire-navy font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto">
-        {packageText}
-      </pre>
 
       {showUrlPrompt && !urlSubmitted && (
         <div className="mt-4 bg-green-50 border border-green-200 rounded p-4">

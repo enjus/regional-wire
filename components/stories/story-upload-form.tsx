@@ -107,10 +107,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
       .from('story-assets')
       .upload(path, file, { upsert: true })
     if (error) throw new Error(`Upload failed: ${error.message}`)
-    const { data: urlData } = supabase.storage
-      .from('story-assets')
-      .getPublicUrl(data.path)
-    return urlData.publicUrl
+    return data.path
   }
 
   async function handleSubmit(e: React.FormEvent) {

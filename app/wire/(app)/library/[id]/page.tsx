@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createAdminSupabase } from '@/lib/platform-admin'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -49,7 +49,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
   const isOwnOrg = !isPlatformAdmin && story.organization_id === currentUser.organization_id
   const embargoed = story.status === 'embargoed' && isEmbargoActive(story.embargo_lifts_at)
   const org = story.organizations as { id: string; name: string; website_url: string; republication_guidance: string | null } | null
-  const assets = (story.story_assets ?? []) as {
+  const rawAssets = (story.story_assets ?? []) as {
     id: string
     asset_type: string
     file_url: string
@@ -57,6 +57,18 @@ export default async function StoryDetailPage({ params }: PageProps) {
     credit: string | null
     is_primary: boolean
   }[]
+
+  // Generate signed URLs for private bucket assets
+  let assets: (typeof rawAssets[0] & { displayUrl: string })[] = rawAssets.map(a => ({ ...a, displayUrl: '' }))
+  if (rawAssets.length > 0) {
+    const serviceClient = await createServiceClient()
+    const { data: signedData } = await serviceClient.storage
+      .from('story-assets')
+      .createSignedUrls(rawAssets.map(a => a.file_url), 3600)
+    const urlMap: Record<string, string> = {}
+    signedData?.forEach(item => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl })
+    assets = rawAssets.map(a => ({ ...a, displayUrl: urlMap[a.file_url] ?? '' }))
+  }
 
   const primaryImage = assets.find((a) => a.is_primary && a.asset_type === 'image')
   const additionalImages = assets.filter((a) => !a.is_primary && a.asset_type === 'image')
@@ -96,7 +108,11 @@ export default async function StoryDetailPage({ params }: PageProps) {
           {story.title}
         </h1>
 
-        <p className="text-wire-slate text-sm">{story.byline}</p>
+        <p className="text-wire-slate text-sm">
+          {story.byline}
+          <span className="mx-2">·</span>
+          <span>{story.body_plain.trim().split(/\s+/).filter(Boolean).length.toLocaleString()} words</span>
+        </p>
 
         {story.canonical_url && (
           <a
@@ -115,7 +131,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
         <figure className="mb-8">
           <div className="relative w-full h-64 sm:h-80 rounded overflow-hidden bg-gray-100">
             <Image
-              src={primaryImage.file_url}
+              src={primaryImage.displayUrl}
               alt={primaryImage.caption ?? story.title}
               fill
               className="object-cover"
@@ -124,7 +140,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
             />
           </div>
           <figcaption className="mt-2">
-            <AssetMeta caption={primaryImage.caption} credit={primaryImage.credit} url={primaryImage.file_url} />
+            <AssetMeta caption={primaryImage.caption} credit={primaryImage.credit} url={primaryImage.displayUrl} />
           </figcaption>
         </figure>
       )}
@@ -180,7 +196,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
               <figure key={img.id}>
                 <div className="relative h-32 rounded overflow-hidden bg-gray-100">
                   <Image
-                    src={img.file_url}
+                    src={img.displayUrl}
                     alt={img.caption ?? ''}
                     fill
                     className="object-cover"
@@ -188,7 +204,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
                   />
                 </div>
                 <figcaption className="mt-1">
-                  <AssetMeta caption={img.caption} credit={img.credit} url={img.file_url} />
+                  <AssetMeta caption={img.caption} credit={img.credit} url={img.displayUrl} />
                 </figcaption>
               </figure>
             ))}
@@ -202,10 +218,10 @@ export default async function StoryDetailPage({ params }: PageProps) {
           <h3 className="text-sm font-semibold text-wire-navy uppercase tracking-wide mb-3">
             Video
           </h3>
-          <video controls className="w-full rounded" src={video.file_url}>
+          <video controls className="w-full rounded" src={video.displayUrl}>
             Your browser does not support video.
           </video>
-          <AssetMeta caption={video.caption} credit={video.credit} url={video.file_url} />
+          <AssetMeta caption={video.caption} credit={video.credit} url={video.displayUrl} />
         </div>
       )}
 
