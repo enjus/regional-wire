@@ -1,17 +1,15 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 function RegisterForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const initialError = searchParams.get('error')
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState(
     initialError === 'no-org'
       ? 'Your email domain is not associated with a member organization. Register your newsroom first.'
@@ -28,7 +26,7 @@ function RegisterForm() {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email }),
     })
 
     const data = await res.json()
@@ -51,7 +49,7 @@ function RegisterForm() {
           Check your email
         </h1>
         <p className="text-wire-slate text-sm leading-relaxed">
-          We've sent a confirmation link to <strong>{email}</strong>. Click it
+          We've sent a sign-in link to <strong>{email}</strong>. Click it
           to complete your registration and access your dashboard.
         </p>
       </div>
@@ -104,22 +102,6 @@ function RegisterForm() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-wire-navy mb-1">
-            Password
-          </label>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-            placeholder="8+ characters"
-            autoComplete="new-password"
-          />
-        </div>
-
         {error && (
           <div className="text-sm bg-amber-50 border border-amber-200 rounded px-3 py-2">
             <p className="text-amber-800">{error}</p>
@@ -139,7 +121,7 @@ function RegisterForm() {
           disabled={loading}
           className="w-full bg-wire-navy text-white py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors disabled:opacity-50"
         >
-          {loading ? 'Creating account…' : 'Create account'}
+          {loading ? 'Sending link…' : 'Continue with email'}
         </button>
       </form>
 
