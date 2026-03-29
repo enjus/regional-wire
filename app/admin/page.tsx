@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { formatDate } from '@/lib/utils'
-import AdminOrgActions from './admin-org-actions'
+import AdminOrgActions, { AdminRemoveAction } from './admin-org-actions'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Admin — Regional Wire' }
@@ -21,7 +21,7 @@ async function getAdminData() {
         .order('created_at', { ascending: false }),
       supabase
         .from('organizations')
-        .select('id, name, email_domain, website_url, created_at')
+        .select('id, name, email_domain, website_url, contact_emails, created_at')
         .eq('status', 'approved')
         .order('name'),
       supabase
@@ -128,14 +128,17 @@ export default async function AdminPage() {
                   {org.email_domain} · Approved {formatDate(org.created_at)}
                 </p>
               </div>
-              <a
-                href={org.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-wire-red hover:underline"
-              >
-                Website ↗
-              </a>
+              <div className="flex items-center gap-3">
+                <a
+                  href={org.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-wire-red hover:underline"
+                >
+                  Website ↗
+                </a>
+                <AdminRemoveAction orgId={org.id} orgName={org.name} />
+              </div>
             </div>
           ))}
         </div>

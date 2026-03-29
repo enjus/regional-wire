@@ -290,7 +290,31 @@ Manage your alerts: ${APP_URL}/dashboard/settings/alerts
 }
 
 // ----------------------------------------------------------------
-// 10. Media asset request — to originating org
+// 10. Org removed — notify org contacts
+// ----------------------------------------------------------------
+export async function sendOrgRemovalEmail(org: Organization, reason: string) {
+  const text = `
+${org.name} — Regional Wire Membership Removed
+
+Your newsroom's membership in Regional Wire has been removed by a platform administrator.
+
+${reason ? `Reason: ${reason}\n` : ''}All previously shared stories have been withdrawn from the library. Existing republications by other members are not affected.
+
+If you believe this is an error, please contact us by replying to this email.
+
+— Regional Wire
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: org.contact_emails,
+    subject: `Regional Wire — membership removed for ${org.name}`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 11. Media asset request — to originating org
 // ----------------------------------------------------------------
 export async function sendAssetRequestEmail(
   targetOrgContacts: string[],

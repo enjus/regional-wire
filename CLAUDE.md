@@ -24,9 +24,9 @@ Regional Wire is a Next.js 15 App Router application. Member newsrooms share sto
 
 ### Auth & Access Control
 
-- **Supabase Auth** handles signup/login. Email confirmation is required.
-- **`middleware.ts`** enforces auth on all routes: refreshes the Supabase session, redirects unauthenticated users, and checks that authenticated users have a `users` record (org association). Admin routes (`/admin`, `/api/admin/*`) use HTTP Basic Auth instead.
-- **`/auth/callback`** exchanges the Supabase code for a session, looks up the user's org by email domain, creates the `users` record, and assigns `admin` (first user from that domain) or `editor` role.
+- **Supabase Auth** handles signup/login via **magic link (OTP) only** — no passwords. Users enter their email and receive a sign-in link.
+- **`middleware.ts`** enforces auth on all routes: refreshes the Supabase session, redirects unauthenticated users, and checks that authenticated users have a `users` record (org association). Admin routes (`/admin`, `/api/admin/*`) use HTTP Basic Auth instead. Approve/reject email links bypass Basic Auth via HMAC-signed tokens (`verifyAdminToken`).
+- **`/auth/callback`** exchanges the Supabase code for a session, looks up the user's org by email domain, creates the `users` record, and assigns `admin` (first user from that domain) or `editor` role. Uses `NEXT_PUBLIC_APP_URL` for all redirects (not `request.nextUrl.origin`) to work correctly behind a reverse proxy.
 - **`/register`** requires the email domain to match an approved org. The domain check uses the service role client to bypass RLS.
 - All Supabase tables have RLS. Three `SECURITY DEFINER` helper functions (`get_user_org_id()`, `is_approved_member()`, `is_org_admin()`) are used in policies to avoid recursive lookups.
 
@@ -50,7 +50,7 @@ Stories enter the library two ways:
 - **Manual upload**: editors use the Tiptap rich-text editor. Body stored as `body_html` + `body_plain`.
 - **Feed ingestion** (`/api/cron/poll-feeds`): RSS parser runs every 15 minutes. Full-text feeds create `stories` records; headline feeds create `feed_headlines` records.
 
-`sanitizeStoryHtml()` in `lib/utils.ts` strips scripts, iframes, embeds, forms, figures, and images before rendering or copying. This must be applied to feed-ingested HTML before display.
+`sanitizeStoryHtml()` in `lib/utils.ts` strips scripts, iframes, embeds, forms, figures, images, SVGs, event handler attributes, and `javascript:`/`data:` URIs. This must be applied to feed-ingested HTML before display.
 
 ### Republication Package (Clipboard)
 
@@ -60,9 +60,13 @@ Stories enter the library two ways:
 
 `lib/email.ts` uses Resend. The client is lazy-initialized via `getResend()` to avoid build-time errors when `RESEND_API_KEY` is absent. All email functions are fire-and-forget at call sites (`.catch()` to log, never throw).
 
+### Story Assets
+
+Assets are stored in the `story-assets` Supabase Storage bucket as **private** (not public). The upload form stores the relative path (`data.path`), not the public URL. The story detail page generates signed URLs at render time via the service role client (`createSignedUrls`, 1-hour expiry). `next.config.mjs` allows the signed URL hostname pattern (`*.supabase.co/storage/v1/object/sign/**`) for `next/image`.
+
 ### Cron Jobs
 
-Defined in `vercel.json`. Both routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
+Defined in `vercel.json` (for Vercel) and via `crontab` on the DigitalOcean droplet. Both routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
 
 - `/api/cron/poll-feeds` (every 15 min): ingests RSS feeds, deduplicates by `feed_guid`, lifts expired embargoes, triggers story alerts.
 - `/api/cron/alert-digest` (hourly): sends digest emails only at the hour configured by `ALERT_DIGEST_HOUR`.
@@ -71,6 +75,8 @@ Defined in `vercel.json`. Both routes check `Authorization: Bearer {CRON_SECRET}
 
 The migration is in `supabase/migrations/001_schema.sql`. Post-migration additions made directly in Supabase SQL Editor (not yet in the migration file):
 - `feed_headlines.author TEXT` — added to capture `dc:creator` from RSS items
+- `users.is_platform_admin BOOLEAN NOT NULL DEFAULT false` — platform admin flag
+- `organizations.republication_guidance TEXT` — optional guidance for republishers
 
 When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
 

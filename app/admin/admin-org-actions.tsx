@@ -81,3 +81,63 @@ export default function AdminOrgActions({ orgId, orgName }: Props) {
     </div>
   )
 }
+
+export function AdminRemoveAction({ orgId, orgName }: Props) {
+  const router = useRouter()
+  const [removing, setRemoving] = useState(false)
+  const [reason, setReason] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleRemove() {
+    setLoading(true)
+    await fetch(`/api/admin/orgs/${orgId}/remove`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason }),
+    })
+    setLoading(false)
+    setRemoving(false)
+    router.refresh()
+  }
+
+  if (removing) {
+    return (
+      <div className="space-y-2 w-64">
+        <p className="text-xs text-red-600 font-medium">
+          Remove {orgName}? This withdraws all stories, deactivates feeds, and revokes access.
+        </p>
+        <textarea
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Reason for removal (sent to org)…"
+          rows={2}
+          className="w-full border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={handleRemove}
+            disabled={loading}
+            className="text-xs bg-red-600 text-white rounded px-3 py-1.5 hover:bg-red-700 disabled:opacity-50"
+          >
+            {loading ? 'Removing…' : 'Confirm removal'}
+          </button>
+          <button
+            onClick={() => { setRemoving(false); setReason('') }}
+            className="text-xs text-wire-slate hover:text-wire-navy"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={() => setRemoving(true)}
+      className="text-xs border border-red-200 text-red-600 rounded px-3 py-1.5 hover:bg-red-50 transition-colors"
+    >
+      Remove
+    </button>
+  )
+}
