@@ -15,8 +15,8 @@ export default function HomePage() {
           </div>
 
           <h1 className="font-serif text-[clamp(2.75rem,6vw,5rem)] font-bold text-wire-navy leading-[1.06] mb-8">
-            Where regional journalism<br className="hidden sm:block" />
-            {' '}finds a wider audience.
+            Regional journalism is<br className="hidden sm:block" />
+            {' '}stronger together.
           </h1>
 
           <p className="text-lg text-wire-slate max-w-xl mb-10 leading-relaxed">
@@ -27,19 +27,19 @@ export default function HomePage() {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/register/organization"
+              href="/how-it-works"
               className="inline-flex items-center gap-2 bg-wire-red text-white px-6 py-3.5 rounded text-sm font-medium hover:bg-wire-red-dark transition-colors"
             >
-              Join the network
+              How it works
               <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden>
                 <path d="M3.75 8a.75.75 0 01.75-.75h6.19L8.22 4.78a.75.75 0 011.06-1.06l3.5 3.5a.75.75 0 010 1.06l-3.5 3.5a.75.75 0 11-1.06-1.06L11.25 9.5H4.5A.75.75 0 013.75 8z" />
               </svg>
             </Link>
             <Link
-              href="/how-it-works"
+              href="/login"
               className="inline-flex items-center gap-2 border border-wire-border bg-white text-wire-navy px-6 py-3.5 rounded text-sm font-medium hover:border-wire-navy/25 transition-colors"
             >
-              How it works
+              Member sign in
             </Link>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function HomePage() {
             </span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-wire-navy mb-10">
-            A growing network of<br />regional journalism.
+            Our member newsrooms.
           </h2>
 
           <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 mb-8">
@@ -144,7 +144,6 @@ export default function HomePage() {
           </div>
 
           <p className="text-sm text-wire-slate">
-            Regional Wire is actively growing its member network.{' '}
             <Link href="/members" className="text-wire-red hover:underline">
               See all member newsrooms →
             </Link>
@@ -169,11 +168,11 @@ export default function HomePage() {
             {[
               {
                 title: 'Regional newspapers',
-                desc: 'Daily and weekly papers with local coverage areas looking to expand story reach without additional reporting.',
+                desc: 'Daily and weekly papers sharing local coverage to reach audiences beyond their immediate market.',
               },
               {
                 title: 'Nonprofit newsrooms',
-                desc: 'Mission-driven organizations covering underrepresented communities whose work deserves broader distribution.',
+                desc: 'Mission-driven organizations covering underrepresented communities and distributing their work more broadly.',
               },
               {
                 title: 'University news organizations',
@@ -181,7 +180,7 @@ export default function HomePage() {
               },
               {
                 title: 'Broadcast with digital',
-                desc: 'Local TV and radio stations with online news operations that want to contribute to and draw from the wire.',
+                desc: 'Local TV and radio stations with online news operations contributing to and drawing from the wire.',
               },
             ].map((item) => (
               <div
@@ -219,11 +218,11 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <h2 className="font-serif text-2xl font-bold mb-2">
-              Read the documentation first.
+              Read the documentation.
             </h2>
             <p className="text-white/50 text-sm max-w-sm leading-relaxed">
-              Before applying, review the docs. They cover the approval process, how story
-              sharing works, and what to expect as a member.
+              Learn how story sharing works, what to expect as a member, and how the
+              platform handles attribution and republication.
             </p>
           </div>
           <Link

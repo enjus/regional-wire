@@ -37,13 +37,13 @@ export default function HowItWorksPage() {
             <div>
               <h2 className="font-serif text-2xl font-bold text-wire-navy mb-4">Organization approval</h2>
               <p className="text-wire-slate leading-relaxed mb-5">
-                Regional Wire is a closed network. Your newsroom must apply and be approved
-                by the platform administrator before anyone from your organization can sign
+                Regional Wire is an invite-only network. Newsrooms are approved by the
+                platform administrator before anyone from the organization can sign
                 in. Once approved, any staff member with a matching email domain can create
                 an account.
               </p>
               <ul className="space-y-2 text-sm text-wire-slate">
-                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Apply at <Link href="/register/organization" className="text-wire-red hover:underline">/register/organization</Link> with your newsroom&apos;s details and primary contact</span></li>
+                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Invited newsrooms register at <Link href="/register/organization" className="text-wire-red hover:underline">/register/organization</Link> with their details and primary contact</span></li>
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Approval typically takes 1–2 business days; you&apos;ll receive an email when your org is approved</span></li>
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Once approved, staff sign up at <Link href="/register" className="text-wire-red hover:underline">/register</Link> using their work email address</span></li>
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>The first user from your organization is automatically designated admin and can manage feeds, alerts, and settings</span></li>
@@ -119,12 +119,12 @@ export default function HowItWorksPage() {
       <div className="border-t border-wire-border bg-wire-bg">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h3 className="font-serif text-xl font-bold text-wire-navy mb-1">Ready to join?</h3>
-            <p className="text-sm text-wire-slate">Apply to bring your newsroom into the network.</p>
+            <h3 className="font-serif text-xl font-bold text-wire-navy mb-1">Already a member?</h3>
+            <p className="text-sm text-wire-slate">Sign in to access the story library and your dashboard.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/register/organization" className="bg-wire-red text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-red-dark transition-colors">
-              Apply now →
+            <Link href="/login" className="bg-wire-red text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-red-dark transition-colors">
+              Sign in →
             </Link>
             <Link href="/docs" className="border border-wire-border bg-white text-wire-navy px-5 py-2.5 rounded text-sm font-medium hover:border-wire-navy/20 transition-colors">
               Read the docs

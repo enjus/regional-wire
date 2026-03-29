@@ -22,8 +22,7 @@ export default function MembersPage() {
           </h1>
           <p className="text-lg text-wire-slate leading-relaxed max-w-2xl">
             Regional Wire members are approved regional newsrooms that share and republish
-            stories across the network. Membership is by application and subject to
-            editorial review.
+            stories across the network.
           </p>
         </div>
       </div>
@@ -58,18 +57,18 @@ export default function MembersPage() {
             </svg>
           </div>
           <h3 className="font-serif text-xl font-bold text-wire-navy mb-2">
-            Is your newsroom a good fit?
+            Already a member?
           </h3>
           <p className="text-sm text-wire-slate mb-6 max-w-sm mx-auto leading-relaxed">
-            Regional Wire welcomes applications from regional newspapers, nonprofit newsrooms,
+            Our network includes regional newspapers, nonprofit newsrooms,
             university news organizations, and local broadcast outlets with digital operations.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link
-              href="/register/organization"
+              href="/login"
               className="inline-flex items-center gap-2 bg-wire-red text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-red-dark transition-colors"
             >
-              Apply to join the network →
+              Sign in →
             </Link>
             <Link
               href="/how-it-works"

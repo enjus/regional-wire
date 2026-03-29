@@ -102,9 +102,9 @@ export default function DocsIndexPage() {
 
       <div className="mt-12 pt-8 border-t border-wire-border">
         <p className="text-sm text-wire-slate">
-          Ready to apply?{' '}
-          <Link href="/register/organization" className="text-wire-red hover:underline font-medium">
-            Register your newsroom →
+          Already a member?{' '}
+          <Link href="/login" className="text-wire-red hover:underline font-medium">
+            Sign in →
           </Link>
         </p>
       </div>
