@@ -40,6 +40,12 @@ export default async function StoryManagePage({ params }: PageProps) {
     .eq('story_id', id)
     .order('downloaded_at', { ascending: false })
 
+  const { data: storyChanges } = await supabase
+    .from('story_changes')
+    .select('*, users(display_name)')
+    .eq('story_id', id)
+    .order('created_at', { ascending: false })
+
   const embargoed = story.status === 'embargoed' && isEmbargoActive(story.embargo_lifts_at)
 
   return (
@@ -156,6 +162,56 @@ export default async function StoryManagePage({ params }: PageProps) {
           </div>
         )}
       </div>
+
+      {/* Change history */}
+      {storyChanges && storyChanges.length > 0 && (
+        <div className="mt-8">
+          <h3 className="font-serif text-lg font-bold text-wire-navy mb-4">
+            Change History
+          </h3>
+          <div className="space-y-3">
+            {storyChanges.map((change) => (
+              <div
+                key={change.id}
+                className="bg-white border border-wire-border rounded p-4"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`text-xs font-medium rounded px-2 py-0.5 ${
+                      change.change_type === 'correction'
+                        ? 'bg-amber-100 text-amber-800'
+                        : change.change_type === 'withdrawal'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {change.change_type === 'correction'
+                      ? 'Correction'
+                      : change.change_type === 'withdrawal'
+                      ? 'Withdrawn'
+                      : 'Update'}
+                  </span>
+                  <span className="text-xs text-wire-slate">
+                    {formatDateTime(change.created_at)}
+                  </span>
+                  <span className="text-xs text-wire-slate">
+                    by {(change.users as unknown as { display_name: string } | null)?.display_name ?? 'Unknown'}
+                  </span>
+                </div>
+                {change.change_note && (
+                  <p className="text-sm text-wire-slate mt-1">{change.change_note}</p>
+                )}
+                {change.correction_text && (
+                  <p className="text-sm text-amber-900 mt-1 italic">{change.correction_text}</p>
+                )}
+                {change.withdrawal_reason && (
+                  <p className="text-sm text-red-800 mt-1">{change.withdrawal_reason}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

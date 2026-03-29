@@ -1,6 +1,7 @@
 export type OrgStatus = 'pending' | 'approved' | 'suspended'
 export type UserRole = 'admin' | 'editor'
 export type StoryStatus = 'available' | 'embargoed' | 'withdrawn'
+export type ChangeType = 'update' | 'correction' | 'withdrawal'
 export type StorySource = 'manual' | 'feed'
 export type FeedType = 'full_text' | 'headline'
 export type RequestStatus = 'pending' | 'fulfilled' | 'declined'
@@ -43,12 +44,14 @@ export interface Story {
   source: StorySource
   feed_guid: string | null
   embargo_lifts_at: string | null
+  has_correction: boolean
   created_at: string
   published_at: string
   // Joined
   organizations?: Organization
   story_assets?: StoryAsset[]
   republication_log?: RepublicationLogEntry[]
+  story_changes?: StoryChange[]
 }
 
 export interface StoryAsset {
@@ -111,6 +114,19 @@ export interface RepublicationLogEntry {
   downloaded_at: string
   // Joined
   organizations?: Organization
+}
+
+export interface StoryChange {
+  id: string
+  story_id: string
+  user_id: string
+  change_type: ChangeType
+  change_note: string | null
+  correction_text: string | null
+  withdrawal_reason: string | null
+  created_at: string
+  // Joined
+  users?: User
 }
 
 export interface StoryAlert {

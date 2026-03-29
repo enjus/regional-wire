@@ -3,7 +3,7 @@ import { createAdminSupabase } from '@/lib/platform-admin'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { formatDate, isEmbargoActive, sanitizeStoryHtml } from '@/lib/utils'
+import { formatDate, formatDateTime, isEmbargoActive, sanitizeStoryHtml } from '@/lib/utils'
 import RepublicationPackage from '@/components/stories/republication-package'
 import AssetRequestButton from '@/components/stories/asset-request-button'
 
@@ -44,6 +44,16 @@ export default async function StoryDetailPage({ params }: PageProps) {
     .single()
 
   if (!story) notFound()
+
+  // Fetch change history for this story
+  const { data: storyChanges } = await queryClient
+    .from('story_changes')
+    .select('*, users(display_name)')
+    .eq('story_id', id)
+    .order('created_at', { ascending: false })
+
+  const corrections = (storyChanges ?? []).filter((c) => c.change_type === 'correction')
+  const allChanges = storyChanges ?? []
 
   // Can't access own org's story for republication package (but can still view via dashboard)
   const isOwnOrg = !isPlatformAdmin && story.organization_id === currentUser.organization_id
@@ -125,6 +135,25 @@ export default async function StoryDetailPage({ params }: PageProps) {
           </a>
         )}
       </div>
+
+      {/* Correction notices */}
+      {corrections.length > 0 && (
+        <div className="mb-8 space-y-3">
+          {corrections.map((c) => (
+            <div key={c.id} className="bg-amber-50 border border-amber-300 rounded-lg p-4">
+              <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-1">
+                Correction
+              </p>
+              <p className="text-sm text-amber-900 leading-relaxed">
+                {c.correction_text}
+              </p>
+              <p className="text-xs text-amber-700 mt-2">
+                &mdash; {org?.name}, {formatDateTime(c.created_at)}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Primary image */}
       {primaryImage && (
@@ -305,14 +334,13 @@ export default async function StoryDetailPage({ params }: PageProps) {
       <div className="border-t border-wire-border pt-8">
         {isOwnOrg ? (
           <div className="bg-wire-bg border border-wire-border rounded p-4 text-sm text-wire-slate text-center">
-            This is your organization's story. View it in your{' '}
+            This is your organization&apos;s story. View it in your{' '}
             <Link href="/wire/dashboard" className="text-wire-red hover:underline">
               dashboard
             </Link>
             .
           </div>
         ) : (
-          <>
           <RepublicationPackage
             story={{
               id: story.id,
@@ -328,10 +356,55 @@ export default async function StoryDetailPage({ params }: PageProps) {
             embargoed={embargoed}
             embargoLiftsAt={story.embargo_lifts_at}
           />
-
-          </>
         )}
       </div>
+
+      {/* Change history */}
+      {allChanges.length > 0 && (
+        <div className="border-t border-wire-border pt-8 mt-8">
+          <h3 className="text-sm font-semibold text-wire-navy uppercase tracking-wide mb-4">
+            Change History
+          </h3>
+          <div className="space-y-3">
+            {allChanges.map((change) => (
+              <div key={change.id} className="border border-wire-border rounded p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`text-xs font-medium rounded px-2 py-0.5 ${
+                      change.change_type === 'correction'
+                        ? 'bg-amber-100 text-amber-800'
+                        : change.change_type === 'withdrawal'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {change.change_type === 'correction'
+                      ? 'Correction'
+                      : change.change_type === 'withdrawal'
+                      ? 'Withdrawn'
+                      : 'Update'}
+                  </span>
+                  <span className="text-xs text-wire-slate">
+                    {formatDateTime(change.created_at)}
+                  </span>
+                  <span className="text-xs text-wire-slate">
+                    by {(change.users as unknown as { display_name: string } | null)?.display_name ?? 'Unknown'}
+                  </span>
+                </div>
+                {change.change_note && (
+                  <p className="text-sm text-wire-slate mt-1">{change.change_note}</p>
+                )}
+                {change.correction_text && (
+                  <p className="text-sm text-amber-900 mt-1 italic">{change.correction_text}</p>
+                )}
+                {change.withdrawal_reason && (
+                  <p className="text-sm text-red-800 mt-1">{change.withdrawal_reason}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

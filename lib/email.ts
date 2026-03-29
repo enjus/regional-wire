@@ -371,3 +371,73 @@ ${republishingOrgName} has published your story and submitted their URL:
     text,
   })
 }
+
+// ----------------------------------------------------------------
+// 12. Story correction notice — to republishing orgs
+// ----------------------------------------------------------------
+export async function sendCorrectionNotice(
+  republisherContacts: string[],
+  originOrgName: string,
+  storyTitle: string,
+  correctionText: string,
+  storyId: string
+) {
+  const text = `
+STORY CORRECTION — Regional Wire
+
+${originOrgName} has issued a correction for a story your newsroom republished:
+
+  "${storyTitle}"
+
+Correction notice:
+  ${correctionText}
+
+Updated story: ${APP_URL}/library/${storyId}
+
+If you have published this story, please update your version with the corrected information above.
+
+— Regional Wire
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: republisherContacts,
+    subject: `Correction: "${storyTitle}"`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 13. Story withdrawal notice — to republishing orgs
+// ----------------------------------------------------------------
+export async function sendWithdrawalNotice(
+  republisherContacts: string[],
+  originOrgName: string,
+  storyTitle: string,
+  withdrawalReason: string,
+  storyId: string
+) {
+  const text = `
+STORY WITHDRAWN — Regional Wire
+
+${originOrgName} has withdrawn a story your newsroom downloaded:
+
+  "${storyTitle}"
+
+Reason:
+  ${withdrawalReason}
+
+Story page: ${APP_URL}/library/${storyId}
+
+If you have published this story, we strongly recommend removing it or appending an editor's note.
+
+— Regional Wire
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: republisherContacts,
+    subject: `Withdrawn: "${storyTitle}"`,
+    text,
+  })
+}

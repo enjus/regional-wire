@@ -63,6 +63,11 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
   const [additionalImages, setAdditionalImages] = useState<AssetField[]>([])
   const [video, setVideo] = useState<AssetField>(emptyAsset())
 
+  // Change tracking (edit mode only)
+  const [changeType, setChangeType] = useState<'update' | 'correction'>('update')
+  const [changeNote, setChangeNote] = useState('')
+  const [correctionText, setCorrectionText] = useState('')
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -117,6 +122,12 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
 
     if (!bodyHtml.trim() || bodyHtml === '<p></p>') {
       setError('Story body is required.')
+      setLoading(false)
+      return
+    }
+
+    if (isEdit && changeType === 'correction' && !correctionText.trim()) {
+      setError('Publication-ready correction text is required for corrections.')
       setLoading(false)
       return
     }
@@ -197,6 +208,11 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
             ? new Date(embargoLiftsAt).toISOString()
             : null,
           assets: uploadedAssets,
+          ...(isEdit && {
+            change_type: changeType,
+            change_note: changeNote.trim() || null,
+            correction_text: changeType === 'correction' ? correctionText.trim() : null,
+          }),
         }),
       })
 
@@ -531,6 +547,85 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
           )}
         </div>
       </div>
+
+      {/* Change classification (edit mode only) */}
+      {isEdit && (
+        <div className="border-t border-wire-border pt-6">
+          <h3 className="text-sm font-semibold text-wire-navy mb-3">What kind of change is this?</h3>
+
+          <div className="space-y-2 mb-4">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="changeType"
+                value="update"
+                checked={changeType === 'update'}
+                onChange={() => setChangeType('update')}
+                className="mt-0.5 accent-wire-navy"
+              />
+              <span className="text-sm">
+                <strong className="text-wire-navy">Update</strong>
+                <span className="text-wire-slate"> — minor fix, added detail, formatting, or clarification</span>
+              </span>
+            </label>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="changeType"
+                value="correction"
+                checked={changeType === 'correction'}
+                onChange={() => setChangeType('correction')}
+                className="mt-0.5 accent-wire-navy"
+              />
+              <span className="text-sm">
+                <strong className="text-wire-navy">Correction</strong>
+                <span className="text-wire-slate"> — error of fact (wrong name, wrong number, misattribution, etc.)</span>
+              </span>
+            </label>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-wire-navy mb-1">
+              Change note{' '}
+              <span className="text-wire-slate font-normal">(optional)</span>
+            </label>
+            <p className="text-xs text-wire-slate mb-1">
+              Brief description of what you changed. Visible to other members on the story page.
+            </p>
+            <input
+              type="text"
+              value={changeNote}
+              onChange={(e) => setChangeNote(e.target.value)}
+              className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+              placeholder="e.g., Added missing source name in paragraph 3"
+            />
+          </div>
+
+          {changeType === 'correction' && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-wire-navy mb-1">
+                Correction notice <span className="text-wire-red">*</span>
+              </label>
+              <p className="text-xs text-wire-slate mb-1">
+                Publication-ready text describing the error and what was corrected. This will be displayed on the story page and emailed to all newsrooms that have republished this story.
+              </p>
+              <textarea
+                required
+                value={correctionText}
+                onChange={(e) => setCorrectionText(e.target.value)}
+                rows={3}
+                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+                placeholder="An earlier version of this story incorrectly stated…"
+              />
+              <div className="mt-2 bg-amber-50 border border-amber-200 rounded p-3">
+                <p className="text-xs text-amber-800">
+                  All newsrooms that downloaded this story will be notified of this correction by email.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded px-4 py-3 text-sm text-red-700">

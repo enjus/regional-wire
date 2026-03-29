@@ -80,6 +80,18 @@ The migration is in `supabase/migrations/001_schema.sql`. Post-migration additio
 
 When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
 
+### Story Corrections & Withdrawals
+
+Stories support two tiers of post-publication changes tracked in the `story_changes` table:
+
+- **Update**: minor fixes — added detail, formatting, rewording. Optional change note (visible to members, not emailed). No notification sent.
+- **Correction**: error of fact — wrong name, wrong number, misattribution. Requires publication-ready correction text. Emailed to all orgs in `republication_log`. Correction notices displayed prominently on the library detail page (stacked, newest first). Sets `stories.has_correction = true`.
+- **Withdrawal**: story pulled from library. Requires a reason. All republishing orgs notified by email.
+
+The edit form (`story-upload-form.tsx`) shows a change classification section in edit mode (radio: update/correction, change note field, correction text field). The withdraw button (`story-withdraw-button.tsx`) shows an inline form requiring a reason.
+
+The PATCH endpoint (`/api/stories/[id]`) validates change metadata, inserts `story_changes` rows via service role, and fires off notification emails (fire-and-forget). The migration is in `supabase/migrations/002_story_changes.sql`.
+
 ### Admin Dashboard
 
 `/admin` is a server component protected by HTTP Basic Auth (credentials in `.env.local`). It uses a service role Supabase client with no-op cookies. Approve/reject actions are in `/app/admin/admin-org-actions.tsx` (client component) and hit `/api/admin/orgs/[id]/approve` and `/api/admin/orgs/[id]/reject`.
