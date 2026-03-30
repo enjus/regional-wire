@@ -106,10 +106,17 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
     setAdditionalImages(updated)
   }
 
-  async function uploadFile(file: File, path: string): Promise<string> {
-    const res = await fetch(`/api/stories/upload-url?path=${encodeURIComponent(path)}`)
-    if (!res.ok) throw new Error('Upload failed: could not get upload URL')
-    const { token } = await res.json()
+  async function uploadFile(file: File): Promise<string> {
+    const type = file.type.startsWith('video/') ? 'video' : 'image'
+    const ext = file.name.split('.').pop() ?? ''
+    const res = await fetch(
+      `/api/stories/upload-url?type=${type}&ext=${encodeURIComponent(ext)}`
+    )
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(`Upload failed: ${body.error ?? res.statusText}`)
+    }
+    const { token, path } = await res.json()
 
     const supabase = createClient()
     const { data, error } = await supabase.storage
@@ -138,7 +145,6 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
 
     try {
       // Upload files to Supabase Storage
-      const storySlug = `${Date.now()}`
       const uploadedAssets: {
         asset_type: string
         file_url: string
@@ -148,10 +154,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
       }[] = []
 
       if (primaryImage.file) {
-        const url = await uploadFile(
-          primaryImage.file,
-          `images/${storySlug}/primary.${primaryImage.file.name.split('.').pop()}`
-        )
+        const url = await uploadFile(primaryImage.file)
         uploadedAssets.push({
           asset_type: 'image',
           file_url: url,
@@ -164,10 +167,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
       for (let i = 0; i < additionalImages.length; i++) {
         const img = additionalImages[i]
         if (!img.file) continue
-        const url = await uploadFile(
-          img.file,
-          `images/${storySlug}/additional-${i}.${img.file.name.split('.').pop()}`
-        )
+        const url = await uploadFile(img.file)
         uploadedAssets.push({
           asset_type: 'image',
           file_url: url,
@@ -178,10 +178,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
       }
 
       if (video.file) {
-        const url = await uploadFile(
-          video.file,
-          `videos/${storySlug}/video.${video.file.name.split('.').pop()}`
-        )
+        const url = await uploadFile(video.file)
         uploadedAssets.push({
           asset_type: 'video',
           file_url: url,
