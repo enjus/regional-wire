@@ -107,10 +107,14 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
   }
 
   async function uploadFile(file: File, path: string): Promise<string> {
+    const res = await fetch(`/api/stories/upload-url?path=${encodeURIComponent(path)}`)
+    if (!res.ok) throw new Error('Upload failed: could not get upload URL')
+    const { token } = await res.json()
+
     const supabase = createClient()
     const { data, error } = await supabase.storage
       .from('story-assets')
-      .upload(path, file, { upsert: true })
+      .uploadToSignedUrl(path, token, file)
     if (error) throw new Error(`Upload failed: ${error.message}`)
     return data.path
   }
