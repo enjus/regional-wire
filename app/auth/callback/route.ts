@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   } else if (tokenHash && type) {
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
-      type: type as 'email' | 'magiclink',
+      type: type as 'email' | 'sms' | 'phone_change' | 'recovery' | 'invite' | 'email_change',
     })
     if (error || !data.user) {
       return NextResponse.redirect(`${origin}/login?error=auth-failed`)
