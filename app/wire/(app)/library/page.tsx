@@ -50,7 +50,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     .select('id, name')
     .eq('status', 'approved')
     .order('name')
-  const { data: orgs } = currentOrgId
+  const { data: orgs } = (currentOrgId && !isPlatformAdmin)
     ? await orgsQuery.neq('id', currentOrgId)
     : await orgsQuery
 
@@ -78,7 +78,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         .select('id, canonical_url, published_at')
         .in('canonical_url', headlineUrls)
         .in('status', ['available', 'embargoed'])
-      if (currentOrgId) matchedQuery = matchedQuery.neq('organization_id', currentOrgId)
+      if (currentOrgId && !isPlatformAdmin) matchedQuery = matchedQuery.neq('organization_id', currentOrgId)
       const { data: matchedStories } = await matchedQuery
       for (const s of (matchedStories ?? []) as { id: string; canonical_url: string | null; published_at: string }[]) {
         if (s.canonical_url) libraryByUrl[s.canonical_url] = { id: s.id, published_at: s.published_at }
@@ -88,6 +88,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <LibraryHeader />
+        {isPlatformAdmin && <AdminBanner />}
         <LibraryFilters orgs={orgs ?? []} currentOrgId={currentOrgId} />
         <TabNav active="headlines" />
 
@@ -185,8 +186,9 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     `,
       { count: 'exact' }
     )
-  if (currentOrgId) query = query.neq('organization_id', currentOrgId)
-    .in('status', ['available', 'embargoed'])
+  if (currentOrgId && !isPlatformAdmin) query = query.neq('organization_id', currentOrgId)
+  query = query
+    .in('status', isPlatformAdmin ? ['available', 'embargoed', 'withdrawn'] : ['available', 'embargoed'])
     .order('published_at', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1)
 
@@ -201,6 +203,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <LibraryHeader />
+      {isPlatformAdmin && <AdminBanner />}
       <LibraryFilters orgs={orgs ?? []} currentOrgId={currentOrgId} />
       <TabNav active="library" />
 
@@ -215,6 +218,16 @@ export default async function LibraryPage({ searchParams }: PageProps) {
       )}
 
       <Pagination page={page} totalPages={totalPages} params={params} />
+    </div>
+  )
+}
+
+function AdminBanner() {
+  return (
+    <div className="mb-4 flex items-center gap-2 bg-slate-100 border border-slate-200 rounded px-3 py-2 text-xs text-slate-600">
+      <span className="font-semibold text-slate-800">Platform admin view</span>
+      <span className="text-slate-400">·</span>
+      <span>All orgs visible including your own · Withdrawn stories shown</span>
     </div>
   )
 }

@@ -82,7 +82,12 @@ export default function StoryCard({ story }: Props) {
           </div>
         )}
 
-        {!embargoed && (
+        {story.status === 'withdrawn' ? (
+          <div className="mt-3 flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+            <span className="text-xs text-red-600 font-medium">Withdrawn</span>
+          </div>
+        ) : !embargoed && (
           <div className="mt-3 flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
             <span className="text-xs text-wire-slate">Available for republication</span>
