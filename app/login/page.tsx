@@ -16,6 +16,8 @@ function LoginForm() {
   )
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [verifying, setVerifying] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -26,6 +28,8 @@ function LoginForm() {
     const { error: authError } = await supabase.auth.signInWithOtp({
       email,
       options: {
+        // emailRedirectTo is used as the post-verification destination when
+        // the user clicks the magic link (after the /auth/confirm step).
         emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirect)}`,
       },
     })
@@ -40,20 +44,79 @@ function LoginForm() {
     setLoading(false)
   }
 
+  async function handleVerifyOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setVerifying(true)
+    setError('')
+
+    const supabase = createClient()
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token: otp.trim(),
+      type: 'email',
+    })
+
+    if (verifyError) {
+      setError('Invalid or expired code. Check your email and try again.')
+      setVerifying(false)
+      return
+    }
+
+    // Session is now set client-side; hand off to callback for user setup
+    window.location.href = `/auth/callback?next=${encodeURIComponent(redirect)}`
+  }
+
   if (sent) {
     return (
-      <div className="w-full max-w-sm text-center">
-        <div className="text-4xl mb-4">✉</div>
-        <h1 className="font-serif text-2xl font-bold text-wire-navy mb-3">
-          Check your email
-        </h1>
-        <p className="text-wire-slate text-sm leading-relaxed">
-          We've sent a sign-in link to <strong>{email}</strong>.
-          Click it to access your account.
-        </p>
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="text-4xl mb-4">✉</div>
+          <h1 className="font-serif text-2xl font-bold text-wire-navy mb-2">
+            Check your email
+          </h1>
+          <p className="text-wire-slate text-sm leading-relaxed">
+            We&apos;ve sent a sign-in link to <strong>{email}</strong>.
+            Click it, or enter the code below.
+          </p>
+        </div>
+
+        <form onSubmit={handleVerifyOtp} className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-wire-navy mb-1">
+              Sign-in code
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              required
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+              className="w-full border border-wire-border rounded px-3 py-2 text-sm text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+              placeholder="000000"
+              autoComplete="one-time-code"
+            />
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={verifying || otp.length < 6}
+            className="w-full bg-wire-navy text-white py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors disabled:opacity-50"
+          >
+            {verifying ? 'Verifying…' : 'Verify code'}
+          </button>
+        </form>
+
         <button
-          onClick={() => { setSent(false); setEmail('') }}
-          className="mt-4 text-sm text-wire-slate hover:text-wire-navy"
+          onClick={() => { setSent(false); setOtp(''); setError('') }}
+          className="mt-4 w-full text-center text-sm text-wire-slate hover:text-wire-navy"
         >
           ← Use a different email
         </button>

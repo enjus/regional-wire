@@ -6,13 +6,12 @@ import Link from 'next/link'
 
 function ConfirmContent() {
   const searchParams = useSearchParams()
-  const confirmationUrl = searchParams.get('confirmation_url')
+  const tokenHash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const isValid =
-    typeof confirmationUrl === 'string' &&
-    supabaseUrl.length > 0 &&
-    confirmationUrl.startsWith(supabaseUrl + '/auth/v1/verify')
+    typeof tokenHash === 'string' && tokenHash.length > 0 &&
+    typeof type === 'string' && type.length > 0
 
   if (!isValid) {
     return (
@@ -34,6 +33,9 @@ function ConfirmContent() {
     )
   }
 
+  const callbackUrl =
+    `/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}`
+
   return (
     <div className="w-full max-w-sm text-center">
       <div className="text-4xl mb-4">✉</div>
@@ -44,7 +46,7 @@ function ConfirmContent() {
         Click the button below to complete signing in to Regional Wire.
       </p>
       <a
-        href={confirmationUrl}
+        href={callbackUrl}
         className="inline-block bg-wire-navy text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors"
       >
         Sign in to Regional Wire

@@ -8,13 +8,11 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
   const origin = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin
   const code = searchParams.get('code')
+  const tokenHash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
   const rawNext = searchParams.get('next') ?? '/wire/library'
   // Only allow relative paths to prevent open redirect attacks
   const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/wire/library'
-
-  if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=missing-code`)
-  }
 
   const cookieStore = await cookies()
 
@@ -33,17 +31,49 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+  // Three ways to arrive here:
+  // 1. code  — PKCE flow (OAuth or PKCE magic link)
+  // 2. token_hash + type — token-hash flow (confirm page click or direct OTP)
+  // 3. neither — session already set by client-side verifyOtp; just do user setup
+  let userId: string
+  let userEmail: string | undefined
+  let userMeta: Record<string, unknown> | undefined
 
-  if (error || !data.user) {
-    return NextResponse.redirect(`${origin}/login?error=auth-failed`)
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error || !data.user) {
+      return NextResponse.redirect(`${origin}/login?error=auth-failed`)
+    }
+    userId = data.user.id
+    userEmail = data.user.email
+    userMeta = data.user.user_metadata
+  } else if (tokenHash && type) {
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: type as 'email' | 'magiclink',
+    })
+    if (error || !data.user) {
+      return NextResponse.redirect(`${origin}/login?error=auth-failed`)
+    }
+    userId = data.user.id
+    userEmail = data.user.email
+    userMeta = data.user.user_metadata
+  } else {
+    // Session was established client-side (OTP code entered in browser)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.redirect(`${origin}/login?error=missing-code`)
+    }
+    userId = user.id
+    userEmail = user.email
+    userMeta = user.user_metadata
   }
 
   // Check if user already has a users record
   const { data: existingUser } = await supabase
     .from('users')
     .select('id')
-    .eq('id', data.user.id)
+    .eq('id', userId)
     .single()
 
   if (existingUser) {
@@ -51,7 +81,7 @@ export async function GET(request: NextRequest) {
     const { data: record } = await supabase
       .from('users')
       .select('is_platform_admin')
-      .eq('id', data.user.id)
+      .eq('id', userId)
       .single()
     if (record?.is_platform_admin) {
       return NextResponse.redirect(`${origin}/platform-admin`)
@@ -67,7 +97,7 @@ export async function GET(request: NextRequest) {
   )
 
   // Look up their org by email domain
-  const domain = data.user.email?.split('@')[1]?.toLowerCase()
+  const domain = userEmail?.split('@')[1]?.toLowerCase()
 
   if (!domain) {
     await supabase.auth.signOut()
@@ -97,10 +127,10 @@ export async function GET(request: NextRequest) {
   const role = count === 0 ? 'admin' : 'editor'
 
   await serviceSupabase.from('users').insert({
-    id: data.user.id,
+    id: userId,
     organization_id: org.id,
-    display_name: data.user.user_metadata?.name ?? data.user.email ?? 'User',
-    email: data.user.email!,
+    display_name: userMeta?.name ?? userEmail ?? 'User',
+    email: userEmail!,
     role,
   })
 
@@ -108,7 +138,7 @@ export async function GET(request: NextRequest) {
   fetch(`${origin}/api/auth/welcome`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId: data.user.id }),
+    body: JSON.stringify({ userId }),
   }).catch(() => {})
 
   return NextResponse.redirect(`${origin}${next}`)
