@@ -1,6 +1,6 @@
 # AWS Migration Guide
 
-This guide covers migrating Regional Wire from Vercel to AWS, replacing Resend with AWS SES for email, and replacing Vercel Cron with EventBridge. Supabase can remain as a managed service (no changes required) or be self-hosted on AWS — see the appendix at the end of this guide.
+This guide covers migrating Regional Wire from a DigitalOcean droplet to AWS, replacing Resend with AWS SES for email, and replacing the crontab-based cron jobs with EventBridge. Supabase can remain as a managed service (no changes required) or be self-hosted on AWS — see the appendix at the end of this guide.
 
 ---
 
@@ -20,9 +20,9 @@ AWS EventBridge Scheduler
 ```
 
 **What changes:**
-- App hosting: Vercel → AWS App Runner
+- App hosting: DigitalOcean droplet → AWS App Runner
 - Email: Resend → AWS SES
-- Cron jobs: Vercel Cron → EventBridge + Lambda
+- Cron jobs: crontab → EventBridge + Lambda
 - Secrets: `.env` → AWS Systems Manager Parameter Store
 
 **What stays the same:**
@@ -185,7 +185,7 @@ In the AWS Console → **App Runner → Create service**:
 
 App Runner will detect Node.js. Set:
 
-- **Runtime:** Node.js 18 (or 20)
+- **Runtime:** Node.js 22 (or 20; Node.js 18 is deprecated)
 - **Build command:** `npm ci && npm run build`
 - **Start command:** `npm start`
 - **Port:** `3000`
@@ -332,9 +332,9 @@ In App Runner → Environment variables, instead of pasting the value directly, 
 
 ---
 
-## Step 6: Replace Vercel Cron with EventBridge + Lambda
+## Step 6: Replace crontab with EventBridge + Lambda
 
-The two cron jobs are plain HTTP GET endpoints protected by `Authorization: Bearer {CRON_SECRET}`. On AWS, EventBridge Scheduler triggers a Lambda function on a schedule, and the Lambda calls the endpoint.
+The two cron jobs are plain HTTP GET endpoints protected by `Authorization: Bearer {CRON_SECRET}`. Currently they're triggered via crontab on the DigitalOcean droplet. On AWS, EventBridge Scheduler triggers a Lambda function on a schedule, and the Lambda calls the endpoint.
 
 ### 6a. Create the Lambda function
 
@@ -652,15 +652,18 @@ Supabase Studio (the dashboard) runs on port 3000 of the EC2 instance. Access it
 
 ### G. Run the Database Migration
 
-In Supabase Studio → **SQL Editor**, run the migration:
+In Supabase Studio → **SQL Editor**, run the migrations in order:
 
 ```
 supabase/migrations/001_schema.sql
+supabase/migrations/002_story_changes.sql
 ```
 
-Then run the post-migration column addition:
+Then run the post-migration column additions:
 ```sql
-ALTER TABLE feed_headlines ADD COLUMN IF NOT EXISTS author text;
+ALTER TABLE feed_headlines ADD COLUMN IF NOT EXISTS author TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_platform_admin BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS republication_guidance TEXT;
 ```
 
 ---
@@ -740,8 +743,10 @@ Compare to managed Supabase Pro at $25/month. Self-hosting makes economic sense 
 - [ ] Lambda function deployed and environment variables set
 - [ ] Test: register a new account and confirm email arrives
 - [ ] Test: upload a story and verify it appears in the library
+- [ ] Test: edit a story with a correction and confirm republisher notification emails are sent
+- [ ] Test: withdraw a story and confirm republisher notification emails are sent
 - [ ] Test: trigger `/api/cron/poll-feeds` manually and confirm feed ingestion
-- [ ] Test: password reset flow end-to-end
+- [ ] Test: magic link sign-in flow end-to-end
 
 ---
 

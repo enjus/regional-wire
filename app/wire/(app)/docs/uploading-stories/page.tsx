@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Uploading stories — Regional Wire Docs',
+  title: 'Uploading stories — Regional Wire Help',
 }
 
 export default function UploadingStoriesPage() {
@@ -18,7 +18,7 @@ export default function UploadingStoriesPage() {
       <p>
         Stories can enter the Regional Wire library in two ways: manual upload via the
         editor, or automatic ingestion via an RSS/Atom feed. This page covers manual
-        upload. For feed ingestion, see <Link href="/docs/feeds">RSS feed ingestion</Link>.
+        upload. For feed ingestion, see <Link href="/wire/docs/feeds">RSS feed ingestion</Link>.
       </p>
 
       <h2>Creating a story</h2>
@@ -91,8 +91,8 @@ export default function UploadingStoriesPage() {
 
       <h2>See also</h2>
       <ul>
-        <li><Link href="/docs/feeds">RSS feed ingestion</Link> — Automate story uploads from your CMS</li>
-        <li><Link href="/docs/alerts">Story alerts</Link> — Let other newsrooms know when you publish</li>
+        <li><Link href="/wire/docs/feeds">RSS feed ingestion</Link> — Automate story uploads from your CMS</li>
+        <li><Link href="/wire/docs/alerts">Story alerts</Link> — Let other newsrooms know when you publish</li>
       </ul>
     </article>
   )

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'RSS feed ingestion — Regional Wire Docs',
+  title: 'RSS feed ingestion — Regional Wire Help',
 }
 
 export default function FeedsPage() {
@@ -47,7 +47,7 @@ export default function FeedsPage() {
         <li>
           <strong>Headline-only feeds</strong> — Items without body content are added to
           the <strong>Headlines</strong> tab in the library. Other member newsrooms can
-          request the full story through the <Link href="/docs/requests">requests workflow</Link>.
+          request the full story through the <Link href="/wire/docs/requests">requests workflow</Link>.
         </li>
       </ul>
 
@@ -85,8 +85,8 @@ export default function FeedsPage() {
 
       <h2>See also</h2>
       <ul>
-        <li><Link href="/docs/uploading-stories">Uploading stories</Link> — Manual upload as an alternative to feeds</li>
-        <li><Link href="/docs/requests">Story requests</Link> — How headline-only items can be fulfilled</li>
+        <li><Link href="/wire/docs/uploading-stories">Uploading stories</Link> — Manual upload as an alternative to feeds</li>
+        <li><Link href="/wire/docs/requests">Story requests</Link> — How headline-only items can be fulfilled</li>
       </ul>
     </article>
   )

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Story requests — Regional Wire Docs',
+  title: 'Story requests — Regional Wire Help',
 }
 
 export default function RequestsPage() {
@@ -70,8 +70,8 @@ export default function RequestsPage() {
 
       <h2>See also</h2>
       <ul>
-        <li><Link href="/docs/republishing">Republishing stories</Link> — Copy package and logging workflow</li>
-        <li><Link href="/docs/feeds">RSS feed ingestion</Link> — How headline-only items enter the library</li>
+        <li><Link href="/wire/docs/republishing">Republishing stories</Link> — Copy package and logging workflow</li>
+        <li><Link href="/wire/docs/feeds">RSS feed ingestion</Link> — How headline-only items enter the library</li>
       </ul>
     </article>
   )

@@ -80,10 +80,11 @@ export default function GettingStartedPage() {
       </ul>
 
       <h2>Next steps</h2>
+      <p>Once you&apos;re signed in, the full platform documentation is available under <strong>Help</strong> in the navigation.</p>
       <ul>
-        <li><Link href="/docs/uploading-stories">Uploading your first story</Link></li>
-        <li><Link href="/docs/feeds">Connecting an RSS feed</Link></li>
-        <li><Link href="/docs/republishing">Republishing stories from other members</Link></li>
+        <li><Link href="/wire/docs/uploading-stories">Uploading your first story</Link></li>
+        <li><Link href="/wire/docs/feeds">Connecting an RSS feed</Link></li>
+        <li><Link href="/wire/docs/republishing">Republishing stories from other members</Link></li>
       </ul>
     </article>
   )

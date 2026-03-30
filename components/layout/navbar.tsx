@@ -45,6 +45,9 @@ export default async function Navbar() {
             <Link href="/wire/directory" className="hover:text-white transition-colors">
               Directory
             </Link>
+            <Link href="/wire/docs" className="hover:text-white transition-colors">
+              Help
+            </Link>
           </nav>
         </div>
 

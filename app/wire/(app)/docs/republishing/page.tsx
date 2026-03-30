@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Republishing stories — Regional Wire Docs',
+  title: 'Republishing stories — Regional Wire Help',
 }
 
 export default function RepublishingPage() {
@@ -29,12 +29,12 @@ export default function RepublishingPage() {
         </li>
         <li>
           <strong>Headlines</strong> — Headline-only items ingested from member feeds where
-          full text wasn&apos;t available. These can be <Link href="/docs/requests">requested</Link> from
+          full text wasn&apos;t available. These can be <Link href="/wire/docs/requests">requested</Link> from
           the originating newsroom.
         </li>
       </ul>
       <p>
-        You can also set up <Link href="/docs/alerts">story alerts</Link> to receive email
+        You can also set up <Link href="/wire/docs/alerts">story alerts</Link> to receive email
         digests when specific member organizations publish new content.
       </p>
 
@@ -104,8 +104,8 @@ export default function RepublishingPage() {
 
       <h2>See also</h2>
       <ul>
-        <li><Link href="/docs/requests">Story requests</Link> — Request a full story from a headline-only item</li>
-        <li><Link href="/docs/alerts">Story alerts</Link> — Get notified when member orgs publish</li>
+        <li><Link href="/wire/docs/requests">Story requests</Link> — Request a full story from a headline-only item</li>
+        <li><Link href="/wire/docs/alerts">Story alerts</Link> — Get notified when member orgs publish</li>
       </ul>
     </article>
   )

@@ -6,11 +6,22 @@ import { usePathname } from 'next/navigation'
 const SECTIONS = [
   {
     label: null,
-    items: [{ href: '/docs', label: 'Overview' }],
+    items: [{ href: '/wire/docs', label: 'Overview' }],
   },
   {
-    label: 'Getting started',
-    items: [{ href: '/docs/getting-started', label: 'Quick start guide' }],
+    label: 'For publishers',
+    items: [
+      { href: '/wire/docs/uploading-stories', label: 'Uploading stories' },
+      { href: '/wire/docs/feeds', label: 'RSS feed ingestion' },
+      { href: '/wire/docs/alerts', label: 'Story alerts' },
+    ],
+  },
+  {
+    label: 'For editors',
+    items: [
+      { href: '/wire/docs/republishing', label: 'Republishing stories' },
+      { href: '/wire/docs/requests', label: 'Story requests' },
+    ],
   },
 ]
 
