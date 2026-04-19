@@ -12,7 +12,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState('')
   const [error, setError] = useState(
-    errorParam === 'missing-code' ? 'That sign-in link is invalid or has expired. Request a new one below.' : ''
+    errorParam === 'missing-code' ? 'That sign-in code is invalid or has expired. Request a new one below.' : ''
   )
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -25,17 +25,10 @@ function LoginForm() {
     setError('')
 
     const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        // emailRedirectTo is used as the post-verification destination when
-        // the user clicks the magic link (after the /auth/confirm step).
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirect)}`,
-      },
-    })
+    const { error: authError } = await supabase.auth.signInWithOtp({ email })
 
     if (authError) {
-      setError('Could not send sign-in link. Please try again.')
+      setError('Could not send sign-in code. Please try again.')
       setLoading(false)
       return
     }
@@ -75,8 +68,8 @@ function LoginForm() {
             Check your email
           </h1>
           <p className="text-wire-slate text-sm leading-relaxed">
-            We&apos;ve sent a sign-in link to <strong>{email}</strong>.
-            Click it, or enter the code below.
+            We&apos;ve sent a 6-digit sign-in code to <strong>{email}</strong>.
+            Enter it below.
           </p>
         </div>
 
@@ -130,7 +123,7 @@ function LoginForm() {
         Sign in
       </h1>
       <p className="text-wire-slate text-sm mb-8">
-        Member newsrooms only. We'll email you a sign-in link.{' '}
+        Member newsrooms only. We'll email you a sign-in code.{' '}
         <Link
           href="/register/organization"
           className="text-wire-red hover:underline"
@@ -165,7 +158,7 @@ function LoginForm() {
           disabled={loading}
           className="w-full bg-wire-navy text-white py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors disabled:opacity-50"
         >
-          {loading ? 'Sending link…' : 'Send sign-in link'}
+          {loading ? 'Sending code…' : 'Send sign-in code'}
         </button>
       </form>
 
