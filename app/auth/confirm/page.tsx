@@ -33,8 +33,10 @@ function ConfirmContent() {
     )
   }
 
+  // Callback calls verifyOtp with type:'email'; 'magiclink' is the Supabase
+  // template type but the JS SDK always uses 'email' for this flow.
   const callbackUrl =
-    `/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}`
+    `/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=email`
 
   return (
     <div className="w-full max-w-sm text-center">
@@ -45,12 +47,12 @@ function ConfirmContent() {
       <p className="text-wire-slate text-sm leading-relaxed mb-6">
         Click the button below to complete signing in to Regional Wire.
       </p>
-      <a
-        href={callbackUrl}
-        className="inline-block bg-wire-navy text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors"
+      <button
+        onClick={() => { window.location.href = callbackUrl }}
+        className="bg-wire-navy text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors cursor-pointer"
       >
         Sign in to Regional Wire
-      </a>
+      </button>
       <p className="mt-6 text-xs text-wire-slate">
         Didn&apos;t request this?{' '}
         <Link href="/login" className="text-wire-red hover:underline">
