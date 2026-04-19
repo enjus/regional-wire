@@ -48,15 +48,14 @@ export async function GET(request: NextRequest) {
     userEmail = data.user.email
     userMeta = data.user.user_metadata
   } else if (tokenHash && type) {
-    // Only accept 'email' — the sole type our OTP flows produce.
-    // Rejecting other values prevents token reuse across flow types
-    // (e.g., a recovery token used here to obtain a session).
-    if (type !== 'email') {
+    // Accept 'email' (OTP code flow) and 'magiclink' (token_hash flow).
+    // Rejecting other values prevents token reuse across unrelated flow types.
+    if (type !== 'email' && type !== 'magiclink') {
       return NextResponse.redirect(`${origin}/login?error=auth-failed`)
     }
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
-      type: 'email',
+      type: type === 'magiclink' ? 'magiclink' : 'email',
     })
     if (error || !data.user) {
       return NextResponse.redirect(`${origin}/login?error=auth-failed`)

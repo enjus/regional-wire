@@ -33,10 +33,8 @@ function ConfirmContent() {
     )
   }
 
-  // Callback calls verifyOtp with type:'email'; 'magiclink' is the Supabase
-  // template type but the JS SDK always uses 'email' for this flow.
   const callbackUrl =
-    `/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=email`
+    `/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}`
 
   return (
     <div className="w-full max-w-sm text-center">
