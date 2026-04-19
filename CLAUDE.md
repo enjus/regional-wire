@@ -12,6 +12,15 @@ npm run lint     # ESLint
 
 There are no tests. The build is the primary correctness check — run `npm run build` after significant changes.
 
+## Deployment
+
+Hosted on a DigitalOcean droplet, managed by PM2. To deploy:
+
+```bash
+# On the droplet (ssh deploy@nwnewswire.com)
+cd /home/deploy/regional-wire && git pull && npm run build && pm2 restart regional-wire
+```
+
 To trigger cron jobs locally (no auth required in development):
 ```
 GET http://localhost:3000/api/cron/poll-feeds
@@ -24,9 +33,9 @@ Regional Wire is a Next.js 15 App Router application. Member newsrooms share sto
 
 ### Auth & Access Control
 
-- **Supabase Auth** handles signup/login via **magic link (OTP) only** — no passwords. Users enter their email and receive a sign-in link.
+- **Supabase Auth** handles signup/login via **6-digit OTP code only** — no passwords, no magic links. Users enter their email, receive a code, and enter it on the login page. Magic links were abandoned due to email prefetching consuming tokens before users could click them.
 - **`middleware.ts`** enforces auth on all routes: refreshes the Supabase session, redirects unauthenticated users, and checks that authenticated users have a `users` record (org association). Admin routes (`/admin`, `/api/admin/*`) use HTTP Basic Auth instead. Approve/reject email links bypass Basic Auth via HMAC-signed tokens (`verifyAdminToken`).
-- **`/auth/callback`** exchanges the Supabase code for a session, looks up the user's org by email domain, creates the `users` record, and assigns `admin` (first user from that domain) or `editor` role. Uses `NEXT_PUBLIC_APP_URL` for all redirects (not `request.nextUrl.origin`) to work correctly behind a reverse proxy.
+- **`/auth/callback`** handles post-OTP session setup: looks up the user's org by email domain, creates the `users` record, and assigns `admin` (first user from that domain) or `editor` role. Uses `NEXT_PUBLIC_APP_URL` for all redirects (not `request.nextUrl.origin`) to work correctly behind a reverse proxy.
 - **`/register`** requires the email domain to match an approved org. The domain check uses the service role client to bypass RLS.
 - All Supabase tables have RLS. Three `SECURITY DEFINER` helper functions (`get_user_org_id()`, `is_approved_member()`, `is_org_admin()`) are used in policies to avoid recursive lookups.
 
@@ -66,7 +75,7 @@ Assets are stored in the `story-assets` Supabase Storage bucket as **private** (
 
 ### Cron Jobs
 
-Defined in `vercel.json` (for Vercel) and via `crontab` on the DigitalOcean droplet. Both routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
+Defined via `crontab` on the DigitalOcean droplet (not Vercel). Both routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
 
 - `/api/cron/poll-feeds` (every 15 min): ingests RSS feeds, deduplicates by `feed_guid`, lifts expired embargoes, triggers story alerts.
 - `/api/cron/alert-digest` (hourly): sends digest emails only at the hour configured by `ALERT_DIGEST_HOUR`.
