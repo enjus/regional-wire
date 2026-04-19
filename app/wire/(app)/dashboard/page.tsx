@@ -74,7 +74,7 @@ export default async function DashboardPage() {
                       {story.source === 'feed' ? 'Feed' : 'Manual'}
                     </span>
                     <span className="text-xs text-wire-slate">
-                      {formatDate(story.published_at)}
+                      {formatDateTime(story.published_at)}
                     </span>
                   </div>
                   <h3 className="font-serif font-semibold text-wire-navy leading-snug">

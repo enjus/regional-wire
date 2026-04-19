@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Story, StoryAsset } from '@/lib/types'
-import { formatDate, isEmbargoActive } from '@/lib/utils'
+import { formatDateTime, isEmbargoActive } from '@/lib/utils'
 
 interface Props {
   story: Story
@@ -45,7 +45,7 @@ export default function StoryCard({ story }: Props) {
           </span>
           <span className="text-wire-slate text-xs">·</span>
           <span className="text-xs text-wire-slate">
-            {formatDate(story.published_at)}
+            {formatDateTime(story.published_at)}
           </span>
           {story.source === 'feed' && (
             <>
