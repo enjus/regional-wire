@@ -82,7 +82,7 @@ export default async function StoryManagePage({ params }: PageProps) {
           </div>
           <div className="flex gap-2 shrink-0">
             <Link
-              href={`/dashboard/stories/${id}/edit`}
+              href={`/wire/dashboard/stories/${id}/edit`}
               className="text-sm border border-wire-border rounded px-3 py-1.5 text-wire-slate hover:text-wire-navy hover:border-wire-navy transition-colors"
             >
               Edit

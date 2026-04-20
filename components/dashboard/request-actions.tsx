@@ -80,7 +80,7 @@ export default function RequestActions({
             </button>
           ) : (
             <Link
-              href={`/dashboard/stories/new?headline=${encodeURIComponent(requestedHeadline)}&url=${encodeURIComponent(requestedUrl ?? '')}&requestId=${requestId}`}
+              href={`/wire/dashboard/stories/new?headline=${encodeURIComponent(requestedHeadline)}&url=${encodeURIComponent(requestedUrl ?? '')}&requestId=${requestId}`}
               className="text-xs bg-wire-navy text-white rounded px-3 py-1.5 hover:bg-wire-navy-light transition-colors text-center"
             >
               Upload & fulfill
