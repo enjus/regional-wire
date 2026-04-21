@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createAdminSupabase } from '@/lib/platform-admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -149,7 +149,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
                   </div>
                   {libraryStory ? (
                     <Link
-                      href={`/library/${libraryStory.id}`}
+                      href={`/wire/library/${libraryStory.id}`}
                       className="shrink-0 text-xs font-medium bg-wire-navy text-white rounded px-3 py-1.5 hover:bg-wire-navy-light transition-colors whitespace-nowrap"
                     >
                       Republish story →
@@ -200,6 +200,24 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   const { data: stories, count } = await query
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
+  // Generate signed URLs for primary preview images
+  const previewUrls: Record<string, string> = {}
+  const primaryAssets = (stories ?? []).flatMap((s) =>
+    (s.story_assets ?? []).filter(
+      (a: { is_primary: boolean; asset_type: string }) => a.is_primary && a.asset_type === 'image'
+    )
+  )
+  if (primaryAssets.length > 0) {
+    const serviceClient = createServiceClient()
+    const paths = primaryAssets.map((a: { file_url: string }) => a.file_url)
+    const { data: signed } = await serviceClient.storage
+      .from('story-assets')
+      .createSignedUrls(paths, 3600)
+    signed?.forEach((item) => {
+      if (item.signedUrl && item.path) previewUrls[item.path] = item.signedUrl
+    })
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <LibraryHeader />
@@ -211,9 +229,18 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         <EmptyState message="No stories available yet. Check back soon." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {stories.map((story) => (
-            <StoryCard key={story.id} story={story as unknown as Story} />
-          ))}
+          {stories.map((story) => {
+            const primaryAsset = (story.story_assets ?? []).find(
+              (a: { is_primary: boolean; asset_type: string }) => a.is_primary && a.asset_type === 'image'
+            )
+            return (
+              <StoryCard
+                key={story.id}
+                story={story as unknown as Story}
+                previewUrl={primaryAsset ? previewUrls[primaryAsset.file_url] : undefined}
+              />
+            )
+          })}
         </div>
       )}
 
@@ -297,7 +324,7 @@ function Pagination({
         ([, v]) => v !== undefined
       ) as [string, string][]
     )
-    return `/library?${qs}`
+    return `/wire/library?${qs}`
   }
 
   return (

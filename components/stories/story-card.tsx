@@ -5,9 +5,10 @@ import { formatDateTime, isEmbargoActive } from '@/lib/utils'
 
 interface Props {
   story: Story
+  previewUrl?: string
 }
 
-export default function StoryCard({ story }: Props) {
+export default function StoryCard({ story, previewUrl }: Props) {
   const orgName = story.organizations?.name ?? 'Unknown'
   const primaryImage = story.story_assets?.find(
     (a: StoryAsset) => a.is_primary && a.asset_type === 'image'
@@ -16,13 +17,13 @@ export default function StoryCard({ story }: Props) {
 
   return (
     <Link
-      href={`/library/${story.id}`}
+      href={`/wire/library/${story.id}`}
       className="group bg-white border border-wire-border rounded overflow-hidden hover:shadow-md transition-shadow block"
     >
-      {primaryImage && (
+      {primaryImage && previewUrl && (
         <div className="relative h-40 bg-gray-100 overflow-hidden">
           <Image
-            src={primaryImage.file_url}
+            src={previewUrl}
             alt={primaryImage.caption ?? story.title}
             fill
             className="object-cover group-hover:scale-[1.02] transition-transform duration-300"

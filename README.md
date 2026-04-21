@@ -68,7 +68,7 @@ In Supabase → Authentication → URL Configuration:
   - `http://localhost:3000/auth/callback`
   - `https://nwnewswire.com/auth/callback`
 
-Auth uses **magic link (OTP) only** — no passwords.
+Auth uses **6-digit OTP code only** — no passwords, no magic links.
 
 ### 4. Run the dev server
 
@@ -138,11 +138,12 @@ Supabase (auth + Postgres + Storage)
 Resend (transactional email)
 ```
 
-**Auth flow (magic link):**
+**Auth flow (OTP):**
 1. User enters email at `/login` or `/register`
-2. Supabase sends OTP email → user clicks link → `/auth/callback`
-3. Callback exchanges code for session, looks up org by email domain, creates `users` record
-4. Middleware refreshes session on every request, redirects unauthenticated users
+2. Supabase sends a 6-digit code to that email
+3. User enters the code on the login page → `/auth/callback`
+4. Callback exchanges code for session, looks up org by email domain, creates `users` record
+5. Middleware refreshes session on every request, redirects unauthenticated users
 
 **Admin auth:**
 HTTP Basic Auth on all `/admin/*` and `/api/admin/*` routes, enforced in `middleware.ts`. Org approve/reject email links bypass Basic Auth via HMAC-signed time-limited tokens.
@@ -151,7 +152,7 @@ HTTP Basic Auth on all `/admin/*` and `/api/admin/*` routes, enforced in `middle
 
 ## Security
 
-- Magic link auth only — no passwords stored
+- OTP-only auth — no passwords stored, no magic links (abandoned due to email prefetching consuming tokens)
 - HTTP Basic Auth protects `/admin` dashboard
 - RLS enabled on all Supabase tables; service role key is server-only
 - `sanitizeStoryHtml()` strips scripts, iframes, SVGs, event handlers, and `javascript:` URIs from feed-ingested HTML before display

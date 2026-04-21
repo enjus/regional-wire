@@ -94,7 +94,7 @@ export default async function OutgoingRequestsPage() {
                     </span>
                     {req.status === 'fulfilled' && story && (
                       <Link
-                        href={`/library/${story.id}`}
+                        href={`/wire/library/${story.id}`}
                         className="block text-xs text-wire-red hover:underline mt-1"
                       >
                         View story →

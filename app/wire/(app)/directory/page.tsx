@@ -104,7 +104,7 @@ export default async function DirectoryPage() {
                   </a>
                   {!isOwnOrg && storiesCount > 0 && (
                     <Link
-                      href={`/library?org=${org.id}`}
+                      href={`/wire/library?org=${org.id}`}
                       className="text-xs text-wire-slate hover:text-wire-navy block mt-1"
                     >
                       View stories →
