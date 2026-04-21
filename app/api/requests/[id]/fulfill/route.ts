@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const { data: currentUser } = await supabase
       .from('users')
-      .select('organization_id')
+      .select('organization_id, organization:organization_id(name)')
       .eq('id', user.id)
       .single()
 
@@ -58,9 +58,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (requestingOrg?.contact_emails?.length && resolvedStoryId) {
       const title = story?.title ?? req.requested_headline ?? 'Your requested story'
+      const fulfillingOrgName =
+        (currentUser.organization as unknown as { name: string } | null)?.name ?? 'a member newsroom'
       await sendRequestFulfilledEmail(
         requestingOrg.contact_emails,
-        'the target newsroom',
+        fulfillingOrgName,
         title,
         resolvedStoryId
       ).catch((err) => console.error('Failed to send fulfillment email:', err))
