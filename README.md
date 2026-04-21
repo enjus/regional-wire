@@ -246,3 +246,7 @@ A member org posts a collaboration proposal for a regional story angle or breaki
 ### Weekly Network Digest Email
 
 Optional weekly email summarizing most-republished stories, new member orgs, and recent library additions.
+
+### Database-driven Homepage Member List
+
+The homepage member list is currently hardcoded in `lib/member-orgs.ts`. For multi-deployment setups, it should be driven by the `organizations` table instead — approved orgs would appear automatically, and adding `website_url` and `logo_path` columns would cover links and logos. Each deployment's own database would keep the lists naturally separate without any code divergence.
