@@ -18,7 +18,7 @@ Hosted on a DigitalOcean droplet, managed by PM2. To deploy:
 
 ```bash
 # On the droplet (ssh deploy@nwnewswire.com)
-cd /home/deploy/regional-wire && git pull && npm run build && pm2 restart regional-wire
+cd /home/deploy/regional-wire && git pull && npm install && npm run build && pm2 restart regional-wire
 ```
 
 To trigger cron jobs locally (no auth required in development):
@@ -44,7 +44,7 @@ Regional Wire is a Next.js 15 App Router application. Member newsrooms share sto
 There are two patterns — use the right one or queries will silently fail due to RLS:
 
 - **Anon client** (`createClient()` / `createServerClient` with anon key): for user-scoped reads/writes where RLS should apply.
-- **Service role client** (`createServiceClient()`): for admin operations, org lookups during auth flow, and anywhere RLS would block a legitimate server-side operation. Uses empty cookie arrays: `{ cookies: { getAll: () => [], setAll: () => {} } }`.
+- **Service role client** (`createServiceClient()`): for admin operations, org lookups during auth flow, and anywhere RLS would block a legitimate server-side operation. Uses plain `@supabase/supabase-js` `createClient` (not the SSR client) with `auth: { autoRefreshToken: false, persistSession: false }` — this ensures the service role key is used for the `authorization` header rather than the user's session JWT.
 
 Supabase join results are typed as arrays by TypeScript even when they return a single object. Always cast through `unknown`:
 ```ts
