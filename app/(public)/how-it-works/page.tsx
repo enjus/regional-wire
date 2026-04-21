@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'How it works — Regional Wire',
-  description: 'A step-by-step walkthrough of the Regional Wire platform: from organization approval to uploading, browsing, and republishing stories.',
+  title: `How it works — ${brand.name}`,
+  description: `A step-by-step walkthrough of the ${brand.name} platform: from organization approval to uploading, browsing, and republishing stories.`,
 }
 
 export default function HowItWorksPage() {
@@ -17,10 +18,10 @@ export default function HowItWorksPage() {
             <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-wire-red">Platform overview</span>
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold text-wire-navy mb-5">
-            How Regional Wire works
+            How {brand.name} works
           </h1>
           <p className="text-lg text-wire-slate leading-relaxed max-w-2xl">
-            Regional Wire is built around a simple exchange: member newsrooms share their
+            {brand.name} is built around a simple exchange: member newsrooms share their
             stories, and other members republish them with full attribution. Here&apos;s
             how that works in practice.
           </p>
@@ -37,7 +38,7 @@ export default function HowItWorksPage() {
             <div>
               <h2 className="font-serif text-2xl font-bold text-wire-navy mb-4">Organization approval</h2>
               <p className="text-wire-slate leading-relaxed mb-5">
-                Regional Wire is an invite-only network. Newsrooms are approved by the
+                {brand.name} is an invite-only network. Newsrooms are approved by the
                 platform administrator before anyone from the organization can sign
                 in. Once approved, any staff member with a matching email domain can create
                 an account.

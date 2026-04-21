@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import NavbarClient from './navbar-client'
+import { brand } from '@/lib/brand'
 
 export default async function Navbar() {
   const supabase = await createClient()
@@ -33,7 +34,7 @@ export default async function Navbar() {
             href="/wire/library"
             className="font-serif text-lg font-bold tracking-tight hover:text-white/90 transition-colors"
           >
-            Regional Wire
+            {brand.name}
           </Link>
           <nav className="hidden sm:flex items-center gap-6 text-sm text-white/75">
             <Link href="/wire/library" className="hover:text-white transition-colors">

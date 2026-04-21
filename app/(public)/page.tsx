@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { MEMBER_ORGS } from '@/lib/member-orgs'
+import { brand } from '@/lib/brand'
 
 export default function HomePage() {
   return (
@@ -20,7 +21,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg text-wire-slate max-w-xl mb-10 leading-relaxed">
-            Regional Wire is a closed content-sharing platform for member newsrooms.
+            {brand.name} is a closed content-sharing platform for member newsrooms.
             Upload stories, browse the shared library, and republish with full
             attribution — all without the back-and-forth.
           </p>
@@ -203,10 +204,10 @@ export default function HomePage() {
               On republication
             </p>
             <p className="text-wire-navy text-base leading-relaxed">
-              Republishing via Regional Wire means publishing an original story on your own
+              Republishing via {brand.name} means publishing an original story on your own
               platform with full attribution — including the original author&apos;s byline and a
               link back to the canonical source. Member organizations are responsible for
-              their own editorial decisions about what they republish. Regional Wire does not
+              their own editorial decisions about what they republish. {brand.name} does not
               modify story content and holds no copyright over shared material.
             </p>
           </div>

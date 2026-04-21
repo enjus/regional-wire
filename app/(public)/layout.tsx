@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import PublicNavClient from '@/components/public/public-nav-client'
+import { brand } from '@/lib/brand'
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,7 +9,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <header className="sticky top-0 z-40 bg-white border-b border-wire-border">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between relative">
           <Link href="/" className="font-serif text-lg font-bold text-wire-navy tracking-tight">
-            Regional Wire
+            {brand.name}
           </Link>
 
           <nav className="hidden sm:flex items-center gap-8 text-[13px] text-wire-slate">
@@ -40,7 +41,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 pb-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 pb-10 border-b border-white/10">
             <div className="col-span-2">
-              <span className="font-serif text-xl font-bold block mb-3">Regional Wire</span>
+              <span className="font-serif text-xl font-bold block mb-3">{brand.name}</span>
               <p className="text-sm text-white/45 leading-relaxed max-w-xs">
                 A content-sharing platform built for regional newsrooms. Member organizations share and republish stories across the network.
               </p>
@@ -63,7 +64,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
           <p className="pt-6 text-xs text-white/20">
-            © {new Date().getFullYear()} Regional Wire. Built for local journalism.
+            © {new Date().getFullYear()} {brand.name}. Built for local journalism.
           </p>
         </div>
       </footer>

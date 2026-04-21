@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { MEMBER_ORGS } from '@/lib/member-orgs'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Member newsrooms — Regional Wire',
-  description: 'Regional Wire member newsrooms — approved regional newspapers, nonprofit newsrooms, and digital outlets sharing stories across the network.',
+  title: `Member newsrooms — ${brand.name}`,
+  description: `${brand.name} member newsrooms — approved regional newspapers, nonprofit newsrooms, and digital outlets sharing stories across the network.`,
 }
 
 export default function MembersPage() {
@@ -21,7 +22,7 @@ export default function MembersPage() {
             Member newsrooms
           </h1>
           <p className="text-lg text-wire-slate leading-relaxed max-w-2xl">
-            Regional Wire members are approved regional newsrooms that share and republish
+            {brand.name} members are approved regional newsrooms that share and republish
             stories across the network.
           </p>
         </div>

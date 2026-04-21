@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Lora } from 'next/font/google'
+import { brand, brandCssVars } from '@/lib/brand'
 import './globals.css'
 
 const inter = Inter({
@@ -14,11 +15,10 @@ const lora = Lora({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Regional Wire',
-    template: '%s — Regional Wire',
+    default: brand.name,
+    template: `%s — ${brand.name}`,
   },
-  description:
-    'A content-sharing platform for regional news organizations. Share and republish stories across your newsroom network.',
+  description: brand.description,
 }
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${lora.variable}`}>
+    <html lang="en" className={`${inter.variable} ${lora.variable}`} style={brandCssVars as React.CSSProperties}>
       <body>{children}</body>
     </html>
   )

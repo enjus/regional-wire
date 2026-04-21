@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Documentation — Regional Wire',
-  description: 'How Regional Wire works: applying for membership, onboarding your newsroom, and what to expect.',
+  title: `Documentation — ${brand.name}`,
+  description: `How ${brand.name} works: applying for membership, onboarding your newsroom, and what to expect.`,
 }
 
 export default function DocsIndexPage() {
@@ -15,7 +16,7 @@ export default function DocsIndexPage() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-wire-red">Documentation</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-wire-navy mb-4">
-          Regional Wire docs
+          {brand.name} docs
         </h1>
         <p className="text-wire-slate leading-relaxed max-w-lg">
           Everything you need to get your newsroom approved and onboarded. Full

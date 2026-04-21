@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
       return new NextResponse('Unauthorized', {
         status: 401,
         headers: {
-          'WWW-Authenticate': 'Basic realm="Regional Wire Admin"',
+          'WWW-Authenticate': `Basic realm="${process.env.NEXT_PUBLIC_BRAND_NAME ?? 'Regional Wire'} Admin"`,
         },
       })
     }

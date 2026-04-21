@@ -15,8 +15,8 @@ const config: Config = {
       },
       colors: {
         wire: {
-          red: '#c41230',
-          'red-dark': '#9a0e26',
+          red: 'rgb(var(--brand-accent-rgb) / <alpha-value>)',
+          'red-dark': 'rgb(var(--brand-accent-dark-rgb) / <alpha-value>)',
           navy: '#111827',
           'navy-light': '#1f2937',
           slate: '#6b7280',

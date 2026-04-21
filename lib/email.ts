@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { Organization } from './types'
+import { brand } from './brand'
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -10,7 +11,7 @@ function getResend(): Resend {
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-const FROM_ADDRESS = 'Regional Wire <noreply@updates.nwnewswire.com>'
+const FROM_ADDRESS = `${brand.name} <noreply@updates.nwnewswire.com>`
 
 // ----------------------------------------------------------------
 // 1. New org registration — notify platform admin
@@ -24,7 +25,7 @@ export async function sendOrgRegistrationNotification(
   const rejectUrl = `${APP_URL}/admin?review=${org.id}`
 
   const text = `
-New Newsroom Registration — Regional Wire
+New Newsroom Registration — ${brand.name}
 
 Organization: ${org.name}
 Website: ${org.website_url}
@@ -51,9 +52,9 @@ Actions:
 // ----------------------------------------------------------------
 export async function sendOrgApprovedEmail(org: Organization) {
   const text = `
-${org.name} — Regional Wire Membership Approved
+${org.name} — ${brand.name} Membership Approved
 
-Your newsroom has been approved for Regional Wire membership.
+Your newsroom has been approved for ${brand.name} membership.
 
 You can now invite your team to sign up at:
 ${APP_URL}/register
@@ -65,13 +66,13 @@ Once signed up, your editors can:
 
 Questions? Reply to this email.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: org.contact_emails,
-    subject: `Welcome to Regional Wire — ${org.name} is approved`,
+    subject: `Welcome to ${brand.name} — ${org.name} is approved`,
     text,
   })
 }
@@ -81,20 +82,20 @@ Questions? Reply to this email.
 // ----------------------------------------------------------------
 export async function sendOrgRejectedEmail(org: Organization, reason: string) {
   const text = `
-${org.name} — Regional Wire Membership
+${org.name} — ${brand.name} Membership
 
-Thank you for your interest in Regional Wire. After review, we're unable to approve your newsroom's membership at this time.
+Thank you for your interest in ${brand.name}. After review, we're unable to approve your newsroom's membership at this time.
 
 ${reason ? `Reason: ${reason}\n` : ''}
 If you believe this is an error or have additional information, please contact us by replying to this email.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: org.contact_emails,
-    subject: `Regional Wire — membership update for ${org.name}`,
+    subject: `${brand.name} — membership update for ${org.name}`,
     text,
   })
 }
@@ -108,26 +109,26 @@ export async function sendUserWelcomeEmail(
   orgName: string
 ) {
   const text = `
-Welcome to Regional Wire, ${displayName}
+Welcome to ${brand.name}, ${displayName}
 
-You've joined ${orgName}'s account on Regional Wire, the regional newsroom content-sharing platform.
+You've joined ${orgName}'s account on ${brand.name}, the regional newsroom content-sharing platform.
 
 Get started:
   Browse the story library: ${APP_URL}/library
   Upload a story: ${APP_URL}/dashboard/stories/new
   Your dashboard: ${APP_URL}/dashboard
 
-Regional Wire allows member newsrooms to share stories for republication. When you download a republication package, you'll receive the full story text along with SEO instructions to protect the original publisher's search ranking.
+${brand.name} allows member newsrooms to share stories for republication. When you download a republication package, you'll receive the full story text along with SEO instructions to protect the original publisher's search ranking.
 
 Questions? Contact your organization's admin or reply to this email.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: email,
-    subject: 'Welcome to Regional Wire',
+    subject: `Welcome to ${brand.name}`,
     text,
   })
 }
@@ -144,7 +145,7 @@ export async function sendRepublicationRequestEmail(
   requestId: string
 ) {
   const text = `
-Republication Request — Regional Wire
+Republication Request — ${brand.name}
 
 ${requestingOrgName} is requesting permission to republish:
   Headline: ${headline}
@@ -154,7 +155,7 @@ ${requestingOrgName} is requesting permission to republish:
 To fulfill or decline this request, visit your dashboard:
 ${APP_URL}/dashboard/requests
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -175,15 +176,15 @@ export async function sendRequestFulfilledEmail(
   storyId: string
 ) {
   const text = `
-Story Available — Regional Wire
+Story Available — ${brand.name}
 
 ${targetOrgName} has fulfilled your republication request for:
   "${headline}"
 
-The full story is now available in the Regional Wire library:
+The full story is now available in the ${brand.name} library:
 ${APP_URL}/library/${storyId}
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -204,7 +205,7 @@ export async function sendRequestDeclinedEmail(
   reason: string | null
 ) {
   const text = `
-Republication Request — Regional Wire
+Republication Request — ${brand.name}
 
 ${targetOrgName} has declined your request for:
   "${headline}"
@@ -212,7 +213,7 @@ ${targetOrgName} has declined your request for:
 ${reason ? `Their note: ${reason}\n` : ''}
 You can browse the full story library at ${APP_URL}/library or reach out to the newsroom directly via the member directory at ${APP_URL}/directory.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -235,7 +236,7 @@ export async function sendStoryAlertEmail(
   storyId: string
 ) {
   const text = `
-Story Alert — Regional Wire
+Story Alert — ${brand.name}
 
 A new story matching your alert (${matchedKeywords.join(', ')}) is available:
 
@@ -244,7 +245,7 @@ A new story matching your alert (${matchedKeywords.join(', ')}) is available:
   ${summary ? `Summary: ${summary}\n` : ''}
   Read & republish: ${APP_URL}/library/${storyId}
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -270,7 +271,7 @@ export async function sendAlertDigestEmail(
     .join('\n\n')
 
   const text = `
-Regional Wire — Daily Story Alert
+${brand.name} — Daily Story Alert
 
 ${stories.length} new ${stories.length === 1 ? 'story matches' : 'stories match'} your alerts from the past 24 hours:
 
@@ -278,13 +279,13 @@ ${storyLines}
 
 Manage your alerts: ${APP_URL}/dashboard/settings/alerts
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: toEmail,
-    subject: `Regional Wire alert digest — ${stories.length} new ${stories.length === 1 ? 'story' : 'stories'}`,
+    subject: `${brand.name} alert digest — ${stories.length} new ${stories.length === 1 ? 'story' : 'stories'}`,
     text,
   })
 }
@@ -294,21 +295,21 @@ Manage your alerts: ${APP_URL}/dashboard/settings/alerts
 // ----------------------------------------------------------------
 export async function sendOrgRemovalEmail(org: Organization, reason: string) {
   const text = `
-${org.name} — Regional Wire Membership Removed
+${org.name} — ${brand.name} Membership Removed
 
-Your newsroom's membership in Regional Wire has been removed by a platform administrator.
+Your newsroom's membership in ${brand.name} has been removed by a platform administrator.
 
 ${reason ? `Reason: ${reason}\n` : ''}All previously shared stories have been withdrawn from the library. Existing republications by other members are not affected.
 
 If you believe this is an error, please contact us by replying to this email.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: org.contact_emails,
-    subject: `Regional Wire — membership removed for ${org.name}`,
+    subject: `${brand.name} — membership removed for ${org.name}`,
     text,
   })
 }
@@ -323,7 +324,7 @@ export async function sendAssetRequestEmail(
   storyId: string
 ) {
   const text = `
-Media Asset Request — Regional Wire
+Media Asset Request — ${brand.name}
 
 ${requestingOrgName} is requesting images or video for your story:
   "${storyTitle}"
@@ -333,7 +334,7 @@ They are preparing to republish this story and would like the original media ass
 You can also view the story on your dashboard:
 ${APP_URL}/dashboard/stories/${storyId}
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -354,14 +355,14 @@ export async function sendLinkBackEmail(
   republishedUrl: string
 ) {
   const text = `
-Story Republished — Regional Wire
+Story Republished — ${brand.name}
 
 ${republishingOrgName} has published your story and submitted their URL:
 
   Story: ${storyTitle}
   Republished at: ${republishedUrl}
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -383,7 +384,7 @@ export async function sendCorrectionNotice(
   storyId: string
 ) {
   const text = `
-STORY CORRECTION — Regional Wire
+STORY CORRECTION — ${brand.name}
 
 ${originOrgName} has issued a correction for a story your newsroom republished:
 
@@ -396,7 +397,7 @@ Updated story: ${APP_URL}/library/${storyId}
 
 If you have published this story, please update your version with the corrected information above.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
@@ -418,7 +419,7 @@ export async function sendWithdrawalNotice(
   storyId: string
 ) {
   const text = `
-STORY WITHDRAWN — Regional Wire
+STORY WITHDRAWN — ${brand.name}
 
 ${originOrgName} has withdrawn a story your newsroom downloaded:
 
@@ -431,7 +432,7 @@ Story page: ${APP_URL}/library/${storyId}
 
 If you have published this story, we strongly recommend removing it or appending an editor's note.
 
-— Regional Wire
+— ${brand.name}
 `.trim()
 
   return getResend().emails.send({
