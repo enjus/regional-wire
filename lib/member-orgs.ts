@@ -8,7 +8,7 @@ export type MemberOrg = {
 }
 
 export const MEMBER_ORGS: MemberOrg[] = [
-  { initials: 'H', 	name: 'The Herald',     		location: 'Northfield',		color: '#2D5A8B',	url:https://google.com },
+  { initials: 'H', 	name: 'The Herald',     		location: 'Northfield',		color: '#2D5A8B',	url: 'https://google.com' },
   { initials: 'DG', name: 'Daily Gazette',          location: 'Angel Grove',	color: '#8B3A3A' },
   { initials: 'RV', name: 'River Valley Report',    location: 'Millersberg',	color: '#4A7C59' },
   { initials: 'WC', name: 'Westchester Courier',    location: 'Westchester',	color: '#8B5E3C' },
