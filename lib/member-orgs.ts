@@ -3,6 +3,8 @@ export type MemberOrg = {
   name: string
   type: string
   color: string
+  url?: string
+  logo?: string  // raw SVG markup; overrides initials when provided
 }
 
 export const MEMBER_ORGS: MemberOrg[] = [

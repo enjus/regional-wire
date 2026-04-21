@@ -99,6 +99,44 @@ Visit `http://localhost:3000`.
 
 ---
 
+## Member Newsrooms
+
+The homepage "Our member newsrooms" section is driven by the array in [`lib/member-orgs.ts`](lib/member-orgs.ts). Each entry is a plain object — add, remove, or reorder entries there and the homepage updates automatically.
+
+### Fields
+
+| Field | Required | Description |
+|---|---|---|
+| `initials` | Yes | 2–3 letter abbreviation shown in the avatar when no logo is provided |
+| `name` | Yes | Full organization name, shown on the card |
+| `type` | Yes | Organization type shown below the name (e.g. `"Daily newspaper"`, `"Nonprofit newsroom"`) |
+| `color` | Yes | Hex color for the initials avatar background (e.g. `"#2D5A8B"`) |
+| `url` | No | If provided, the entire card becomes a link to this URL (opens in a new tab) |
+| `logo` | No | Raw SVG markup. If provided, replaces the initials circle with a logo inside a square container |
+
+### Adding a member
+
+```ts
+{ initials: 'OL', name: 'OregonLive', type: 'Regional newspaper', color: '#1a1a1a', url: 'https://oregonlive.com' },
+```
+
+### Adding a logo
+
+Paste the SVG markup as a string. Keep it compact — strip comments, metadata, and unnecessary attributes. The logo renders at 48×48px:
+
+```ts
+{
+  initials: 'OL',
+  name: 'OregonLive',
+  type: 'Regional newspaper',
+  color: '#1a1a1a',
+  url: 'https://oregonlive.com',
+  logo: '<svg viewBox="0 0 48 48" ...>...</svg>',
+},
+```
+
+---
+
 ## Branding & Customization
 
 This codebase is designed to be deployable under a custom brand without maintaining separate branches. The current production deployment runs as **Northwest Newswire**.

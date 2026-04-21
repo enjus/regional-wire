@@ -114,7 +114,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Member logos ─────────────────────────────────────────────── */}
+      {/* ── Member newsrooms ─────────────────────────────────────────── */}
       <section className="bg-wire-bg border-b border-wire-border">
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
           <div className="flex items-center gap-4 mb-3">
@@ -127,28 +127,48 @@ export default function HomePage() {
             Our member newsrooms.
           </h2>
 
-          <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 mb-8">
-            {MEMBER_ORGS.map((org) => (
-              <div
-                key={org.initials}
-                title={org.name}
-                className="aspect-square bg-white rounded-lg border border-wire-border flex items-center justify-center hover:border-wire-navy/15 hover:shadow-sm transition-all"
-              >
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {MEMBER_ORGS.map((org) => {
+              const avatar = org.logo ? (
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  className="w-12 h-12 rounded-lg border border-wire-border bg-white flex items-center justify-center flex-shrink-0 overflow-hidden"
+                  dangerouslySetInnerHTML={{ __html: org.logo }}
+                />
+              ) : (
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                   style={{ backgroundColor: org.color }}
                 >
                   {org.initials}
                 </div>
-              </div>
-            ))}
+              )
+              const inner = (
+                <>
+                  {avatar}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-wire-navy text-sm leading-snug">{org.name}</p>
+                    <p className="text-xs text-wire-slate mt-0.5">{org.type}</p>
+                  </div>
+                </>
+              )
+              const cardClass = "bg-white border border-wire-border rounded-lg p-5 flex items-center gap-4 hover:border-wire-navy/15 hover:shadow-sm transition-all"
+              return org.url ? (
+                <a
+                  key={org.name}
+                  href={org.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cardClass}
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={org.name} className={cardClass}>
+                  {inner}
+                </div>
+              )
+            })}
           </div>
-
-          <p className="text-sm text-wire-slate">
-            <Link href="/members" className="text-wire-red hover:underline">
-              See all member newsrooms →
-            </Link>
-          </p>
         </div>
       </section>
 

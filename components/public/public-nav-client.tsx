@@ -30,7 +30,6 @@ export default function PublicNavClient() {
           <div className="absolute top-full left-0 right-0 bg-white border-b border-wire-border shadow-md z-40">
             <div className="px-5 py-4 flex flex-col gap-1">
               <Link href="/how-it-works" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>How it works</Link>
-              <Link href="/members" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Members</Link>
               <Link href="/docs" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Documentation</Link>
               <div className="border-t border-wire-border mt-2 pt-3 flex flex-col gap-1">
                 <Link href="/login" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Sign in</Link>

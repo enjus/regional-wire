@@ -14,7 +14,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
           <nav className="hidden sm:flex items-center gap-8 text-[13px] text-wire-slate">
             <Link href="/how-it-works" className="hover:text-wire-navy transition-colors">How it works</Link>
-            <Link href="/members" className="hover:text-wire-navy transition-colors">Members</Link>
             <Link href="/docs" className="hover:text-wire-navy transition-colors">Docs</Link>
           </nav>
 
@@ -50,7 +49,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <p className="text-[11px] font-semibold uppercase tracking-widest text-white/30 mb-4">Platform</p>
               <ul className="space-y-2.5 text-sm text-white/50">
                 <li><Link href="/how-it-works" className="hover:text-white transition-colors">How it works</Link></li>
-                <li><Link href="/members" className="hover:text-white transition-colors">Members</Link></li>
                 <li><Link href="/docs" className="hover:text-white transition-colors">Documentation</Link></li>
               </ul>
             </div>
