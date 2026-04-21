@@ -51,7 +51,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-4">
           <ul className="flex flex-wrap items-center gap-x-8 gap-y-2 text-[13px] text-white/55 sm:justify-start justify-center">
             {[
-              'No license fees',
+              'Free content sharing',
               'Story-level embargo control',
               'Full attribution preserved',
               'RSS feed ingestion',
