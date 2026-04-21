@@ -158,14 +158,15 @@ export default async function StoryDetailPage({ params }: PageProps) {
       {/* Primary image */}
       {primaryImage && (
         <figure className="mb-8">
-          <div className="relative w-full h-64 sm:h-80 rounded overflow-hidden bg-gray-100">
+          <div className="rounded overflow-hidden bg-gray-100">
             <Image
               src={primaryImage.displayUrl}
               alt={primaryImage.caption ?? story.title}
-              fill
-              className="object-cover"
-              priority
+              width={0}
+              height={0}
               sizes="(max-width: 896px) 100vw, 896px"
+              className="w-full h-auto"
+              priority
             />
           </div>
           <figcaption className="mt-2">
@@ -223,13 +224,14 @@ export default async function StoryDetailPage({ params }: PageProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {additionalImages.map((img) => (
               <figure key={img.id}>
-                <div className="relative h-32 rounded overflow-hidden bg-gray-100">
+                <div className="rounded overflow-hidden bg-gray-100">
                   <Image
                     src={img.displayUrl}
                     alt={img.caption ?? ''}
-                    fill
-                    className="object-cover"
+                    width={0}
+                    height={0}
                     sizes="200px"
+                    className="w-full h-auto"
                   />
                 </div>
                 <figcaption className="mt-1">
