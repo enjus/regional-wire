@@ -105,6 +105,15 @@ The PATCH endpoint (`/api/stories/[id]`) validates change metadata, inserts `sto
 
 `/admin` is a server component protected by HTTP Basic Auth (credentials in `.env.local`). It uses a service role Supabase client with no-op cookies. Approve/reject actions are in `/app/admin/admin-org-actions.tsx` (client component) and hit `/api/admin/orgs/[id]/approve` and `/api/admin/orgs/[id]/reject`.
 
+### Branding
+
+The production deployment runs as **Northwest Newswire**. The codebase supports deploy-time customization without branching:
+
+- **Name / description**: `NEXT_PUBLIC_BRAND_NAME` and `NEXT_PUBLIC_BRAND_DESCRIPTION` in `.env.local`. Read at runtime via `lib/brand.ts`. Used in nav/footer wordmarks, page `<title>`, and all transactional email copy.
+- **Accent color**: Hardcoded in `tailwind.config.ts` (`wire.red` / `wire.red-dark`). Must be changed in code and rebuilt — env vars are not reliably available to Tailwind during `next build`. Current values: `#2c6330` / `#1e4522` (forest green).
+
+The color keys are named `wire-red`/`wire-red-dark` throughout the codebase for historical reasons. Don't rename them — there are 55+ files using these class names.
+
 ### Key Environment Variables
 
 ```
@@ -117,4 +126,6 @@ ADMIN_USERNAME / ADMIN_PASSWORD   # HTTP Basic Auth for /admin
 NEXT_PUBLIC_APP_URL
 CRON_SECRET
 ALERT_DIGEST_HOUR                 # 0–23, default 7
+NEXT_PUBLIC_BRAND_NAME            # Platform name (default: "Regional Wire")
+NEXT_PUBLIC_BRAND_DESCRIPTION     # Page metadata description
 ```

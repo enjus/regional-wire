@@ -94,6 +94,42 @@ Visit `http://localhost:3000`.
 | `NEXT_PUBLIC_APP_URL` | Full URL of your deployment, no trailing slash (e.g. `https://nwnewswire.com`) |
 | `ALERT_DIGEST_HOUR` | UTC hour (0–23) for daily digest emails, default `7` |
 | `CRON_SECRET` | Secret token sent as `Authorization: Bearer <token>` to cron endpoints |
+| `NEXT_PUBLIC_BRAND_NAME` | Platform name shown in nav, footer, emails, and page titles (default: `Regional Wire`) |
+| `NEXT_PUBLIC_BRAND_DESCRIPTION` | One-sentence description used in page metadata (default: generic) |
+
+---
+
+## Branding & Customization
+
+This codebase is designed to be deployable under a custom brand without maintaining separate branches. The current production deployment runs as **Northwest Newswire**.
+
+### Name and description
+
+Set in `.env.local` on the server — read at runtime, so no rebuild required:
+
+```
+NEXT_PUBLIC_BRAND_NAME=Northwest Newswire
+NEXT_PUBLIC_BRAND_DESCRIPTION=A content-sharing platform for Northwest newsrooms.
+```
+
+These flow through `lib/brand.ts` into page metadata, nav/footer wordmarks, and all transactional emails.
+
+### Accent color
+
+The accent color is hardcoded in `tailwind.config.ts` and baked into the CSS at build time:
+
+```ts
+// tailwind.config.ts
+wire: {
+  red: '#2c6330',       // primary accent
+  'red-dark': '#1e4522', // hover/active state
+  ...
+}
+```
+
+To change the accent color for a new deployment, edit those two values and rebuild. The color keys are named `wire-red`/`wire-red-dark` throughout the codebase for historical reasons — the names don't reflect the actual color in production.
+
+The typography plugin's link color is also set in `tailwind.config.ts` under `theme.extend.typography`.
 
 ---
 
