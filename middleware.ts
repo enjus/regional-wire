@@ -48,10 +48,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Only /wire/*, /platform-admin/*, and authenticated API routes require a session
   const requiresAuth =
     pathname.startsWith('/wire') ||
     pathname.startsWith('/platform-admin') ||
+    pathname.startsWith('/library') ||
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/directory') ||
     (pathname.startsWith('/api/') &&
       !pathname.startsWith('/api/orgs/register') &&
       !pathname.startsWith('/api/auth/register') &&
