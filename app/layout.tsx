@@ -26,8 +26,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const cssVarBlock = Object.entries(brandCssVars)
+    .map(([k, v]) => `${k}:${v}`)
+    .join(';')
+
   return (
-    <html lang="en" className={`${inter.variable} ${lora.variable}`} style={brandCssVars as React.CSSProperties}>
+    <html lang="en" className={`${inter.variable} ${lora.variable}`}>
+      <head>
+        <style>{`:root{${cssVarBlock}}`}</style>
+      </head>
       <body>{children}</body>
     </html>
   )
