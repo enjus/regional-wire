@@ -1,6 +1,9 @@
 import type { Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme'
 
+const ACCENT = process.env.NEXT_PUBLIC_BRAND_ACCENT ?? '#c41230'
+const ACCENT_DARK = process.env.NEXT_PUBLIC_BRAND_ACCENT_DARK ?? '#9a0e26'
+
 const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -15,8 +18,8 @@ const config: Config = {
       },
       colors: {
         wire: {
-          red: 'rgb(var(--brand-accent-rgb) / <alpha-value>)',
-          'red-dark': 'rgb(var(--brand-accent-dark-rgb) / <alpha-value>)',
+          red: ACCENT,
+          'red-dark': ACCENT_DARK,
           navy: '#111827',
           'navy-light': '#1f2937',
           slate: '#6b7280',
