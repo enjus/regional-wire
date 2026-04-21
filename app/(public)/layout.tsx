@@ -23,9 +23,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </Link>
             <Link
               href="/register/organization"
-              className="bg-wire-red text-white text-[13px] font-medium px-4 py-2 rounded hover:bg-wire-red-dark transition-colors"
+              className="text-[13px] text-wire-slate hover:text-wire-navy transition-colors"
             >
-              Join the network
+              Join as newsroom
             </Link>
           </div>
 

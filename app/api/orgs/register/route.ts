@@ -46,11 +46,19 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existing) {
-      const msg =
-        existing.status === 'pending'
-          ? 'An application for this domain is already pending review.'
-          : 'This domain is already registered.'
-      return NextResponse.json({ error: msg }, { status: 400 })
+      if (existing.status === 'pending') {
+        return NextResponse.json(
+          { error: 'An application for this domain is already pending review.' },
+          { status: 400 }
+        )
+      }
+      return NextResponse.json(
+        {
+          error: 'This domain is already registered as a member organization.',
+          code: 'domain_registered',
+        },
+        { status: 400 }
+      )
     }
 
     const slug = slugify(name)

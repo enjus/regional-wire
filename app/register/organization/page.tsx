@@ -11,6 +11,7 @@ export default function RegisterOrganizationPage() {
   const [description, setDescription] = useState('')
   const [republication_guidance, setRepublicationGuidance] = useState('')
   const [error, setError] = useState('')
+  const [errorCode, setErrorCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -57,6 +58,7 @@ export default function RegisterOrganizationPage() {
 
     if (!res.ok) {
       setError(data.error ?? 'Something went wrong. Please try again.')
+      setErrorCode(data.code ?? '')
       setLoading(false)
       return
     }
@@ -108,10 +110,21 @@ export default function RegisterOrganizationPage() {
           <h1 className="font-serif text-3xl font-bold text-wire-navy mb-1">
             Register your newsroom
           </h1>
-          <p className="text-wire-slate text-sm mb-8">
+          <p className="text-wire-slate text-sm mb-6">
             All member organizations are vetted before approval. Once approved,
             your team can sign up using email addresses on your domain.
           </p>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-8">
+            <p className="text-sm text-blue-800">
+              <strong>Already a member newsroom?</strong> If your organization is already on the network,
+              you don&apos;t need to register it again —{' '}
+              <Link href="/register" className="underline font-medium">
+                create a user account
+              </Link>{' '}
+              using your work email instead.
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -234,11 +247,22 @@ export default function RegisterOrganizationPage() {
               />
             </div>
 
-            {error && (
+            {error && errorCode === 'domain_registered' ? (
+              <div className="text-sm bg-amber-50 border border-amber-200 rounded px-3 py-2">
+                <p className="text-amber-800 font-medium">Your newsroom is already a member.</p>
+                <p className="text-amber-700 mt-1">
+                  Use your work email to{' '}
+                  <Link href="/register" className="underline font-medium">
+                    create a user account
+                  </Link>{' '}
+                  instead of registering a new organization.
+                </p>
+              </div>
+            ) : error ? (
               <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
                 {error}
               </p>
-            )}
+            ) : null}
 
             <button
               type="submit"
