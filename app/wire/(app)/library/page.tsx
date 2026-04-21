@@ -342,7 +342,7 @@ function RequestStoryButton({
   // For server rendering we output a link to the request flow
   return (
     <Link
-      href={`/dashboard/requests/new?org=${orgId}&headline=${encodeURIComponent(headline)}&url=${encodeURIComponent(url)}`}
+      href={`/wire/dashboard/requests/new?org=${orgId}&headline=${encodeURIComponent(headline)}&url=${encodeURIComponent(url)}`}
       className="shrink-0 text-xs font-medium border border-wire-navy text-wire-navy rounded px-3 py-1.5 hover:bg-wire-navy hover:text-white transition-colors whitespace-nowrap"
     >
       Request story

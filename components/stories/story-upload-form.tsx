@@ -232,7 +232,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
         })
       }
 
-      router.push(`/dashboard/stories/${data.id}`)
+      router.push(`/wire/dashboard/stories/${data.id}`)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')

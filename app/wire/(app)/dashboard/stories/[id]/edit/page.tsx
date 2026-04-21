@@ -42,7 +42,7 @@ export default async function EditStoryPage({ params }: PageProps) {
     <div>
       <div className="mb-6">
         <Link
-          href={`/dashboard/stories/${id}`}
+          href={`/wire/dashboard/stories/${id}`}
           className="text-sm text-wire-slate hover:text-wire-navy"
         >
           ← Back to story

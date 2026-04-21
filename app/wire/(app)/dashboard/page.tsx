@@ -94,13 +94,13 @@ export default async function DashboardPage() {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <Link
-                    href={`/dashboard/stories/${story.id}`}
+                    href={`/wire/dashboard/stories/${story.id}`}
                     className="text-xs border border-wire-border rounded px-3 py-1.5 text-wire-slate hover:text-wire-navy hover:border-wire-navy transition-colors"
                   >
                     Manage
                   </Link>
                   <Link
-                    href={`/dashboard/stories/${story.id}/edit`}
+                    href={`/wire/dashboard/stories/${story.id}/edit`}
                     className="text-xs text-wire-slate hover:text-wire-navy"
                   >
                     Edit
