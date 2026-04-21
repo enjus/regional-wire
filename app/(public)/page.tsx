@@ -130,10 +130,9 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {MEMBER_ORGS.map((org) => {
               const avatar = org.logo ? (
-                <div
-                  className="w-12 h-12 rounded-lg border border-wire-border bg-white flex items-center justify-center flex-shrink-0 overflow-hidden"
-                  dangerouslySetInnerHTML={{ __html: org.logo }}
-                />
+                <div className="w-12 h-12 rounded-lg border border-wire-border bg-white flex items-center justify-center flex-shrink-0 overflow-hidden p-1">
+                  <img src={org.logo} alt={org.name} className="w-full h-full object-contain" />
+                </div>
               ) : (
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
@@ -147,7 +146,7 @@ export default function HomePage() {
                   {avatar}
                   <div className="min-w-0">
                     <p className="font-semibold text-wire-navy text-sm leading-snug">{org.name}</p>
-                    <p className="text-xs text-wire-slate mt-0.5">{org.type}</p>
+                    <p className="text-xs text-wire-slate mt-0.5">{org.location}</p>
                   </div>
                 </>
               )

@@ -109,10 +109,10 @@ The homepage "Our member newsrooms" section is driven by the array in [`lib/memb
 |---|---|---|
 | `initials` | Yes | 2–3 letter abbreviation shown in the avatar when no logo is provided |
 | `name` | Yes | Full organization name, shown on the card |
-| `type` | Yes | Organization type shown below the name (e.g. `"Daily newspaper"`, `"Nonprofit newsroom"`) |
+| `location` | Yes | Location or org type shown below the name (e.g. `"Portland, Oregon"`, `"Nonprofit newsroom"`) |
 | `color` | Yes | Hex color for the initials avatar background (e.g. `"#2D5A8B"`) |
 | `url` | No | If provided, the entire card becomes a link to this URL (opens in a new tab) |
-| `logo` | No | Raw SVG markup. If provided, replaces the initials circle with a logo inside a square container |
+| `logo` | No | Path to a logo file relative to `/public` (e.g. `'/logos/foo.svg'`). If provided, replaces the initials circle with the logo inside a square container |
 
 ### Adding a member
 
@@ -122,7 +122,7 @@ The homepage "Our member newsrooms" section is driven by the array in [`lib/memb
 
 ### Adding a logo
 
-Paste the SVG markup as a string. Keep it compact — strip comments, metadata, and unnecessary attributes. The logo renders at 48×48px:
+Drop the logo file into `public/logos/`, then reference it by path:
 
 ```ts
 {
@@ -131,9 +131,11 @@ Paste the SVG markup as a string. Keep it compact — strip comments, metadata, 
   type: 'Regional newspaper',
   color: '#1a1a1a',
   url: 'https://oregonlive.com',
-  logo: '<svg viewBox="0 0 48 48" ...>...</svg>',
+  logo: '/logos/oregonlive.svg',
 },
 ```
+
+SVG and PNG both work. The logo renders at 48×48px with `object-contain` padding.
 
 ---
 
