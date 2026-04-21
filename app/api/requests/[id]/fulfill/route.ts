@@ -59,7 +59,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (requestingOrg?.contact_emails?.length && resolvedStoryId) {
       const title = story?.title ?? req.requested_headline ?? 'Your requested story'
       const fulfillingOrgName =
-        (currentUser.organization as unknown as { name: string } | null)?.name ?? 'a member newsroom'
+        (currentUser.organization as unknown as { name: string } | null)?.name ?? 'A member newsroom'
       await sendRequestFulfilledEmail(
         requestingOrg.contact_emails,
         fulfillingOrgName,
