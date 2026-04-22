@@ -2,9 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import Parser from 'rss-parser'
 import { slugify } from '@/lib/utils'
-import { checkStoryAlerts } from '@/lib/alerts'
 
-// This route is called by Vercel Cron every 15 minutes.
+// This route is called via crontab every 15 minutes.
 // For AWS: use EventBridge rule to trigger a Lambda on the same schedule.
 // The Lambda invokes this endpoint via an HTTP request with CRON_SECRET header,
 // or replicate the logic directly in the Lambda handler using the same Supabase
@@ -113,10 +112,6 @@ export async function GET(request: NextRequest) {
             console.error(`[poll-feeds] Failed to insert story for ${guid}:`, storyError)
           } else if (story) {
             processed++
-            // Trigger alerts fire-and-forget
-            checkStoryAlerts(story.id, request).catch((e) =>
-              console.error('[poll-feeds] Alert check failed:', e)
-            )
           }
         } else if (feed.feed_type === 'headline') {
           // Upsert into feed_headlines
@@ -167,10 +162,6 @@ export async function GET(request: NextRequest) {
         .from('stories')
         .update({ status: 'available' })
         .eq('id', story.id)
-      // Treat as a new story entering the library for alert purposes
-      checkStoryAlerts(story.id, request).catch((e) =>
-        console.error('[poll-feeds] Alert check for embargo lift failed:', e)
-      )
     }
     console.log(`[poll-feeds] Lifted ${expiredEmbargoes.length} embargo(es)`)
   }

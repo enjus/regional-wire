@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { slugify } from '@/lib/utils'
-import { checkStoryAlerts } from '@/lib/alerts'
 
 export async function POST(request: NextRequest) {
   try {
@@ -92,13 +91,6 @@ export async function POST(request: NextRequest) {
       }))
 
       await serviceSupabase.from('story_assets').insert(assetRows)
-    }
-
-    // Trigger alert check for immediately available stories
-    if (status === 'available') {
-      checkStoryAlerts(story.id, request).catch((err) =>
-        console.error('Alert check error:', err)
-      )
     }
 
     return NextResponse.json({ id: story.id })

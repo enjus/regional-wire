@@ -225,57 +225,46 @@ You can browse the full story library at ${APP_URL}/library or reach out to the 
 }
 
 // ----------------------------------------------------------------
-// 8. Story alert — immediate
+// 8. Consolidated hourly alert — keyword matches + org follows
 // ----------------------------------------------------------------
-export async function sendStoryAlertEmail(
-  toEmail: string,
-  matchedKeywords: string[],
-  storyTitle: string,
-  orgName: string,
-  summary: string | null,
+export type AlertStory = {
+  title: string
+  orgName: string
   storyId: string
-) {
-  const text = `
-Story Alert — ${brand.name}
-
-A new story matching your alert (${matchedKeywords.join(', ')}) is available:
-
-  Headline: ${storyTitle}
-  From: ${orgName}
-  ${summary ? `Summary: ${summary}\n` : ''}
-  Read & republish: ${APP_URL}/library/${storyId}
-
-— ${brand.name}
-`.trim()
-
-  return getResend().emails.send({
-    from: FROM_ADDRESS,
-    to: toEmail,
-    subject: `Alert: "${storyTitle}"`,
-    text,
-  })
+  summary: string | null
+  matchedKeywords?: string[]
 }
 
-// ----------------------------------------------------------------
-// 9. Story alert — daily digest
-// ----------------------------------------------------------------
-export async function sendAlertDigestEmail(
+export async function sendConsolidatedAlertEmail(
   toEmail: string,
-  stories: { title: string; orgName: string; storyId: string; summary: string | null }[]
+  keywordMatches: AlertStory[],
+  orgFollowMatches: AlertStory[]
 ) {
-  const storyLines = stories
-    .map(
-      (s, i) =>
-        `${i + 1}. ${s.title}\n   From: ${s.orgName}\n   ${s.summary ? s.summary + '\n   ' : ''}${APP_URL}/library/${s.storyId}`
+  if (!keywordMatches.length && !orgFollowMatches.length) return
+  const formatStory = (s: AlertStory, i: number) => {
+    const kwLine = s.matchedKeywords?.length ? `   Keywords: ${s.matchedKeywords.join(', ')}\n` : ''
+    return `${i + 1}. ${s.title}\n   From: ${s.orgName}\n${kwLine}${s.summary ? `   ${s.summary}\n` : ''}   ${APP_URL}/library/${s.storyId}`
+  }
+
+  const sections: string[] = []
+
+  if (keywordMatches.length) {
+    sections.push(
+      `Matching your keywords:\n\n${keywordMatches.map(formatStory).join('\n\n')}`
     )
-    .join('\n\n')
+  }
+  if (orgFollowMatches.length) {
+    sections.push(
+      `From newsrooms you follow:\n\n${orgFollowMatches.map(formatStory).join('\n\n')}`
+    )
+  }
+
+  const totalCount = keywordMatches.length + orgFollowMatches.length
 
   const text = `
-${brand.name} — Daily Story Alert
+${brand.name} — New ${totalCount === 1 ? 'Story' : 'Stories'} Matching Your Alerts
 
-${stories.length} new ${stories.length === 1 ? 'story matches' : 'stories match'} your alerts from the past 24 hours:
-
-${storyLines}
+${sections.join('\n\n---\n\n')}
 
 Manage your alerts: ${APP_URL}/dashboard/settings/alerts
 
@@ -285,7 +274,41 @@ Manage your alerts: ${APP_URL}/dashboard/settings/alerts
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: toEmail,
-    subject: `${brand.name} alert digest — ${stories.length} new ${stories.length === 1 ? 'story' : 'stories'}`,
+    subject: `${brand.name}: ${totalCount} new ${totalCount === 1 ? 'story' : 'stories'} matching your alerts`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 9. Daily digest
+// ----------------------------------------------------------------
+export async function sendDailyDigestEmail(
+  toEmail: string,
+  stories: AlertStory[]
+) {
+  const storyLines = stories
+    .map(
+      (s, i) =>
+        `${i + 1}. ${s.title}\n   From: ${s.orgName}\n${s.summary ? `   ${s.summary}\n` : ''}   ${APP_URL}/library/${s.storyId}`
+    )
+    .join('\n\n')
+
+  const text = `
+${brand.name} — Daily Digest
+
+${stories.length} ${stories.length === 1 ? 'story' : 'stories'} from the past 24 hours, sorted by popularity:
+
+${storyLines}
+
+Manage your digest settings: ${APP_URL}/dashboard/settings/alerts
+
+— ${brand.name}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: toEmail,
+    subject: `${brand.name} Daily Digest — ${stories.length} new ${stories.length === 1 ? 'story' : 'stories'}`,
     text,
   })
 }

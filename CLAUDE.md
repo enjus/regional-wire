@@ -77,8 +77,15 @@ Assets are stored in the `story-assets` Supabase Storage bucket as **private** (
 
 Defined via `crontab` on the DigitalOcean droplet (not Vercel). Both routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
 
-- `/api/cron/poll-feeds` (every 15 min): ingests RSS feeds, deduplicates by `feed_guid`, lifts expired embargoes, triggers story alerts.
-- `/api/cron/alert-digest` (hourly): sends digest emails only at the hour configured by `ALERT_DIGEST_HOUR`.
+- `/api/cron/poll-feeds` (every 15 min): ingests RSS feeds, deduplicates by `feed_guid`, lifts expired embargoes.
+- `/api/cron/hourly-digest` (every hour): sends alerts and daily digests. Two passes per run:
+  1. **Consolidated alert pass** — stories from the last ~61 minutes matched against all active `story_alerts` (keyword match or org follow). All of a user's matches are merged into one email, at most once per 55 minutes, tracked in `alert_send_log`.
+  2. **Daily digest pass** — for users with `user_digest_prefs.daily_digest_enabled = true` whose `delivery_hour_utc` matches the current UTC hour. Pulls up to 10 stories from last 24h, sorted by republication count (from `republication_log`) then recency. Guarded by `alert_send_log` (23h window).
+
+To trigger locally (no auth required in development):
+```
+GET http://localhost:3000/api/cron/hourly-digest
+```
 
 ### Schema Notes
 
@@ -86,6 +93,13 @@ The migration is in `supabase/migrations/001_schema.sql`. Post-migration additio
 - `feed_headlines.author TEXT` — added to capture `dc:creator` from RSS items
 - `users.is_platform_admin BOOLEAN NOT NULL DEFAULT false` — platform admin flag
 - `organizations.republication_guidance TEXT` — optional guidance for republishers
+
+`supabase/migrations/003_alert_enhancements.sql` adds:
+- `story_alerts.followed_organization_id UUID` — org-follow alert type (either this or `keywords` required)
+- `story_alerts.keywords` — made nullable (was NOT NULL)
+- `story_alerts.alert_type` — dropped (all alerts now batch hourly)
+- `user_digest_prefs` table — per-user daily digest opt-in and `delivery_hour_utc`
+- `alert_send_log` table — dedup/throttle log for hourly and daily_digest sends
 
 When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
 
@@ -125,7 +139,6 @@ PLATFORM_ADMIN_EMAIL
 ADMIN_USERNAME / ADMIN_PASSWORD   # HTTP Basic Auth for /admin
 NEXT_PUBLIC_APP_URL
 CRON_SECRET
-ALERT_DIGEST_HOUR                 # 0–23, default 7
 NEXT_PUBLIC_BRAND_NAME            # Platform name (default: "Regional Wire")
 NEXT_PUBLIC_BRAND_DESCRIPTION     # Page metadata description
 ```

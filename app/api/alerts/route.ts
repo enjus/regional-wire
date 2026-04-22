@@ -18,10 +18,17 @@ export async function POST(request: NextRequest) {
 
     if (!currentUser) return NextResponse.json({ error: 'User not found.' }, { status: 404 })
 
-    const { keywords, alert_type } = await request.json()
+    const body = await request.json()
+    const { keywords, followed_organization_id } = body
 
-    if (!keywords?.length) {
-      return NextResponse.json({ error: 'Keywords required.' }, { status: 400 })
+    const hasKeywords = Array.isArray(keywords) && keywords.length > 0
+    const hasOrgFollow = typeof followed_organization_id === 'string' && followed_organization_id
+
+    if (!hasKeywords && !hasOrgFollow) {
+      return NextResponse.json(
+        { error: 'Provide keywords or a newsroom to follow.' },
+        { status: 400 }
+      )
     }
 
     const serviceSupabase = await createServiceClient()
@@ -30,8 +37,8 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         organization_id: currentUser.organization_id,
-        keywords,
-        alert_type: alert_type ?? 'immediate',
+        keywords: hasKeywords ? keywords : null,
+        followed_organization_id: hasOrgFollow ? followed_organization_id : null,
         is_active: true,
       })
       .select()

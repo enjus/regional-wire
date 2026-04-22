@@ -15,12 +15,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
-    const body = await request.json()
+    const { is_active } = await request.json()
+
+    if (typeof is_active !== 'boolean') {
+      return NextResponse.json({ error: 'is_active must be a boolean.' }, { status: 400 })
+    }
+
     const serviceSupabase = await createServiceClient()
 
     await serviceSupabase
       .from('story_alerts')
-      .update(body)
+      .update({ is_active })
       .eq('id', id)
       .eq('user_id', user.id)
 

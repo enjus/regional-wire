@@ -6,7 +6,6 @@ export type StorySource = 'manual' | 'feed'
 export type FeedType = 'full_text' | 'headline'
 export type RequestStatus = 'pending' | 'fulfilled' | 'declined'
 export type AssetType = 'image' | 'video' | 'document'
-export type AlertType = 'immediate' | 'digest'
 
 export interface Organization {
   id: string
@@ -133,10 +132,19 @@ export interface StoryAlert {
   id: string
   user_id: string
   organization_id: string
-  keywords: string[]
-  alert_type: AlertType
+  keywords: string[] | null
+  followed_organization_id: string | null
   is_active: boolean
   created_at: string
+  // Joined
+  followed_org?: { id: string; name: string } | null
+}
+
+export interface UserDigestPrefs {
+  user_id: string
+  daily_digest_enabled: boolean
+  delivery_hour_utc: number
+  updated_at: string
 }
 
 // Auth context shape
