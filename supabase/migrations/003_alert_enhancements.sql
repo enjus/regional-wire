@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS user_digest_prefs (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 ALTER TABLE user_digest_prefs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS user_digest_prefs_self ON user_digest_prefs
+CREATE POLICY user_digest_prefs_self ON user_digest_prefs
   FOR ALL
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());

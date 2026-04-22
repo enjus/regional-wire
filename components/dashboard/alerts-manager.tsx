@@ -12,10 +12,26 @@ interface Props {
 
 const UTC_HOURS = Array.from({ length: 24 }, (_, i) => i)
 
-function formatHour(h: number) {
-  const period = h < 12 ? 'AM' : 'PM'
-  const display = h % 12 === 0 ? 12 : h % 12
-  return `${display}:00 ${period} UTC`
+// Convert UTC hour to Pacific Time for display
+function utcToPacific(utcHour: number): number {
+  // Pacific is UTC-8 (standard) or UTC-7 (daylight). Use UTC-8 as a standard offset.
+  let pacificHour = utcHour - 8
+  if (pacificHour < 0) pacificHour += 24
+  return pacificHour
+}
+
+// Convert Pacific hour back to UTC for storage
+function pacificToUtc(pacificHour: number): number {
+  let utcHour = pacificHour + 8
+  if (utcHour >= 24) utcHour -= 24
+  return utcHour
+}
+
+function formatHour(utcHour: number) {
+  const pacificHour = utcToPacific(utcHour)
+  const period = pacificHour < 12 ? 'AM' : 'PM'
+  const display = pacificHour % 12 === 0 ? 12 : pacificHour % 12
+  return `${display}:00 PM` // Return Pacific Time
 }
 
 export default function AlertsManager({ alerts: initialAlerts, orgId, organizations, digestPrefs: initialPrefs }: Props) {
@@ -31,9 +47,9 @@ export default function AlertsManager({ alerts: initialAlerts, orgId, organizati
   const [addingFollow, setAddingFollow] = useState(false)
   const [followError, setFollowError] = useState('')
 
-  // Daily digest prefs
+  // Daily digest prefs (stored as UTC, but displayed as Pacific)
   const [digestEnabled, setDigestEnabled] = useState(initialPrefs?.daily_digest_enabled ?? false)
-  const [deliveryHour, setDeliveryHour] = useState(initialPrefs?.delivery_hour_utc ?? 7)
+  const [deliveryHourUtc, setDeliveryHourUtc] = useState(initialPrefs?.delivery_hour_utc ?? 15) // 15 UTC = 7 AM Pacific
   const [savingPrefs, setSavingPrefs] = useState(false)
   const [prefsMessage, setPrefsMessage] = useState('')
 
@@ -118,7 +134,7 @@ export default function AlertsManager({ alerts: initialAlerts, orgId, organizati
     const res = await fetch('/api/digest-prefs', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ daily_digest_enabled: digestEnabled, delivery_hour_utc: deliveryHour }),
+      body: JSON.stringify({ daily_digest_enabled: digestEnabled, delivery_hour_utc: deliveryHourUtc }),
     })
     setSavingPrefs(false)
     setPrefsMessage(res.ok ? 'Saved.' : 'Failed to save.')
@@ -295,15 +311,15 @@ export default function AlertsManager({ alerts: initialAlerts, orgId, organizati
 
           {digestEnabled && (
             <div>
-              <label className="block text-xs text-wire-slate mb-1">Delivery time (UTC)</label>
+              <label className="block text-xs text-wire-slate mb-1">Delivery time (Pacific Time)</label>
               <select
-                value={deliveryHour}
-                onChange={(e) => setDeliveryHour(Number(e.target.value))}
+                value={deliveryHourUtc}
+                onChange={(e) => setDeliveryHourUtc(Number(e.target.value))}
                 className="border border-wire-border rounded px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red"
               >
-                {UTC_HOURS.map((h) => (
-                  <option key={h} value={h}>
-                    {formatHour(h)}
+                {UTC_HOURS.map((utcH) => (
+                  <option key={utcH} value={utcH}>
+                    {formatHour(utcH)}
                   </option>
                 ))}
               </select>
