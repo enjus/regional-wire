@@ -31,7 +31,7 @@ function formatHour(utcHour: number) {
   const pacificHour = utcToPacific(utcHour)
   const period = pacificHour < 12 ? 'AM' : 'PM'
   const display = pacificHour % 12 === 0 ? 12 : pacificHour % 12
-  return `${display}:00 PM` // Return Pacific Time
+  return `${display}:00 ${period}`
 }
 
 export default function AlertsManager({ alerts: initialAlerts, orgId, organizations, digestPrefs: initialPrefs }: Props) {
