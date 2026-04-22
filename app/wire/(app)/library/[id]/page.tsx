@@ -306,7 +306,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">4.</span>
-              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author's name must appear as written. Do not substitute your own staff byline.</span>
+              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author's name must appear exactly as written — this is the author credit. Do not substitute your own staff name or remove the byline.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">5.</span>

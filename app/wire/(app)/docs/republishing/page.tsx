@@ -58,14 +58,19 @@ export default function RepublishingPage() {
       <h3>What&apos;s included in the package</h3>
       <ul>
         <li>The story headline</li>
-        <li>The author byline (formatted as <em>By [Name]</em>)</li>
+        <li>The author byline (formatted as <em>By [Name]</em>) — this is the required author credit; do not remove it</li>
         <li>The story body — sanitized to remove scripts, embeds, iframes, and images</li>
         <li>
           An attribution line: <em>This story originally appeared in [Publication] and is
           republished with permission. <a href="#">[Story title]</a></em> — with the title
-          linking to the canonical URL.
+          linking to the canonical URL. This is the required publisher credit; do not remove it.
         </li>
       </ul>
+      <p>
+        Republication requires crediting <strong>both</strong> the original author (via the byline)
+        and the original publisher (via the attribution line). Both are included in the package
+        and must be preserved as published.
+      </p>
 
       <h2>Images</h2>
       <p>
