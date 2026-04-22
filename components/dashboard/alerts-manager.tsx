@@ -12,27 +12,12 @@ interface Props {
 
 const UTC_HOURS = Array.from({ length: 24 }, (_, i) => i)
 
-// Convert UTC hour to Pacific Time for display
-function utcToPacific(utcHour: number): number {
-  // Pacific is UTC-8 (standard) or UTC-7 (daylight). Use UTC-8 as a standard offset.
-  let pacificHour = utcHour - 8
-  if (pacificHour < 0) pacificHour += 24
-  return pacificHour
-}
-
-// Convert Pacific hour back to UTC for storage
-function pacificToUtc(pacificHour: number): number {
-  let utcHour = pacificHour + 8
-  if (utcHour >= 24) utcHour -= 24
-  return utcHour
-}
-
 function formatHour(utcHour: number) {
-  const pacificHour = utcToPacific(utcHour)
-  const period = pacificHour < 12 ? 'AM' : 'PM'
-  const display = pacificHour % 12 === 0 ? 12 : pacificHour % 12
-  return `${display}:00 ${period}`
+  const d = new Date()
+  d.setUTCHours(utcHour, 0, 0, 0)
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
 }
+
 
 export default function AlertsManager({ alerts: initialAlerts, orgId, organizations, digestPrefs: initialPrefs }: Props) {
   const [alerts, setAlerts] = useState(initialAlerts)
@@ -311,7 +296,7 @@ export default function AlertsManager({ alerts: initialAlerts, orgId, organizati
 
           {digestEnabled && (
             <div>
-              <label className="block text-xs text-wire-slate mb-1">Delivery time (Pacific Time)</label>
+              <label className="block text-xs text-wire-slate mb-1">Delivery time (your local time)</label>
               <select
                 value={deliveryHourUtc}
                 onChange={(e) => setDeliveryHourUtc(Number(e.target.value))}
