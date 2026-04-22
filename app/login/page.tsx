@@ -27,14 +27,14 @@ function LoginForm() {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (session) {
-        router.push('/wire/library')
+        router.push(redirect)
       } else {
         setChecking(false)
       }
     }
 
     checkSession()
-  }, [])
+  }, [router, redirect])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
