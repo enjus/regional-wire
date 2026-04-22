@@ -294,7 +294,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
           <ul className="space-y-2 text-sm text-wire-slate">
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">1.</span>
-              <span><strong className="text-wire-navy">Attribution is required.</strong> The republished story must include a link back to the original story on the originating newsroom's website. Do not remove or alter the attribution line.</span>
+              <span><strong className="text-wire-navy">Credit the original author and publisher.</strong> The republished story must name the original author as written and identify the originating newsroom, with a link back to the original story on their website. Do not remove or alter the byline or attribution line.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">2.</span>
@@ -306,7 +306,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">4.</span>
-              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author's name must appear as written. Do not substitute your own staff byline.</span>
+              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author's name must appear exactly as written — this is the author credit. Do not substitute your own staff name or remove the byline.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">5.</span>

@@ -129,10 +129,10 @@ From **Dashboard → Requests:**
 
 ### Republication Requirements Summary
 
-- Include the attribution line linking back to the original story. Do not remove it.
+- **Credit the original author and publisher.** The byline (author credit) and attribution line (publisher credit) must both appear in the republished story. Do not remove or alter either.
 - Headlines may be adapted for your audience but must retain the original meaning.
 - Minor edits for style, updated time references, or clarification of genuine ambiguity are acceptable. Substantive changes to facts, tone, or conclusions are not.
-- Preserve the original byline. Do not substitute your own staff name.
+- Preserve the original byline exactly as written. Do not substitute your own staff name or remove the byline.
 - Do not redistribute the story to third parties or other publications outside of Regional Wire.
 - Submit your published URL so the originating newsroom can track where their story appeared.
 
