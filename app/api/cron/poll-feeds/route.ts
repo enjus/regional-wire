@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
             .insert({
               organization_id: org.id,
               title,
-              byline: result.title ?? org.id,
+              byline: item.creator || item.author || result.title || org.id,
               body_html: bodyHtml,
               body_plain: bodyPlain,
               canonical_url: item.link ?? guid,
