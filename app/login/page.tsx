@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, Suspense, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 function LoginForm() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') ?? '/auth/landing'
   const errorParam = searchParams.get('error')
@@ -18,6 +19,22 @@ function LoginForm() {
   const [sent, setSent] = useState(false)
   const [otp, setOtp] = useState('')
   const [verifying, setVerifying] = useState(false)
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (session) {
+        router.push('/wire/library')
+      } else {
+        setChecking(false)
+      }
+    }
+
+    checkSession()
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -57,6 +74,14 @@ function LoginForm() {
 
     // Session is now set client-side; hand off to callback for user setup
     window.location.href = `/auth/callback?next=${encodeURIComponent(redirect)}`
+  }
+
+  if (checking) {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <div className="text-wire-slate text-sm">Loading…</div>
+      </div>
+    )
   }
 
   if (sent) {
