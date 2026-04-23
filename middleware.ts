@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { checkBasicAuth, verifyAdminToken } from './lib/utils'
+import { checkBasicAuth, verifyAdminToken } from './lib/edge-auth'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     const tokenRouteMatch = pathname.match(/^\/api\/admin\/orgs\/([^/]+)\/(approve|reject)$/)
     if (tokenRouteMatch) {
       const token = request.nextUrl.searchParams.get('token')
-      if (token && verifyAdminToken(tokenRouteMatch[1], tokenRouteMatch[2], token)) {
+      if (token && await verifyAdminToken(tokenRouteMatch[1], tokenRouteMatch[2], token)) {
         return NextResponse.next()
       }
     }
