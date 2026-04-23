@@ -14,6 +14,7 @@ const SECTIONS = [
       { href: '/wire/docs/uploading-stories', label: 'Uploading stories' },
       { href: '/wire/docs/feeds', label: 'RSS feed ingestion' },
       { href: '/wire/docs/alerts', label: 'Story alerts' },
+      { href: '/wire/docs/exclusions', label: 'Publisher exclusions' },
     ],
   },
   {

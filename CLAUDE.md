@@ -101,7 +101,31 @@ The migration is in `supabase/migrations/001_schema.sql`. Post-migration additio
 - `user_digest_prefs` table — per-user daily digest opt-in and `delivery_hour_utc`
 - `alert_send_log` table — dedup/throttle log for hourly and daily_digest sends
 
+`supabase/migrations/004_org_exclusions.sql` adds:
+- `org_exclusions` table — org-to-org exclusion relationships (see Publisher Exclusions below)
+
 When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
+
+### Publisher Exclusions
+
+Org admins can exclude other publishers via **Dashboard → Settings → Exclusions**. Exclusions are mutual in effect: when Org A excludes Org B, neither sees the other's stories in the library or on direct story URLs. Only the initiating org can remove the exclusion.
+
+**Schema:** `org_exclusions` table with `initiator_id` and `excluded_id` (both reference `organizations.id`). A single row represents one exclusion. The mutual effect is achieved by querying both directions at the application layer, not by storing two rows.
+
+**`lib/exclusions.ts`** exports `getExcludedOrgIds(client, orgId)` — pass the anon Supabase client and the current user's org ID; returns an array of org IDs that should be hidden. Queries both `initiator_id = orgId` and `excluded_id = orgId` in one call. Returns `[]` if no exclusions exist.
+
+**Enforcement points:**
+- `app/wire/(app)/library/page.tsx` — filters excluded orgs from the stories query, org filter dropdown, and headlines tab feed query. All three sites check `excludedOrgIds.length > 0` before applying the filter.
+- `app/wire/(app)/library/[id]/page.tsx` — calls `getExcludedOrgIds` after fetching the story; returns `notFound()` if the story's org is excluded.
+- Platform admins bypass all exclusion filtering.
+
+**Scope:** Exclusions affect library visibility only. Story alerts, email digests, and republication log history are unaffected.
+
+**API routes:**
+- `POST /api/orgs/[id]/exclusions` — create exclusion (initiating org admin only; checks for existing exclusion in either direction, returns 409 on duplicate)
+- `DELETE /api/orgs/[id]/exclusions/[excluded_org_id]` — remove exclusion (initiating org admin only; returns 404 if no matching row)
+
+Both routes use the service role client for the write; application-layer auth check is the gate.
 
 ### Story Corrections & Withdrawals
 
