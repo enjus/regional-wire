@@ -62,7 +62,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
           <p className="pt-6 text-xs text-white/20">
-            © {new Date().getFullYear()} {brand.name}. Built for local journalism.
+            © {new Date().getFullYear()} Advance Local Media LLC. Story content copyright belongs to the respective member organizations.
           </p>
         </div>
       </footer>
