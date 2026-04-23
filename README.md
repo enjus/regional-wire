@@ -35,13 +35,16 @@ Fill in all values — see **Environment Variables** below.
 
 #### Schema
 
-Run the migration in your Supabase project's SQL Editor:
+Run all migrations in order in your Supabase project's SQL Editor:
 
 ```
-supabase/migrations/001_schema.sql
+supabase/migrations/001_schema.sql   — core schema, RLS policies, helper functions
+supabase/migrations/002_story_changes.sql   — story corrections and withdrawals
+supabase/migrations/003_alert_enhancements.sql   — org-follow alerts, daily digest prefs
+supabase/migrations/004_org_exclusions.sql   — publisher exclusions
 ```
 
-Then run these additional statements (post-migration additions not yet in the file):
+Then run these additional statements (post-migration additions not yet in the migration files):
 
 ```sql
 ALTER TABLE feed_headlines ADD COLUMN IF NOT EXISTS author TEXT;
