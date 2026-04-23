@@ -33,7 +33,7 @@ export default function GettingStartedPage() {
         <li>A contact email address for the application</li>
       </ul>
       <p>
-        Approval typically takes 1–2 business days. You&apos;ll receive an email when your
+        Approval may take 1–2 business days. You&apos;ll receive an email when your
         organization is approved or if there are questions about your application.
       </p>
 
@@ -41,7 +41,7 @@ export default function GettingStartedPage() {
       <p>
         Once your organization is approved, any staff member with your registered email domain
         can sign up at <Link href="/register">/register</Link>. Use your work email address —
-        the domain must match the one on your organization&apos;s application.
+        the domain must match the one associated with your organization.
       </p>
       <p>
         You&apos;ll receive a confirmation email. Click the link to verify your address and
