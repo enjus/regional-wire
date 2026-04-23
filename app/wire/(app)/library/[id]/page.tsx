@@ -322,11 +322,11 @@ export default async function StoryDetailPage({ params }: PageProps) {
 
       {/* Additional publisher guidance */}
       {!isOwnOrg && org?.republication_guidance && (
-        <div className="border border-wire-border rounded-lg p-5 mb-8 bg-wire-bg">
-          <p className="text-xs font-semibold text-wire-navy uppercase tracking-wide mb-3">
-            Additional publisher guidance
+        <div className="border-l-4 border-amber-500 bg-amber-50 rounded-r-lg p-5 mb-8">
+          <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-1">
+            ⚠ Additional Requirements — {org.name}
           </p>
-          <p className="text-sm text-wire-slate leading-relaxed whitespace-pre-line">
+          <p className="text-sm text-amber-900 leading-relaxed whitespace-pre-line">
             {org.republication_guidance}
           </p>
         </div>

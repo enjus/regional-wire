@@ -16,6 +16,7 @@ export interface Organization {
   status: OrgStatus
   description: string | null
   contact_emails: string[]
+  republication_guidance: string | null
   created_at: string
 }
 

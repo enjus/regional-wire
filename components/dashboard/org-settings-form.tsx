@@ -13,6 +13,7 @@ export default function OrgSettingsForm({ org }: Props) {
   const [name, setName] = useState(org.name)
   const [website, setWebsite] = useState(org.website_url)
   const [description, setDescription] = useState(org.description ?? '')
+  const [repGuidance, setRepGuidance] = useState(org.republication_guidance ?? '')
   const [contacts, setContacts] = useState<string[]>(org.contact_emails)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -53,6 +54,7 @@ export default function OrgSettingsForm({ org }: Props) {
         name: name.trim(),
         website_url: website.trim(),
         description: description.trim() || null,
+        republication_guidance: repGuidance.trim() || null,
         contact_emails: validContacts,
       }),
     })
@@ -106,6 +108,22 @@ export default function OrgSettingsForm({ org }: Props) {
           rows={3}
           className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-wire-navy mb-1">
+          Republication rules
+        </label>
+        <textarea
+          value={repGuidance}
+          onChange={(e) => setRepGuidance(e.target.value)}
+          rows={4}
+          placeholder="e.g. Please credit us as 'The Daily Tribune' and notify editor@example.com when you publish."
+          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+        />
+        <p className="text-xs text-wire-slate mt-1">
+          Displayed alongside standard platform rules on every story your organization shares. Use this to specify any additional requirements — preferred credit line, contact preferences, geographic restrictions, etc.
+        </p>
       </div>
 
       <div>
