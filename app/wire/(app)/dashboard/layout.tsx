@@ -53,6 +53,7 @@ export default async function DashboardLayout({
                 <SidebarLink href="/wire/dashboard/settings" label="Settings" />
                 <SidebarLink href="/wire/dashboard/settings/feeds" label="Feeds" />
                 <SidebarLink href="/wire/dashboard/settings/alerts" label="Alerts" />
+                <SidebarLink href="/wire/dashboard/settings/exclusions" label="Exclusions" />
               </>
             )}
           </ul>

@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createAdminSupabase } from '@/lib/platform-admin'
+import { getExcludedOrgIds } from '@/lib/exclusions'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -45,6 +46,12 @@ export default async function StoryDetailPage({ params }: PageProps) {
 
   if (!story) notFound()
 
+  // Block access if the story's org is excluded
+  if (!isPlatformAdmin && currentUser.organization_id) {
+    const excludedOrgIds = await getExcludedOrgIds(supabase, currentUser.organization_id)
+    if (excludedOrgIds.includes(story.organization_id)) notFound()
+  }
+
   // Fetch change history for this story
   const { data: storyChanges } = await queryClient
     .from('story_changes')
@@ -71,7 +78,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
   // Generate signed URLs for private bucket assets
   let assets: (typeof rawAssets[0] & { displayUrl: string })[] = rawAssets.map(a => ({ ...a, displayUrl: '' }))
   if (rawAssets.length > 0) {
-    const serviceClient = await createServiceClient()
+    const serviceClient = createServiceClient()
     const { data: signedData } = await serviceClient.storage
       .from('story-assets')
       .createSignedUrls(rawAssets.map(a => a.file_url), 3600)
