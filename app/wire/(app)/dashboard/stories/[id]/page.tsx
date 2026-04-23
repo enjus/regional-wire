@@ -125,7 +125,7 @@ export default async function StoryManagePage({ params }: PageProps) {
 
         {!log?.length ? (
           <p className="text-sm text-wire-slate">
-            This story hasn't been republished yet.
+            This story hasn&apos;t been republished yet.
           </p>
         ) : (
           <div className="space-y-3">

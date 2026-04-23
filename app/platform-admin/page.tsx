@@ -1,9 +1,10 @@
 import { requirePlatformAdmin, createAdminSupabase } from '@/lib/platform-admin'
 import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
+import { brand } from '@/lib/brand'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Admin Overview — Regional Wire' }
+export const metadata = { title: `Admin Overview — ${brand.name}` }
 
 export default async function PlatformAdminPage() {
   await requirePlatformAdmin()

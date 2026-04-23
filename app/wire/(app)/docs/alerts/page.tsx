@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Story alerts — Regional Wire Help',
+  title: `Story alerts — ${brand.name} Help`,
 }
 
 export default function AlertsPage() {

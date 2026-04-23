@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { getExcludedOrgIds } from '@/lib/exclusions'
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,11 +39,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Story not found.' }, { status: 404 })
     }
 
+    if (story.status === 'withdrawn') {
+      return NextResponse.json({ error: 'Story has been withdrawn.' }, { status: 404 })
+    }
+
     if (story.organization_id === currentUser.organization_id) {
       return NextResponse.json(
         { error: 'Cannot log republication of own story.' },
         { status: 400 }
       )
+    }
+
+    // Exclusion check — requester's org must not be excluded by the story's org
+    const excludedOrgIds = await getExcludedOrgIds(supabase, currentUser.organization_id)
+    if (excludedOrgIds.includes(story.organization_id)) {
+      return NextResponse.json({ error: 'Story is not available.' }, { status: 403 })
     }
 
     // Check embargo

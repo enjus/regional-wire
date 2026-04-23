@@ -81,7 +81,7 @@ export default function OrgSettingsForm({ org }: Props) {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
         />
       </div>
 
@@ -94,7 +94,7 @@ export default function OrgSettingsForm({ org }: Props) {
           required
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
         />
       </div>
 
@@ -106,7 +106,7 @@ export default function OrgSettingsForm({ org }: Props) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
         />
       </div>
 
@@ -119,7 +119,7 @@ export default function OrgSettingsForm({ org }: Props) {
           onChange={(e) => setRepGuidance(e.target.value)}
           rows={4}
           placeholder="e.g. Please credit us as 'The Daily Tribune' and notify editor@example.com when you publish."
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
         />
         <p className="text-xs text-wire-slate mt-1">
           Displayed alongside standard platform rules on every story your organization shares. Use this to specify any additional requirements — preferred credit line, contact preferences, geographic restrictions, etc.
@@ -137,7 +137,7 @@ export default function OrgSettingsForm({ org }: Props) {
                 type="email"
                 value={contact}
                 onChange={(e) => updateContact(i, e.target.value)}
-                className="flex-1 border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+                className="flex-1 border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
               />
               {contacts.length > 1 && (
                 <button

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { validatePublicFeedHostname } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,15 +27,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'feed_url and feed_type required.' }, { status: 400 })
     }
 
-    // Only allow http/https to prevent SSRF via internal URLs or other protocols
-    let parsedUrl: URL
-    try {
-      parsedUrl = new URL(feed_url.trim())
-    } catch {
-      return NextResponse.json({ error: 'Invalid feed URL.' }, { status: 400 })
-    }
-    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-      return NextResponse.json({ error: 'Feed URL must use HTTP or HTTPS.' }, { status: 400 })
+    const hostnameError = validatePublicFeedHostname(feed_url)
+    if (hostnameError) {
+      return NextResponse.json({ error: hostnameError }, { status: 400 })
     }
 
     const serviceSupabase = await createServiceClient()

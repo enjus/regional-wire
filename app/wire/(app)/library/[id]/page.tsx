@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { formatDate, formatDateTime, isEmbargoActive, sanitizeStoryHtml } from '@/lib/utils'
 import RepublicationPackage from '@/components/stories/republication-package'
 import AssetRequestButton from '@/components/stories/asset-request-button'
+import { brand } from '@/lib/brand'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -301,7 +302,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
           <ul className="space-y-2 text-sm text-wire-slate">
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">1.</span>
-              <span><strong className="text-wire-navy">Attribution is required.</strong> The republished story must include a link back to the original story on the originating newsroom's website. Do not remove or alter the attribution line.</span>
+              <span><strong className="text-wire-navy">Attribution is required.</strong> The republished story must include a link back to the original story on the originating newsroom&apos;s website. Do not remove or alter the attribution line.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">2.</span>
@@ -309,15 +310,15 @@ export default async function StoryDetailPage({ params }: PageProps) {
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">3.</span>
-              <span><strong className="text-wire-navy">Minor edits are acceptable.</strong> Small changes for style, updated time references (e.g. replacing "Wednesday" with a specific date), or clarifications that resolve genuine ambiguity are permitted. Substantive changes to facts, tone, or conclusions are not.</span>
+              <span><strong className="text-wire-navy">Minor edits are acceptable.</strong> Small changes for style, updated time references (e.g. replacing &ldquo;Wednesday&rdquo; with a specific date), or clarifications that resolve genuine ambiguity are permitted. Substantive changes to facts, tone, or conclusions are not.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">4.</span>
-              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author's name must appear exactly as written — this is the author credit. Do not substitute your own staff name or remove the byline.</span>
+              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author&apos;s name must appear exactly as written — this is the author credit. Do not substitute your own staff name or remove the byline.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">5.</span>
-              <span><strong className="text-wire-navy">No resyndication.</strong> You may not redistribute this story to third parties or other publications outside of Regional Wire.</span>
+              <span><strong className="text-wire-navy">No resyndication.</strong> You may not redistribute this story to third parties or other publications outside of {brand.name}.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">6.</span>

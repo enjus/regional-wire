@@ -57,8 +57,8 @@ function RequestFormContent() {
         Request Story
       </h2>
       <p className="text-wire-slate text-sm mb-6">
-        Your request will be emailed to the newsroom's editors. They'll upload the
-        full story and notify you when it's available.
+        Your request will be emailed to the newsroom&apos;s editors. They&apos;ll upload the
+        full story and notify you when it&apos;s available.
       </p>
 
       <div className="bg-wire-bg border border-wire-border rounded p-4 mb-6">
@@ -88,7 +88,7 @@ function RequestFormContent() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows={4}
-            className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red resize-none"
+            className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red resize-none"
             placeholder="Tell the newsroom why you'd like to republish this story…"
           />
         </div>

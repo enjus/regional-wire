@@ -200,7 +200,7 @@ export default function RepublicationPackage({
               value={publishedUrl}
               onChange={(e) => setPublishedUrl(e.target.value)}
               placeholder="https://yournewsroom.com/story/..."
-              className="flex-1 border border-green-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
+              className="flex-1 border border-green-300 rounded px-3 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
             />
             <button
               onClick={submitPublishedUrl}

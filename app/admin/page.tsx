@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { formatDate } from '@/lib/utils'
 import AdminOrgActions, { AdminRemoveAction } from './admin-org-actions'
+import { brand } from '@/lib/brand'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Admin — Regional Wire' }
+export const metadata = { title: `Admin — ${brand.name}` }
 
 async function getAdminData() {
   const supabase = createServerClient(
@@ -43,7 +44,7 @@ export default async function AdminPage() {
         <h1 className="font-serif text-3xl font-bold text-wire-navy">
           Platform Admin
         </h1>
-        <p className="text-wire-slate text-sm mt-1">Regional Wire</p>
+        <p className="text-wire-slate text-sm mt-1">{brand.name}</p>
       </div>
 
       {/* Pending */}

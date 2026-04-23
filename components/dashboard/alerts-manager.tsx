@@ -327,7 +327,7 @@ export default function AlertsManager({ alerts: initialAlerts, orgId, organizati
       </section>
 
       <p className="text-xs text-wire-slate">
-        Alerts are delivered at most once per hour. Your own newsroom's stories are excluded.
+        Alerts are delivered at most once per hour. Your own newsroom&apos;s stories are excluded.
       </p>
     </div>
   )

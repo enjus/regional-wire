@@ -1,5 +1,6 @@
 import { requirePlatformAdmin } from '@/lib/platform-admin'
 import AdminNav from '@/components/platform-admin/admin-nav'
+import { brand } from '@/lib/brand'
 
 export default async function PlatformAdminLayout({
   children,
@@ -14,7 +15,7 @@ export default async function PlatformAdminLayout({
       <aside className="w-56 bg-slate-900 flex flex-col shrink-0 fixed inset-y-0 left-0 z-10">
         <div className="px-5 py-5 border-b border-slate-700">
           <div className="text-wire-red font-bold text-xs tracking-widest uppercase">
-            Regional Wire
+            {brand.name}
           </div>
           <div className="text-white font-semibold text-sm mt-0.5">Platform Admin</div>
         </div>

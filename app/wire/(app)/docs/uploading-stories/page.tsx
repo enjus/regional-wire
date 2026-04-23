@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Uploading stories — Regional Wire Help',
+  title: `Uploading stories — ${brand.name} Help`,
 }
 
 export default function UploadingStoriesPage() {
@@ -16,7 +17,7 @@ export default function UploadingStoriesPage() {
 
       <h2>Overview</h2>
       <p>
-        Stories can enter the Regional Wire library in two ways: manual upload via the
+        Stories can enter the {brand.name} library in two ways: manual upload via the
         editor, or automatic ingestion via an RSS/Atom feed. This page covers manual
         upload. For feed ingestion, see <Link href="/wire/docs/feeds">RSS feed ingestion</Link>.
       </p>

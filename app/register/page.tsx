@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { brand } from '@/lib/brand'
 
 function RegisterForm() {
   const searchParams = useSearchParams()
@@ -75,8 +76,8 @@ function RegisterForm() {
             Check your email
           </h1>
           <p className="text-wire-slate text-sm leading-relaxed">
-            We&apos;ve sent a sign-in link to <strong>{email}</strong>.
-            Click it, or enter the code below to complete your registration.
+            We&apos;ve sent a 6-digit code to <strong>{email}</strong>.
+            Enter it below to complete your registration.
           </p>
         </div>
 
@@ -93,7 +94,7 @@ function RegisterForm() {
               required
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              className="w-full border border-wire-border rounded px-3 py-2 text-sm text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+              className="w-full border border-wire-border rounded px-3 py-2 text-base text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
               placeholder="000000"
               autoComplete="one-time-code"
             />
@@ -130,7 +131,7 @@ function RegisterForm() {
         Create account
       </h1>
       <p className="text-wire-slate text-sm mb-8">
-        Your email must match a member newsroom's domain.{' '}
+        Your email must match a member newsroom&apos;s domain.{' '}
         <Link
           href="/register/organization"
           className="text-wire-red hover:underline"
@@ -149,7 +150,7 @@ function RegisterForm() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+            className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
             placeholder="Jane Smith"
             autoComplete="name"
           />
@@ -164,7 +165,7 @@ function RegisterForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+            className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
             placeholder="you@newsroom.com"
             autoComplete="email"
           />
@@ -189,7 +190,7 @@ function RegisterForm() {
           disabled={loading}
           className="w-full bg-wire-navy text-white py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors disabled:opacity-50"
         >
-          {loading ? 'Sending link…' : 'Continue with email'}
+          {loading ? 'Sending code…' : 'Continue with email'}
         </button>
       </form>
 
@@ -208,7 +209,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-wire-bg flex flex-col">
       <div className="border-b bg-wire-navy text-white px-6 py-4">
         <Link href="/" className="font-serif text-lg font-bold tracking-tight">
-          Regional Wire
+          {brand.name}
         </Link>
       </div>
       <div className="flex-1 flex items-center justify-center px-4 py-16">

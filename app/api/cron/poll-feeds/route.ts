@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import Parser from 'rss-parser'
-import { slugify } from '@/lib/utils'
+import { slugify, sanitizeStoryHtml } from '@/lib/utils'
 
 // This route is called via crontab every 15 minutes.
 // For AWS: use EventBridge rule to trigger a Lambda on the same schedule.
@@ -77,7 +77,8 @@ export async function GET(request: NextRequest) {
 
           if (existing) continue
 
-          const bodyHtml = item.contentEncoded || item.content || ''
+          const rawBodyHtml = item.contentEncoded || item.content || ''
+          const bodyHtml = rawBodyHtml ? sanitizeStoryHtml(rawBodyHtml) : ''
           const bodyPlain =
             item.contentSnippet ||
             bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()

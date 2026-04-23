@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { checkBasicAuth, verifyAdminToken } from '@/lib/utils'
 import { sendOrgApprovedEmail } from '@/lib/email'
+import { brand } from '@/lib/brand'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -20,11 +21,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   if (!validBasicAuth && !validToken) {
     return new NextResponse('Unauthorized', {
       status: 401,
-      headers: { 'WWW-Authenticate': 'Basic realm="Regional Wire Admin"' },
+      headers: { 'WWW-Authenticate': `Basic realm="${brand.name} Admin"` },
     })
   }
 
-  return handleApprove(id, request.nextUrl.origin)
+  return handleApprove(id)
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -35,10 +36,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
-  return handleApprove(id, request.nextUrl.origin)
+  return handleApprove(id)
 }
 
-async function handleApprove(orgId: string, origin: string) {
+async function handleApprove(orgId: string) {
+  const origin = process.env.NEXT_PUBLIC_APP_URL!
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,

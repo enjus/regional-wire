@@ -149,7 +149,7 @@ export default function ExclusionsManager({ orgId, initialExclusions, availableO
               setConfirming(false)
               setError(null)
             }}
-            className="block w-full max-w-sm border border-wire-border rounded px-3 py-2 text-sm text-wire-navy bg-white focus:outline-none focus:ring-2 focus:ring-wire-red"
+            className="block w-full max-w-sm border border-wire-border rounded px-3 py-2 text-base text-wire-navy bg-white focus:outline-none focus:ring-2 focus:ring-wire-red"
           >
             <option value="">Select a publisher…</option>
             {pickableOrgs.map((o) => (

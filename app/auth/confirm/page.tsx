@@ -3,6 +3,7 @@
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { brand } from '@/lib/brand'
 
 function ConfirmContent() {
   const searchParams = useSearchParams()
@@ -44,13 +45,13 @@ function ConfirmContent() {
         Confirm your sign-in
       </h1>
       <p className="text-wire-slate text-sm leading-relaxed mb-6">
-        Click the button below to complete signing in to Regional Wire.
+        Click the button below to complete signing in to {brand.name}.
       </p>
       <button
         onClick={() => { window.location.href = callbackUrl }}
         className="bg-wire-navy text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-wire-navy-light transition-colors cursor-pointer"
       >
-        Sign in to Regional Wire
+        Sign in to {brand.name}
       </button>
       <p className="mt-6 text-xs text-wire-slate">
         Didn&apos;t request this?{' '}
@@ -67,7 +68,7 @@ export default function ConfirmPage() {
     <div className="min-h-screen bg-wire-bg flex flex-col">
       <div className="border-b bg-wire-navy text-white px-6 py-4">
         <span className="font-serif text-lg font-bold tracking-tight">
-          Regional Wire
+          {brand.name}
         </span>
       </div>
       <div className="flex-1 flex items-center justify-center px-4 py-16">

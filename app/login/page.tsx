@@ -4,6 +4,7 @@ import { useState, Suspense, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { brand } from '@/lib/brand'
 
 function LoginForm() {
   const router = useRouter()
@@ -111,7 +112,7 @@ function LoginForm() {
               required
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              className="w-full border border-wire-border rounded px-3 py-2 text-sm text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+              className="w-full border border-wire-border rounded px-3 py-2 text-base text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
               placeholder="000000"
               autoComplete="one-time-code"
             />
@@ -148,7 +149,7 @@ function LoginForm() {
         Sign in
       </h1>
       <p className="text-wire-slate text-sm mb-8">
-        Member newsrooms only. We'll email you a sign-in code.{' '}
+        Member newsrooms only. We&apos;ll email you a sign-in code.{' '}
         <Link
           href="/register/organization"
           className="text-wire-red hover:underline"
@@ -167,7 +168,7 @@ function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+            className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
             placeholder="you@newsroom.com"
           />
         </div>
@@ -188,7 +189,7 @@ function LoginForm() {
       </form>
 
       <p className="mt-6 text-center text-sm text-wire-slate">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link href="/register" className="text-wire-red hover:underline">
           Create one
         </Link>
@@ -202,7 +203,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-wire-bg flex flex-col">
       <div className="border-b bg-wire-navy text-white px-6 py-4">
         <span className="font-serif text-lg font-bold tracking-tight">
-          Regional Wire
+          {brand.name}
         </span>
       </div>
       <div className="flex-1 flex items-center justify-center px-4 py-16">

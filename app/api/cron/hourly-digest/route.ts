@@ -95,50 +95,54 @@ export async function GET(request: NextRequest) {
         }))
 
     for (const [userId, { email, orgId, alerts: userAlerts }] of byUser) {
-      if (recentlySent.has(userId)) continue
+      try {
+        if (recentlySent.has(userId)) continue
 
-      const keywordMatchedIds = new Set<string>()
-      const keywordMatchDetails = new Map<string, string[]>()
-      const orgFollowMatchedIds = new Set<string>()
+        const keywordMatchedIds = new Set<string>()
+        const keywordMatchDetails = new Map<string, string[]>()
+        const orgFollowMatchedIds = new Set<string>()
 
-      for (const alert of userAlerts) {
-        for (const story of recentStories) {
-          if (story.organization_id === orgId) continue
+        for (const alert of userAlerts) {
+          for (const story of recentStories) {
+            if (story.organization_id === orgId) continue
 
-          if (alert.followed_organization_id) {
-            if (story.organization_id === alert.followed_organization_id) {
-              orgFollowMatchedIds.add(story.id)
-            }
-          } else if (alert.keywords) {
-            const text = [story.title, story.summary, story.body_plain]
-              .filter(Boolean)
-              .join(' ')
-              .toLowerCase()
-            const matched = (alert.keywords as string[]).filter((kw) =>
-              text.includes(kw.toLowerCase())
-            )
-            if (matched.length > 0) {
-              keywordMatchedIds.add(story.id)
-              const prev = keywordMatchDetails.get(story.id) ?? []
-              keywordMatchDetails.set(story.id, [...new Set([...prev, ...matched])])
+            if (alert.followed_organization_id) {
+              if (story.organization_id === alert.followed_organization_id) {
+                orgFollowMatchedIds.add(story.id)
+              }
+            } else if (alert.keywords) {
+              const text = [story.title, story.summary, story.body_plain]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase()
+              const matched = (alert.keywords as string[]).filter((kw) =>
+                text.includes(kw.toLowerCase())
+              )
+              if (matched.length > 0) {
+                keywordMatchedIds.add(story.id)
+                const prev = keywordMatchDetails.get(story.id) ?? []
+                keywordMatchDetails.set(story.id, [...new Set([...prev, ...matched])])
+              }
             }
           }
         }
+
+        if (keywordMatchedIds.size === 0 && orgFollowMatchedIds.size === 0) continue
+
+        const keywordMatches = sortByRep(keywordMatchedIds, keywordMatchDetails)
+        const orgFollowMatches = sortByRep(orgFollowMatchedIds)
+
+        await sendConsolidatedAlertEmail(email, keywordMatches, orgFollowMatches).catch((err) =>
+          console.error('[hourly-digest] Consolidated alert error:', err)
+        )
+        const { error: logErr } = await supabase
+          .from('alert_send_log')
+          .insert({ user_id: userId, kind: 'hourly' })
+        if (logErr) console.error('[hourly-digest] Failed to log hourly send:', logErr)
+        alertsSent++
+      } catch (err) {
+        console.error(`[hourly-digest] Alert iteration failed for user ${userId}:`, err)
       }
-
-      if (keywordMatchedIds.size === 0 && orgFollowMatchedIds.size === 0) continue
-
-      const keywordMatches = sortByRep(keywordMatchedIds, keywordMatchDetails)
-      const orgFollowMatches = sortByRep(orgFollowMatchedIds)
-
-      await sendConsolidatedAlertEmail(email, keywordMatches, orgFollowMatches).catch((err) =>
-        console.error('[hourly-digest] Consolidated alert error:', err)
-      )
-      const { error: logErr } = await supabase
-        .from('alert_send_log')
-        .insert({ user_id: userId, kind: 'hourly' })
-      if (logErr) console.error('[hourly-digest] Failed to log hourly send:', logErr)
-      alertsSent++
     }
   }
 
@@ -182,40 +186,44 @@ export async function GET(request: NextRequest) {
       const sentToday = new Set((todaySends ?? []).map((r) => r.user_id))
 
       for (const pref of digestPrefs) {
-        if (sentToday.has(pref.user_id)) continue
-        const userInfo = pref.users as unknown as {
-          email: string
-          organization_id: string
-        } | null
-        if (!userInfo) continue
+        try {
+          if (sentToday.has(pref.user_id)) continue
+          const userInfo = pref.users as unknown as {
+            email: string
+            organization_id: string
+          } | null
+          if (!userInfo) continue
 
-        const stories: AlertStory[] = dailyStories
-          .filter((s) => s.organization_id !== userInfo.organization_id)
-          .sort((a, b) => {
-            const diff =
-              (dailyRepCountMap.get(b.id) ?? 0) - (dailyRepCountMap.get(a.id) ?? 0)
-            if (diff !== 0) return diff
-            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-          })
-          .slice(0, 10)
-          .map((story) => ({
-            title: story.title,
-            orgName:
-              (story.organizations as unknown as { name: string } | null)?.name ?? 'Unknown',
-            storyId: story.id,
-            summary: story.summary ?? null,
-          }))
+          const stories: AlertStory[] = dailyStories
+            .filter((s) => s.organization_id !== userInfo.organization_id)
+            .sort((a, b) => {
+              const diff =
+                (dailyRepCountMap.get(b.id) ?? 0) - (dailyRepCountMap.get(a.id) ?? 0)
+              if (diff !== 0) return diff
+              return new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+            })
+            .slice(0, 10)
+            .map((story) => ({
+              title: story.title,
+              orgName:
+                (story.organizations as unknown as { name: string } | null)?.name ?? 'Unknown',
+              storyId: story.id,
+              summary: story.summary ?? null,
+            }))
 
-        if (!stories.length) continue
+          if (!stories.length) continue
 
-        await sendDailyDigestEmail(userInfo.email, stories).catch((err) =>
-          console.error('[hourly-digest] Daily digest error:', err)
-        )
-        const { error: digestLogErr } = await supabase
-          .from('alert_send_log')
-          .insert({ user_id: pref.user_id, kind: 'daily_digest' })
-        if (digestLogErr) console.error('[hourly-digest] Failed to log daily digest send:', digestLogErr)
-        digestsSent++
+          await sendDailyDigestEmail(userInfo.email, stories).catch((err) =>
+            console.error('[hourly-digest] Daily digest error:', err)
+          )
+          const { error: digestLogErr } = await supabase
+            .from('alert_send_log')
+            .insert({ user_id: pref.user_id, kind: 'daily_digest' })
+          if (digestLogErr) console.error('[hourly-digest] Failed to log daily digest send:', digestLogErr)
+          digestsSent++
+        } catch (err) {
+          console.error(`[hourly-digest] Daily digest iteration failed for user ${pref.user_id}:`, err)
+        }
       }
     }
   }

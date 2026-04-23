@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { sendAssetRequestEmail } from '@/lib/email'
+import { getExcludedOrgIds } from '@/lib/exclusions'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,14 +26,23 @@ export async function POST(request: NextRequest) {
     const serviceSupabase = await createServiceClient()
     const { data: story } = await serviceSupabase
       .from('stories')
-      .select('id, title, organization_id, organizations(contact_emails)')
+      .select('id, title, status, organization_id, organizations(contact_emails)')
       .eq('id', story_id)
       .single()
 
     if (!story) return NextResponse.json({ error: 'Story not found.' }, { status: 404 })
 
+    if (story.status === 'withdrawn') {
+      return NextResponse.json({ error: 'Story has been withdrawn.' }, { status: 404 })
+    }
+
     if (story.organization_id === currentUser.organization_id) {
       return NextResponse.json({ error: 'Cannot request assets from your own story.' }, { status: 400 })
+    }
+
+    const excludedOrgIds = await getExcludedOrgIds(supabase, currentUser.organization_id)
+    if (excludedOrgIds.includes(story.organization_id)) {
+      return NextResponse.json({ error: 'Story is not available.' }, { status: 403 })
     }
 
     const contacts =

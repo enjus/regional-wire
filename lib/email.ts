@@ -11,7 +11,8 @@ function getResend(): Resend {
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-const FROM_ADDRESS = `${brand.name} <noreply@updates.nwnewswire.com>`
+const FROM_EMAIL = process.env.EMAIL_FROM ?? 'noreply@updates.nwnewswire.com'
+const FROM_ADDRESS = `${brand.name} <${FROM_EMAIL}>`
 
 // ----------------------------------------------------------------
 // 1. New org registration — notify platform admin

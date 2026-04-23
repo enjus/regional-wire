@@ -64,7 +64,7 @@ export default function StoryWithdrawButton({ storyId }: { storyId: string }) {
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={3}
-          className="w-full border border-red-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none bg-white"
+          className="w-full border border-red-300 rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none bg-white"
           placeholder="Explain why this story is being withdrawn…"
         />
         {error && (

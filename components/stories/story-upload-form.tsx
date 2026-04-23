@@ -267,7 +267,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
           required
           value={byline}
           onChange={(e) => setByline(e.target.value)}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
           placeholder="Jane Smith, The Daily Tribune"
         />
       </div>
@@ -286,7 +286,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
           required
           value={canonicalUrl}
           onChange={(e) => setCanonicalUrl(e.target.value)}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
           placeholder="https://dailytribune.com/story/..."
         />
       </div>
@@ -318,7 +318,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
           rows={3}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
           placeholder="A brief summary for editors browsing the library…"
         />
       </div>
@@ -331,13 +331,13 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
         </label>
         <p className="text-xs text-wire-slate mb-1">
           Displayed prominently to editors before they copy the package. E.g.
-          "Do not crop lead photo", "Contact editor before publishing".
+          &ldquo;Do not crop lead photo&rdquo;, &ldquo;Contact editor before publishing&rdquo;.
         </p>
         <textarea
           value={specialInstructions}
           onChange={(e) => setSpecialInstructions(e.target.value)}
           rows={2}
-          className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
           placeholder="Do not crop the lead photo."
         />
       </div>
@@ -373,7 +373,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
               required={embargoEnabled}
               value={embargoLiftsAt}
               onChange={(e) => setEmbargoLiftsAt(e.target.value)}
-              className="border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+              className="border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
             />
             <p className="text-xs text-wire-slate mt-1">
               The story will appear in the library with a lock on the
@@ -418,7 +418,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                   setPrimaryImage((p) => ({ ...p, caption: e.target.value }))
                 }
                 placeholder="Caption"
-                className="border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+                className="border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
               />
               <input
                 type="text"
@@ -427,7 +427,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                   setPrimaryImage((p) => ({ ...p, credit: e.target.value }))
                 }
                 placeholder="Photo credit"
-                className="border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+                className="border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
               />
             </div>
           )}
@@ -484,7 +484,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                     updateAdditionalImage(i, (p) => ({ ...p, caption: e.target.value }))
                   }
                   placeholder="Caption"
-                  className="border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+                  className="border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
                 />
                 <input
                   type="text"
@@ -493,7 +493,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                     updateAdditionalImage(i, (p) => ({ ...p, credit: e.target.value }))
                   }
                   placeholder="Photo credit"
-                  className="border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+                  className="border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
                 />
               </div>
             </div>
@@ -533,7 +533,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                   setVideo((p) => ({ ...p, caption: e.target.value }))
                 }
                 placeholder="Caption"
-                className="border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+                className="border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
               />
               <input
                 type="text"
@@ -542,7 +542,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                   setVideo((p) => ({ ...p, credit: e.target.value }))
                 }
                 placeholder="Credit"
-                className="border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+                className="border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
               />
             </div>
           )}
@@ -597,7 +597,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
               type="text"
               value={changeNote}
               onChange={(e) => setChangeNote(e.target.value)}
-              className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+              className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
               placeholder="e.g., Added missing source name in paragraph 3"
             />
           </div>
@@ -615,7 +615,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
                 value={correctionText}
                 onChange={(e) => setCorrectionText(e.target.value)}
                 rows={3}
-                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+                className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
                 placeholder="An earlier version of this story incorrectly stated…"
               />
               <div className="mt-2 bg-amber-50 border border-amber-200 rounded p-3">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { brand } from '@/lib/brand'
 
 export default function RegisterOrganizationPage() {
   const [name, setName] = useState('')
@@ -72,7 +73,7 @@ export default function RegisterOrganizationPage() {
       <div className="min-h-screen bg-wire-bg flex flex-col">
         <div className="border-b bg-wire-navy text-white px-6 py-4">
           <Link href="/" className="font-serif text-lg font-bold tracking-tight">
-            Regional Wire
+            {brand.name}
           </Link>
         </div>
         <div className="flex-1 flex items-center justify-center px-4 py-16">
@@ -82,7 +83,7 @@ export default function RegisterOrganizationPage() {
               Application received
             </h1>
             <p className="text-wire-slate text-sm leading-relaxed">
-              Your newsroom's application is under review. We'll email your
+              Your newsroom&apos;s application is under review. We&apos;ll email your
               contact address once a decision has been made, typically within
               one business day.
             </p>
@@ -101,7 +102,7 @@ export default function RegisterOrganizationPage() {
     <div className="min-h-screen bg-wire-bg flex flex-col">
       <div className="border-b bg-wire-navy text-white px-6 py-4">
         <Link href="/" className="font-serif text-lg font-bold tracking-tight">
-          Regional Wire
+          {brand.name}
         </Link>
       </div>
 
@@ -136,7 +137,7 @@ export default function RegisterOrganizationPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+                className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
                 placeholder="The Daily Tribune"
                 autoComplete="organization"
               />
@@ -151,7 +152,7 @@ export default function RegisterOrganizationPage() {
                 required
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
-                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+                className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
                 placeholder="https://dailytribune.com"
                 autoComplete="url"
               />
@@ -171,7 +172,7 @@ export default function RegisterOrganizationPage() {
                 required
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
-                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+                className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
                 placeholder="dailytribune.com"
                 autoComplete="off"
                 spellCheck={false}
@@ -193,7 +194,7 @@ export default function RegisterOrganizationPage() {
                       type="email"
                       value={contact}
                       onChange={(e) => updateContact(i, e.target.value)}
-                      className="flex-1 border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+                      className="flex-1 border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
                       placeholder="editor@dailytribune.com"
                       autoComplete="email"
                     />
@@ -226,7 +227,7 @@ export default function RegisterOrganizationPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+                className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
                 placeholder="We cover local government, education, and business news in the greater Springfield area."
               />
             </div>
@@ -242,7 +243,7 @@ export default function RegisterOrganizationPage() {
                 value={republication_guidance}
                 onChange={(e) => setRepublicationGuidance(e.target.value)}
                 rows={3}
-                className="w-full border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
+                className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
                 placeholder="Please credit us as 'The Daily Tribune' and notify editor@dailytribune.com when you publish."
               />
             </div>

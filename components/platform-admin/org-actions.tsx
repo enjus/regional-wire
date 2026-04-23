@@ -38,7 +38,7 @@ export default function OrgActions({ orgId, orgName, status }: Props) {
             onChange={(e) => setReason(e.target.value)}
             placeholder="Reason for rejection (emailed to org)…"
             rows={3}
-            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+            className="w-full border border-gray-200 rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
           />
           <div className="flex gap-2">
             <button

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Publisher exclusions — Regional Wire Help',
+  title: `Publisher exclusions — ${brand.name} Help`,
 }
 
 export default function ExclusionsPage() {
@@ -21,8 +22,8 @@ export default function ExclusionsPage() {
       </p>
       <p>
         Exclusions are <strong>mutual and automatic</strong>. You do not need the other
-        organization's approval to create an exclusion, and they are not notified. Both
-        sides' libraries are affected immediately.
+        organization&apos;s approval to create an exclusion, and they are not notified. Both
+        sides&apos; libraries are affected immediately.
       </p>
 
       <h2>Setting up an exclusion</h2>
@@ -36,9 +37,9 @@ export default function ExclusionsPage() {
       <h2>Removing an exclusion</h2>
       <p>
         Only the organization that created the exclusion can remove it. If your organization
-        initiated the exclusion, you'll see a <strong>Remove</strong> button next to the
+        initiated the exclusion, you&apos;ll see a <strong>Remove</strong> button next to the
         entry on the Exclusions settings page. If another organization excluded you, the
-        entry will appear in your list as informational — you'll need to contact that
+        entry will appear in your list as informational — you&apos;ll need to contact that
         organization to request removal.
       </p>
 
@@ -47,7 +48,7 @@ export default function ExclusionsPage() {
         <li>Stories in the main library grid</li>
         <li>The headline feed tab</li>
         <li>The organization filter dropdown in the library</li>
-        <li>Direct story URLs — excluded organizations cannot access each other's story detail pages</li>
+        <li>Direct story URLs — excluded organizations cannot access each other&apos;s story detail pages</li>
       </ul>
 
       <h2>What exclusions do not affect</h2>

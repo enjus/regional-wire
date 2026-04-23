@@ -29,12 +29,12 @@ export default async function RepublishedPage() {
   return (
     <div>
       <h2 className="font-serif text-xl font-bold text-wire-navy mb-6">
-        Stories We've Republished
+        Stories We&apos;ve Republished
       </h2>
 
       {!log?.length ? (
         <p className="text-sm text-wire-slate">
-          You haven't downloaded any republication packages yet.
+          You haven&apos;t downloaded any republication packages yet.
         </p>
       ) : (
         <div className="space-y-3">

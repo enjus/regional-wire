@@ -51,7 +51,7 @@ export default function LibraryFilters({ orgs }: Props) {
         <select
           value={searchParams.get('org') ?? ''}
           onChange={(e) => updateParam('org', e.target.value)}
-          className="border border-wire-border rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="border border-wire-border rounded px-2 py-1.5 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
         >
           <option value="">All newsrooms</option>
           {orgs.map((o) => (
@@ -69,7 +69,7 @@ export default function LibraryFilters({ orgs }: Props) {
         <select
           value={searchParams.get('source') ?? ''}
           onChange={(e) => updateParam('source', e.target.value)}
-          className="border border-wire-border rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="border border-wire-border rounded px-2 py-1.5 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
         >
           <option value="">All sources</option>
           <option value="manual">Manual upload</option>
@@ -85,7 +85,7 @@ export default function LibraryFilters({ orgs }: Props) {
           type="date"
           value={searchParams.get('from') ?? ''}
           onChange={(e) => updateParam('from', e.target.value)}
-          className="border border-wire-border rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="border border-wire-border rounded px-2 py-1.5 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
         />
       </div>
 
@@ -97,7 +97,7 @@ export default function LibraryFilters({ orgs }: Props) {
           type="date"
           value={searchParams.get('to') ?? ''}
           onChange={(e) => updateParam('to', e.target.value)}
-          className="border border-wire-border rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+          className="border border-wire-border rounded px-2 py-1.5 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
         />
       </div>
 

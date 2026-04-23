@@ -46,7 +46,7 @@ export default async function OutgoingRequestsPage() {
 
       {!requests?.length ? (
         <p className="text-sm text-wire-slate">
-          You haven't made any republication requests yet.
+          You haven&apos;t made any republication requests yet.
         </p>
       ) : (
         <div className="space-y-3">

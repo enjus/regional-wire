@@ -238,7 +238,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
       <TabNav active="library" />
 
       {!stories?.length ? (
-        <EmptyState message="No stories available yet. Check back soon." />
+        <LibraryEmptyState canUpload={!!currentOrgId} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {stories.map((story) => {
@@ -315,6 +315,35 @@ function EmptyState({ message }: { message: string }) {
   return (
     <div className="text-center py-16 text-wire-slate">
       <p className="text-sm">{message}</p>
+    </div>
+  )
+}
+
+function LibraryEmptyState({ canUpload }: { canUpload: boolean }) {
+  return (
+    <div className="bg-white border border-wire-border rounded-lg px-6 py-12 text-center max-w-xl mx-auto">
+      <h3 className="font-serif text-xl font-semibold text-wire-navy mb-2">
+        No stories yet
+      </h3>
+      <p className="text-wire-slate text-sm mb-6">
+        Stories shared by member newsrooms will appear here.
+      </p>
+      <div className="flex items-center justify-center gap-4 text-sm">
+        {canUpload && (
+          <Link
+            href="/wire/dashboard/stories/new"
+            className="bg-wire-navy text-white font-medium px-4 py-2 rounded hover:bg-wire-navy-light transition-colors"
+          >
+            Upload a story
+          </Link>
+        )}
+        <Link
+          href="/wire/docs/uploading-stories"
+          className="text-wire-red hover:underline font-medium"
+        >
+          Learn about uploading →
+        </Link>
+      </div>
     </div>
   )
 }

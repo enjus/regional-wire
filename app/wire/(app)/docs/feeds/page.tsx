@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'RSS feed ingestion — Regional Wire Help',
+  title: `RSS feed ingestion — ${brand.name} Help`,
 }
 
 export default function FeedsPage() {
@@ -17,7 +18,7 @@ export default function FeedsPage() {
       <h2>Overview</h2>
       <p>
         Instead of manually uploading each story, you can connect one or more RSS or Atom
-        feeds to Regional Wire. The platform polls your feeds every 15 minutes and
+        feeds to {brand.name}. The platform polls your feeds every 15 minutes and
         automatically adds new items to the library. This is the preferred setup for
         newsrooms with a high story volume or an existing CMS publishing workflow.
       </p>
@@ -25,7 +26,7 @@ export default function FeedsPage() {
       <h2>Adding a feed</h2>
       <p>
         Go to <strong>Dashboard → Settings → Feeds</strong> (admin only). Click
-        <strong> Add feed</strong> and enter your feed&apos;s URL. Regional Wire supports
+        <strong> Add feed</strong> and enter your feed&apos;s URL. {brand.name} supports
         RSS 2.0 and Atom 1.0 formats.
       </p>
       <p>
@@ -35,7 +36,7 @@ export default function FeedsPage() {
 
       <h2>Full-text vs. headline-only feeds</h2>
       <p>
-        Regional Wire handles feeds differently depending on whether they include full story
+        {brand.name} handles feeds differently depending on whether they include full story
         content:
       </p>
       <ul>
@@ -53,7 +54,7 @@ export default function FeedsPage() {
 
       <h2>Deduplication</h2>
       <p>
-        Regional Wire deduplicates feed items using the item&apos;s <code>guid</code> field
+        {brand.name} deduplicates feed items using the item&apos;s <code>guid</code> field
         (or the item URL if no <code>guid</code> is present). If an item has already been
         ingested, it will not be added again on subsequent polls — even if the feed content
         has changed.
@@ -71,7 +72,7 @@ export default function FeedsPage() {
 
       <h2>Author attribution</h2>
       <p>
-        Regional Wire reads the <code>dc:creator</code> field from feed items for author
+        {brand.name} reads the <code>dc:creator</code> field from feed items for author
         attribution. If present, it is used as the byline in the story and copy package.
         If absent, the byline is left blank and should be edited manually after ingestion.
       </p>

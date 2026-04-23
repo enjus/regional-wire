@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Quick start guide — Regional Wire Docs',
+  title: `Quick start guide — ${brand.name} Docs`,
 }
 
 export default function GettingStartedPage() {
@@ -16,7 +17,7 @@ export default function GettingStartedPage() {
 
       <h2>Prerequisites</h2>
       <p>
-        Regional Wire is a closed network. Before anyone from your newsroom can sign in,
+        {brand.name} is a closed network. Before anyone from your newsroom can sign in,
         your organization must be approved by the platform administrator. Approval is based
         on your newsroom&apos;s email domain — once approved, any staff member with a
         matching email address can create an account.

@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Republishing stories — Regional Wire Help',
+  title: `Republishing stories — ${brand.name} Help`,
 }
 
 export default function RepublishingPage() {
@@ -103,7 +104,7 @@ export default function RepublishingPage() {
         that entails.
       </p>
       <p>
-        Regional Wire does not modify story content. The sanitization process strips
+        {brand.name} does not modify story content. The sanitization process strips
         potentially unsafe HTML (scripts, embeds) but does not alter text content.
       </p>
 

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { checkBasicAuth } from '@/lib/utils'
 import { sendOrgRemovalEmail } from '@/lib/email'
+import { brand } from '@/lib/brand'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -86,13 +87,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   // 7. Auto-decline pending republication requests involving this org
   await supabase
     .from('republication_requests')
-    .update({ status: 'declined', decline_reason: 'Organization removed from Regional Wire' })
+    .update({ status: 'declined', decline_reason: `Organization removed from ${brand.name}` })
     .eq('requesting_org_id', id)
     .eq('status', 'pending')
 
   await supabase
     .from('republication_requests')
-    .update({ status: 'declined', decline_reason: 'Organization removed from Regional Wire' })
+    .update({ status: 'declined', decline_reason: `Organization removed from ${brand.name}` })
     .eq('target_org_id', id)
     .eq('status', 'pending')
 

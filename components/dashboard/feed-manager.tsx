@@ -66,12 +66,12 @@ export default function FeedManager({ feeds: initialFeeds, orgId }: Props) {
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
             placeholder="https://yoursite.com/tag/regional-wire/feed/"
-            className="flex-1 min-w-48 border border-wire-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-wire-red"
+            className="flex-1 min-w-48 border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
           />
           <select
             value={newType}
             onChange={(e) => setNewType(e.target.value as 'full_text' | 'headline')}
-            className="border border-wire-border rounded px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-wire-red"
+            className="border border-wire-border rounded px-2 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red"
           >
             <option value="full_text">Full-text</option>
             <option value="headline">Headline only</option>

@@ -5,9 +5,14 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
+    if (!UUID_RE.test(id)) {
+      return NextResponse.json({ error: 'Invalid organization id.' }, { status: 400 })
+    }
     const supabase = await createClient()
     const {
       data: { user },
@@ -29,6 +34,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (!excluded_org_id) {
       return NextResponse.json({ error: 'excluded_org_id is required.' }, { status: 400 })
+    }
+    if (typeof excluded_org_id !== 'string' || !UUID_RE.test(excluded_org_id)) {
+      return NextResponse.json({ error: 'Invalid excluded_org_id.' }, { status: 400 })
     }
     if (excluded_org_id === id) {
       return NextResponse.json({ error: 'Cannot exclude your own organization.' }, { status: 400 })

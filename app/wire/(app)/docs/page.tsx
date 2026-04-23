@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Help — Regional Wire',
+  title: `Help — ${brand.name}`,
 }
 
 const SECTIONS = [
@@ -52,7 +53,7 @@ export default function DocsIndexPage() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-wire-red">Help</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-wire-navy mb-4">
-          Regional Wire docs
+          {brand.name} docs
         </h1>
         <p className="text-wire-slate leading-relaxed max-w-lg">
           How to use the platform — uploading stories, setting up feeds, republishing

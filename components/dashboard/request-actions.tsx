@@ -50,7 +50,7 @@ export default function RequestActions({
             onChange={(e) => setReason(e.target.value)}
             placeholder="Reason (optional, sent to requester)…"
             rows={2}
-            className="w-full border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red resize-none"
+            className="w-full border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red resize-none"
           />
           <div className="flex gap-2">
             <button

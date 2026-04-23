@@ -45,7 +45,7 @@ export default function RepublishedUrlUpdater({ logId, currentUrl }: Props) {
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="https://yournewsroom.com/story/..."
-        className="flex-1 border border-wire-border rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-wire-red"
+        className="flex-1 border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
       />
       <button
         onClick={handleSave}
