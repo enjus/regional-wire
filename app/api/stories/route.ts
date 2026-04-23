@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { slugify } from '@/lib/utils'
+import { autoFulfillRequestsForStory } from '@/lib/requests/autoFulfill'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     const { data: currentUser } = await supabase
       .from('users')
-      .select('organization_id')
+      .select('organization_id, organizations(name)')
       .eq('id', user.id)
       .single()
 
@@ -91,6 +92,22 @@ export async function POST(request: NextRequest) {
       }))
 
       await serviceSupabase.from('story_assets').insert(assetRows)
+    }
+
+    if (status === 'available') {
+      const fulfillingOrgName =
+        (currentUser.organizations as unknown as { name: string } | null)?.name ??
+        'A member newsroom'
+      await autoFulfillRequestsForStory(
+        serviceSupabase,
+        {
+          id: story.id,
+          organization_id: story.organization_id,
+          canonical_url: story.canonical_url,
+          title: story.title,
+        },
+        fulfillingOrgName
+      )
     }
 
     return NextResponse.json({ id: story.id })

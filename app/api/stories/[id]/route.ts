@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { sendCorrectionNotice, sendWithdrawalNotice } from '@/lib/email'
+import { autoFulfillRequestsForStory } from '@/lib/requests/autoFulfill'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -61,7 +62,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { data: currentUser } = await supabase
       .from('users')
-      .select('organization_id')
+      .select('organization_id, organizations(name)')
       .eq('id', user.id)
       .single()
 
@@ -72,7 +73,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     // Verify the story belongs to this org
     const { data: existing } = await supabase
       .from('stories')
-      .select('id, organization_id, title')
+      .select('id, organization_id, title, status, canonical_url')
       .eq('id', id)
       .single()
 
@@ -159,6 +160,25 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         correction_text: effectiveChangeType === 'correction' ? correction_text.trim() : null,
         withdrawal_reason: effectiveChangeType === 'withdrawal' ? withdrawal_reason?.trim() || null : null,
       })
+    }
+
+    // Auto-fulfill pending republication requests when story just became available
+    const becameAvailable =
+      updated.status === 'available' && existing.status !== 'available'
+    if (becameAvailable) {
+      const fulfillingOrgName =
+        (currentUser.organizations as unknown as { name: string } | null)?.name ??
+        'A member newsroom'
+      await autoFulfillRequestsForStory(
+        serviceSupabase,
+        {
+          id: updated.id,
+          organization_id: updated.organization_id,
+          canonical_url: updated.canonical_url,
+          title: updated.title,
+        },
+        fulfillingOrgName
+      )
     }
 
     // Send notifications for corrections and withdrawals
