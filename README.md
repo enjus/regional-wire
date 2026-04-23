@@ -95,7 +95,6 @@ Visit `http://localhost:3000`.
 | `ADMIN_USERNAME` | Username for HTTP Basic Auth on `/admin` |
 | `ADMIN_PASSWORD` | Password for HTTP Basic Auth on `/admin` |
 | `NEXT_PUBLIC_APP_URL` | Full URL of your deployment, no trailing slash (e.g. `https://nwnewswire.com`) |
-| `ALERT_DIGEST_HOUR` | UTC hour (0–23) for daily digest emails, default `7` |
 | `CRON_SECRET` | Secret token sent as `Authorization: Bearer <token>` to cron endpoints |
 | `NEXT_PUBLIC_BRAND_NAME` | Platform name shown in nav, footer, emails, and page titles (default: `Regional Wire`) |
 | `NEXT_PUBLIC_BRAND_DESCRIPTION` | One-sentence description used in page metadata (default: generic) |
@@ -198,7 +197,7 @@ git pull && npm install && npm run build && pm2 restart regional-wire
 ```bash
 # In crontab -e on the server:
 */15 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://nwnewswire.com/api/cron/poll-feeds
-0 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://nwnewswire.com/api/cron/alert-digest
+0 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://nwnewswire.com/api/cron/hourly-digest
 ```
 
 ---
