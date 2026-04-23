@@ -31,7 +31,17 @@ export async function POST(request: NextRequest) {
       .eq('status', 'approved')
       .limit(1)
 
-    const org = orgs?.[0] ?? null
+    let org = orgs?.[0] ?? null
+
+    if (!org) {
+      const { data: allowedOrgs } = await serviceSupabase
+        .from('organizations')
+        .select('id, name')
+        .eq('status', 'approved')
+        .contains('allowed_emails', [email.toLowerCase()])
+        .limit(1)
+      org = allowedOrgs?.[0] ?? null
+    }
 
     if (!org) {
       return NextResponse.json(

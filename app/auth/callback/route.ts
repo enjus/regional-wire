@@ -116,7 +116,17 @@ export async function GET(request: NextRequest) {
     .eq('status', 'approved')
     .limit(1)
 
-  const org = orgs?.[0] ?? null
+  let org = orgs?.[0] ?? null
+
+  if (!org && userEmail) {
+    const { data: allowedOrgs } = await serviceSupabase
+      .from('organizations')
+      .select('id')
+      .eq('status', 'approved')
+      .contains('allowed_emails', [userEmail.toLowerCase()])
+      .limit(1)
+    org = allowedOrgs?.[0] ?? null
+  }
 
   if (!org) {
     await supabase.auth.signOut()
