@@ -129,7 +129,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
         <p className="text-wire-slate text-sm">
           {story.byline}
           <span className="mx-2">·</span>
-          <span>{story.body_plain.trim().split(/\s+/).filter(Boolean).length.toLocaleString()} words</span>
+          <span>{(story.body_html || story.body_plain || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean).length.toLocaleString()} words</span>
         </p>
 
         {story.canonical_url && (
