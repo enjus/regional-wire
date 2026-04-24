@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { generateRepublicationPackage, sanitizeStoryHtml } from '@/lib/utils'
+import { sanitizeStoryHtml } from '@/lib/utils'
 
 interface Asset {
   id: string
@@ -40,8 +40,6 @@ export default function RepublicationPackage({
   const [publishedUrl, setPublishedUrl] = useState('')
   const [urlSubmitted, setUrlSubmitted] = useState(false)
   const [showUrlPrompt, setShowUrlPrompt] = useState(false)
-
-  const packageText = generateRepublicationPackage(story, assets)
 
   async function logDownload(): Promise<string | null> {
     try {
@@ -87,11 +85,17 @@ export default function RepublicationPackage({
   }
 
   function handleDownload() {
-    const blob = new Blob([packageText], { type: 'text/plain' })
+    const orgName = (story.organizations as unknown as { name: string } | null)?.name ?? 'the original publisher'
+    const bylineFormatted = /^by\s/i.test(story.byline.trim()) ? story.byline.trim() : `By ${story.byline.trim()}`
+    const attributionLine = `<p><em>This story originally appeared in ${orgName}: <a href="${story.canonical_url}">${story.title}</a></em></p>`
+    const strippedHtml = sanitizeStoryHtml(story.body_html)
+    const html = `<!DOCTYPE html>\n<html>\n<head><meta charset="utf-8"><title>${story.title}</title></head>\n<body>\n<h1>${story.title}</h1>\n<p><em>${bylineFormatted}</em></p>\n${strippedHtml}\n${attributionLine}\n</body>\n</html>`
+
+    const blob = new Blob([html], { type: 'text/html' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `republication-${story.id.slice(0, 8)}.txt`
+    a.download = `republication-${story.id.slice(0, 8)}.html`
     a.click()
     URL.revokeObjectURL(url)
 
@@ -184,7 +188,7 @@ export default function RepublicationPackage({
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          Download .txt
+          Download HTML
         </button>
       </div>
 
