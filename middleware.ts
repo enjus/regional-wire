@@ -40,8 +40,10 @@ export async function middleware(request: NextRequest) {
     '/auth/callback',
     '/auth/confirm',
     '/auth/landing',
+    '/pending',
     '/api/orgs/register',
     '/api/auth/register',
+    '/api/auth/notify-pending',
     '/api/cron',
   ]
   if (publicPaths.some((p) => pathname.startsWith(p))) {
@@ -101,11 +103,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Authenticated — check they have a users record (org association)
+  // Authenticated — check they have an active users record (org association)
   if (pathname !== '/auth/callback' && !pathname.startsWith('/api/')) {
     const { data: userRecord } = await supabase
       .from('users')
-      .select('id, organization_id')
+      .select('id, organization_id, status')
       .eq('id', user.id)
       .single()
 
@@ -114,6 +116,13 @@ export async function middleware(request: NextRequest) {
       const url = request.nextUrl.clone()
       url.pathname = '/register'
       url.searchParams.set('error', 'no-org')
+      return NextResponse.redirect(url)
+    }
+
+    if (userRecord.status === 'pending') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/pending'
+      url.search = ''
       return NextResponse.redirect(url)
     }
   }

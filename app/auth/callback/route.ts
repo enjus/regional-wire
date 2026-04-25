@@ -77,11 +77,14 @@ export async function GET(request: NextRequest) {
   // Check if user already has a users record
   const { data: existingUser } = await supabase
     .from('users')
-    .select('id')
+    .select('id, status')
     .eq('id', userId)
     .single()
 
   if (existingUser) {
+    if (existingUser.status === 'pending') {
+      return NextResponse.redirect(`${origin}/pending`)
+    }
     // Redirect platform admins to their dedicated dashboard
     const { data: record } = await supabase
       .from('users')
@@ -101,36 +104,78 @@ export async function GET(request: NextRequest) {
     { cookies: { getAll: () => [], setAll: () => {} } }
   )
 
-  // Look up their org by email domain
-  const domain = userEmail?.split('@')[1]?.toLowerCase()
+  // Check for a pending org invite for this email (takes priority over domain match)
+  let inviteId: string | null = null
+  let inviteOrgId: string | null = null
 
-  if (!domain) {
-    await supabase.auth.signOut()
-    return NextResponse.redirect(`${origin}/register?error=no-org`)
+  if (userEmail) {
+    const { data: invite } = await serviceSupabase
+      .from('org_invites')
+      .select('id, org_id')
+      .eq('email', userEmail.toLowerCase())
+      .is('used_at', null)
+      .limit(1)
+      .maybeSingle()
+
+    if (invite) {
+      inviteId = invite.id as string
+      inviteOrgId = invite.org_id as string
+    }
   }
 
-  const { data: orgs } = await serviceSupabase
-    .from('organizations')
-    .select('id')
-    .eq('email_domain', domain)
-    .eq('status', 'approved')
-    .limit(1)
+  // Determine which org this user belongs to
+  let org: { id: string } | null = null
 
-  let org = orgs?.[0] ?? null
-
-  if (!org && userEmail) {
-    const { data: allowedOrgs } = await serviceSupabase
+  if (inviteOrgId) {
+    const { data: inviteOrg } = await serviceSupabase
       .from('organizations')
       .select('id')
+      .eq('id', inviteOrgId)
       .eq('status', 'approved')
-      .contains('allowed_emails', [userEmail.toLowerCase()])
+      .maybeSingle()
+    org = inviteOrg
+  }
+
+  if (!org) {
+    // Fall back to domain / allowed_emails match
+    const domain = userEmail?.split('@')[1]?.toLowerCase()
+
+    if (!domain) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(`${origin}/register?error=no-org`)
+    }
+
+    const { data: orgs } = await serviceSupabase
+      .from('organizations')
+      .select('id')
+      .eq('email_domain', domain)
+      .eq('status', 'approved')
       .limit(1)
-    org = allowedOrgs?.[0] ?? null
+
+    org = orgs?.[0] ?? null
+
+    if (!org && userEmail) {
+      const { data: allowedOrgs } = await serviceSupabase
+        .from('organizations')
+        .select('id')
+        .eq('status', 'approved')
+        .contains('allowed_emails', [userEmail.toLowerCase()])
+        .limit(1)
+      org = allowedOrgs?.[0] ?? null
+    }
   }
 
   if (!org) {
     await supabase.auth.signOut()
     return NextResponse.redirect(`${origin}/register?error=no-org`)
+  }
+
+  // Mark invite as used now that we have a valid org
+  if (inviteId) {
+    await serviceSupabase
+      .from('org_invites')
+      .update({ used_at: new Date().toISOString() })
+      .eq('id', inviteId)
   }
 
   // Check if this is the first user for this org (make them admin)
@@ -141,20 +186,38 @@ export async function GET(request: NextRequest) {
 
   const role = count === 0 ? 'admin' : 'editor'
 
+  // Invited users and first-in-org users are immediately active.
+  // All other self-registered users start as pending.
+  const status = (inviteId || count === 0) ? 'active' : 'pending'
+
+  const displayName = (userMeta?.name as string | undefined) ?? userEmail ?? 'User'
+
   await serviceSupabase.from('users').insert({
     id: userId,
     organization_id: org.id,
-    display_name: userMeta?.name ?? userEmail ?? 'User',
+    display_name: displayName,
     email: userEmail!,
     role,
+    status,
   })
 
-  // Send welcome email (fire-and-forget)
-  fetch(`${origin}/api/auth/welcome`, {
+  if (status === 'active') {
+    // Send welcome email (fire-and-forget)
+    fetch(`${origin}/api/auth/welcome`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    }).catch(() => {})
+
+    return NextResponse.redirect(`${origin}${next}`)
+  }
+
+  // Pending user: notify org admins and redirect to holding page
+  fetch(`${origin}/api/auth/notify-pending`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId }),
   }).catch(() => {})
 
-  return NextResponse.redirect(`${origin}${next}`)
+  return NextResponse.redirect(`${origin}/pending`)
 }

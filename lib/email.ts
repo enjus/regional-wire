@@ -433,6 +433,120 @@ If you have published this story, please update your version with the corrected 
 }
 
 // ----------------------------------------------------------------
+// 14. New user pending approval — to org admins
+// ----------------------------------------------------------------
+export async function sendUserPendingApprovalEmail(
+  adminEmails: string[],
+  userName: string,
+  userEmail: string,
+  orgName: string
+) {
+  const membersUrl = `${APP_URL}/wire/dashboard/settings/members`
+  const text = `
+New member pending approval — ${brand.name}
+
+${userName} (${userEmail}) has registered and is awaiting your approval to join ${orgName} on ${brand.name}.
+
+Review and approve:
+${membersUrl}
+
+— ${brand.name}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: adminEmails,
+    subject: `${userName} is requesting to join ${orgName} on ${brand.name}`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 15. User approved — to the newly approved user
+// ----------------------------------------------------------------
+export async function sendUserApprovedEmail(
+  email: string,
+  displayName: string,
+  orgName: string
+) {
+  const text = `
+Your account has been approved — ${brand.name}
+
+Hi ${displayName},
+
+Your account for ${orgName} on ${brand.name} has been approved. You can now sign in and access the platform.
+
+Sign in: ${APP_URL}/login
+
+— ${brand.name}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: email,
+    subject: `Your ${brand.name} account has been approved`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 16. User removed from org — to the removed user
+// ----------------------------------------------------------------
+export async function sendUserRemovedEmail(
+  email: string,
+  displayName: string,
+  orgName: string
+) {
+  const text = `
+Your access has been removed — ${brand.name}
+
+Hi ${displayName},
+
+Your account has been removed from ${orgName} on ${brand.name} by an organization administrator.
+
+If you believe this was done in error, please contact your organization admin directly.
+
+— ${brand.name}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: email,
+    subject: `Your ${brand.name} access has been removed`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 17. Org admin invite — to invited user
+// ----------------------------------------------------------------
+export async function sendUserInviteEmail(
+  email: string,
+  orgName: string,
+  inviterName: string
+) {
+  const text = `
+You've been invited to ${brand.name}
+
+${inviterName} has invited you to join ${orgName} on ${brand.name}, the regional newsroom content-sharing platform.
+
+To accept, go to:
+${APP_URL}/register
+
+Enter your email address (${email}) and follow the prompts to create your account.
+
+— ${brand.name}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: email,
+    subject: `You've been invited to join ${orgName} on ${brand.name}`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
 // 13. Story withdrawal notice — to republishing orgs
 // ----------------------------------------------------------------
 export async function sendWithdrawalNotice(
