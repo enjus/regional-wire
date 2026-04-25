@@ -175,12 +175,24 @@ function RegisterForm() {
           <div className="text-sm bg-amber-50 border border-amber-200 rounded px-3 py-2">
             <p className="text-amber-800">{error}</p>
             {error.includes('not associated') && (
-              <Link
-                href="/register/organization"
-                className="text-wire-red hover:underline block mt-1 font-medium"
-              >
-                Register your newsroom →
-              </Link>
+              <div className="mt-2 flex flex-col gap-1">
+                <Link
+                  href="/register/organization"
+                  className="text-wire-red hover:underline font-medium"
+                >
+                  Register your newsroom →
+                </Link>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await fetch('/api/auth/signout', { method: 'POST' })
+                    window.location.href = '/login'
+                  }}
+                  className="text-wire-slate hover:text-wire-navy text-left"
+                >
+                  Sign out and use a different email →
+                </button>
+              </div>
             )}
           </div>
         )}
