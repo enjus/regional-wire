@@ -28,6 +28,9 @@
     "slugify": "^1.6.6",
     "tailwind-merge": "^2.3.0"
   },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/typography": "^0.5.13",
