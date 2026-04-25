@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { sendUserApprovedEmail, sendUserRemovedEmail } from '@/lib/email'
+import { sendUserApprovedEmail, sendUserRemovedEmail, sendUserDeniedEmail } from '@/lib/email'
 
 interface RouteParams {
   params: Promise<{ id: string; user_id: string }>
@@ -51,15 +51,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const service = createServiceClient()
 
-    // Verify target user belongs to this org
     const { data: targetUser } = await service
       .from('users')
-      .select('id, email, display_name, status, organization_id, organizations(name)')
+      .select('id, email, display_name, role, status, is_platform_admin, organization_id, organizations(name)')
       .eq('id', user_id)
       .single()
 
     if (!targetUser || targetUser.organization_id !== id) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 })
+    }
+
+    // Platform admins cannot be modified via org-level controls
+    if (targetUser.is_platform_admin) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 })
     }
 
     const orgName = (targetUser.organizations as unknown as { name: string } | null)?.name ?? ''
@@ -77,6 +81,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
       sendUserApprovedEmail(targetUser.email, targetUser.display_name, orgName).catch(() => {})
     } else {
+      // change_role: only applies to active members
+      if (targetUser.status !== 'active') {
+        return NextResponse.json({ error: 'Cannot change role of a pending user.' }, { status: 400 })
+      }
       const { error } = await service
         .from('users')
         .update({ role })
@@ -91,7 +99,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// DELETE /api/orgs/[id]/members/[user_id] — remove user from org
+// DELETE /api/orgs/[id]/members/[user_id] — remove or deny a user
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id, user_id } = await params
@@ -109,7 +117,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     const { data: targetUser } = await service
       .from('users')
-      .select('id, email, display_name, organization_id, organizations(name)')
+      .select('id, email, display_name, status, is_platform_admin, organization_id, organizations(name)')
       .eq('id', user_id)
       .single()
 
@@ -117,12 +125,22 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 })
     }
 
+    // Platform admins cannot be removed via org-level controls
+    if (targetUser.is_platform_admin) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 })
+    }
+
     const orgName = (targetUser.organizations as unknown as { name: string } | null)?.name ?? ''
 
     const { error } = await service.from('users').delete().eq('id', user_id)
     if (error) return NextResponse.json({ error: 'Delete failed.' }, { status: 500 })
 
-    sendUserRemovedEmail(targetUser.email, targetUser.display_name, orgName).catch(() => {})
+    // Pending users who are denied get a different email than active users who are removed
+    if (targetUser.status === 'pending') {
+      sendUserDeniedEmail(targetUser.email, targetUser.display_name, orgName).catch(() => {})
+    } else {
+      sendUserRemovedEmail(targetUser.email, targetUser.display_name, orgName).catch(() => {})
+    }
 
     return NextResponse.json({ ok: true })
   } catch {

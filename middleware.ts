@@ -43,7 +43,6 @@ export async function middleware(request: NextRequest) {
     '/pending',
     '/api/orgs/register',
     '/api/auth/register',
-    '/api/auth/notify-pending',
     '/api/cron',
   ]
   if (publicPaths.some((p) => pathname.startsWith(p))) {

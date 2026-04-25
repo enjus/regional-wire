@@ -87,6 +87,26 @@ export default function MembersManager({ orgId, currentUserId, initialMembers, i
     }
   }
 
+  async function handleDenyMember(member: Member) {
+    if (!confirm(`Deny ${member.display_name}'s request to join?`)) return
+    setLoadingId(member.id)
+    setError(null)
+    setSuccess(null)
+    try {
+      const res = await fetch(`/api/orgs/${orgId}/members/${member.id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const body = await res.json()
+        setError(body.error ?? 'Something went wrong.')
+        return
+      }
+      setMembers((prev) => prev.filter((m) => m.id !== member.id))
+    } catch {
+      setError('Network error.')
+    } finally {
+      setLoadingId(null)
+    }
+  }
+
   async function handleRemoveMember(member: Member) {
     if (!confirm(`Remove ${member.display_name} from your organization?`)) return
     setLoadingId(member.id)
@@ -144,7 +164,7 @@ export default function MembersManager({ orgId, currentUserId, initialMembers, i
       }
       setSuccess(`Invite sent to ${inviteEmail}.`)
       setInvites((prev) => [
-        { id: body.id ?? crypto.randomUUID(), email: inviteEmail.toLowerCase(), created_at: new Date().toISOString() },
+        { id: body.id, email: inviteEmail.toLowerCase(), created_at: new Date().toISOString() },
         ...prev,
       ])
       setInviteEmail('')
@@ -187,7 +207,7 @@ export default function MembersManager({ orgId, currentUserId, initialMembers, i
                     {loadingId === member.id ? 'Approving…' : 'Approve'}
                   </button>
                   <button
-                    onClick={() => handleRemoveMember(member)}
+                    onClick={() => handleDenyMember(member)}
                     disabled={loadingId === member.id}
                     className="text-xs text-wire-slate hover:text-red-700 transition-colors disabled:opacity-50"
                   >

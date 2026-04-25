@@ -106,11 +106,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Create invite record
-    const { error: insertError } = await service
+    const { data: newInvite, error: insertError } = await service
       .from('org_invites')
       .insert({ org_id: id, email: normalizedEmail, invited_by: admin.id })
+      .select('id')
+      .single()
 
-    if (insertError) {
+    if (insertError || !newInvite) {
       return NextResponse.json({ error: 'Failed to create invite.' }, { status: 500 })
     }
 
@@ -126,7 +128,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Send invite email (fire-and-forget)
     sendUserInviteEmail(normalizedEmail, orgName, admin.display_name).catch(() => {})
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, id: newInvite.id })
   } catch {
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 })
   }

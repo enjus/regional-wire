@@ -474,9 +474,9 @@ Your account has been approved — ${brand.name}
 
 Hi ${displayName},
 
-Your account for ${orgName} on ${brand.name} has been approved. You can now sign in and access the platform.
+Your account for ${orgName} on ${brand.name} has been approved. You can now access the platform — your existing session is still active, so just return to the site.
 
-Sign in: ${APP_URL}/login
+Go to your dashboard: ${APP_URL}/wire/library
 
 — ${brand.name}
 `.trim()
@@ -490,7 +490,35 @@ Sign in: ${APP_URL}/login
 }
 
 // ----------------------------------------------------------------
-// 16. User removed from org — to the removed user
+// 16. User registration denied — to the pending user
+// ----------------------------------------------------------------
+export async function sendUserDeniedEmail(
+  email: string,
+  displayName: string,
+  orgName: string
+) {
+  const text = `
+Registration not approved — ${brand.name}
+
+Hi ${displayName},
+
+Your request to join ${orgName} on ${brand.name} was not approved by the organization's administrator.
+
+If you believe this was done in error, please contact your organization admin directly.
+
+— ${brand.name}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: email,
+    subject: `Your ${brand.name} registration was not approved`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
+// 17. User removed from org — to the removed user
 // ----------------------------------------------------------------
 export async function sendUserRemovedEmail(
   email: string,

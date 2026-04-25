@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS org_invites (
   email       TEXT NOT NULL,
   invited_by  UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  used_at     TIMESTAMPTZ,
-  UNIQUE (org_id, email)
+  used_at     TIMESTAMPTZ
 );
 
 ALTER TABLE org_invites ENABLE ROW LEVEL SECURITY;
@@ -64,4 +63,11 @@ CREATE POLICY "org_admins_remove_org_users" ON users
   );
 
 CREATE INDEX IF NOT EXISTS idx_users_org_status ON users(organization_id, status);
+
+-- Partial unique index: allows multiple used invites for the same email+org pair
+-- (re-inviting after the first invite was consumed), while still preventing
+-- duplicate open invites to the same address.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_org_invites_open_unique
+  ON org_invites(org_id, email) WHERE used_at IS NULL;
+
 CREATE INDEX IF NOT EXISTS idx_org_invites_email ON org_invites(email) WHERE used_at IS NULL;
