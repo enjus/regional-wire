@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { sendUserPendingApprovalEmail } from '@/lib/email'
 
 type CookieOption = Record<string, unknown>
 
@@ -74,21 +75,18 @@ export async function GET(request: NextRequest) {
     userMeta = user.user_metadata
   }
 
-  // Check if user already has a users record
+  // Single query for id, status, and platform-admin flag (avoids a second round-trip)
   const { data: existingUser } = await supabase
     .from('users')
-    .select('id')
+    .select('id, status, is_platform_admin')
     .eq('id', userId)
     .single()
 
   if (existingUser) {
-    // Redirect platform admins to their dedicated dashboard
-    const { data: record } = await supabase
-      .from('users')
-      .select('is_platform_admin')
-      .eq('id', userId)
-      .single()
-    if (record?.is_platform_admin) {
+    if (existingUser.status === 'pending') {
+      return NextResponse.redirect(`${origin}/pending`)
+    }
+    if (existingUser.is_platform_admin) {
       return NextResponse.redirect(`${origin}/platform-admin`)
     }
     return NextResponse.redirect(`${origin}${next}`)
@@ -101,31 +99,64 @@ export async function GET(request: NextRequest) {
     { cookies: { getAll: () => [], setAll: () => {} } }
   )
 
-  // Look up their org by email domain
-  const domain = userEmail?.split('@')[1]?.toLowerCase()
+  // Atomically consume an open invite for this email. Using UPDATE + RETURNING
+  // means only one concurrent request can win — the second sees no rows back
+  // because used_at is no longer NULL after the first write.
+  let inviteOrgId: string | null = null
 
-  if (!domain) {
-    await supabase.auth.signOut()
-    return NextResponse.redirect(`${origin}/register?error=no-org`)
+  if (userEmail) {
+    const { data: claimed } = await serviceSupabase
+      .from('org_invites')
+      .update({ used_at: new Date().toISOString() })
+      .eq('email', userEmail.toLowerCase())
+      .is('used_at', null)
+      .select('id, org_id')
+
+    if (claimed && claimed.length > 0) {
+      inviteOrgId = claimed[0].org_id as string
+    }
   }
 
-  const { data: orgs } = await serviceSupabase
-    .from('organizations')
-    .select('id')
-    .eq('email_domain', domain)
-    .eq('status', 'approved')
-    .limit(1)
+  // Determine which org this user belongs to
+  let org: { id: string; name: string } | null = null
 
-  let org = orgs?.[0] ?? null
-
-  if (!org && userEmail) {
-    const { data: allowedOrgs } = await serviceSupabase
+  if (inviteOrgId) {
+    const { data: inviteOrg } = await serviceSupabase
       .from('organizations')
-      .select('id')
+      .select('id, name')
+      .eq('id', inviteOrgId)
       .eq('status', 'approved')
-      .contains('allowed_emails', [userEmail.toLowerCase()])
+      .maybeSingle()
+    org = inviteOrg
+  }
+
+  if (!org) {
+    // Fall back to domain / allowed_emails match
+    const domain = userEmail?.split('@')[1]?.toLowerCase()
+
+    if (!domain) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(`${origin}/register?error=no-org`)
+    }
+
+    const { data: orgs } = await serviceSupabase
+      .from('organizations')
+      .select('id, name')
+      .eq('email_domain', domain)
+      .eq('status', 'approved')
       .limit(1)
-    org = allowedOrgs?.[0] ?? null
+
+    org = orgs?.[0] ?? null
+
+    if (!org && userEmail) {
+      const { data: allowedOrgs } = await serviceSupabase
+        .from('organizations')
+        .select('id, name')
+        .eq('status', 'approved')
+        .contains('allowed_emails', [userEmail.toLowerCase()])
+        .limit(1)
+      org = allowedOrgs?.[0] ?? null
+    }
   }
 
   if (!org) {
@@ -133,28 +164,63 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/register?error=no-org`)
   }
 
-  // Check if this is the first user for this org (make them admin)
+  // Count only active users for the first-user/admin check. If the org has no
+  // active users yet (everyone else is pending), this new user becomes admin.
   const { count } = await serviceSupabase
     .from('users')
     .select('id', { count: 'exact', head: true })
     .eq('organization_id', org.id)
+    .eq('status', 'active')
 
   const role = count === 0 ? 'admin' : 'editor'
 
-  await serviceSupabase.from('users').insert({
+  // Invited users and the first active user per org are immediately active;
+  // all other self-registered users start pending until an admin approves them.
+  const status = (inviteOrgId || count === 0) ? 'active' : 'pending'
+
+  const displayName = (userMeta?.name as string | undefined) ?? userEmail ?? 'User'
+
+  const { error: insertError } = await serviceSupabase.from('users').insert({
     id: userId,
     organization_id: org.id,
-    display_name: userMeta?.name ?? userEmail ?? 'User',
+    display_name: displayName,
     email: userEmail!,
     role,
+    status,
   })
 
-  // Send welcome email (fire-and-forget)
-  fetch(`${origin}/api/auth/welcome`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId }),
-  }).catch(() => {})
+  if (insertError) {
+    // Insert failed (e.g. the user already exists in another org, or a DB error).
+    // Sign out to avoid leaving the user in a broken state.
+    await supabase.auth.signOut()
+    return NextResponse.redirect(`${origin}/register?error=no-org`)
+  }
 
-  return NextResponse.redirect(`${origin}${next}`)
+  if (status === 'active') {
+    // Send welcome email (fire-and-forget)
+    fetch(`${origin}/api/auth/welcome`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    }).catch(() => {})
+
+    return NextResponse.redirect(`${origin}${next}`)
+  }
+
+  // Pending user: notify org admins inline (fire-and-forget, non-blocking)
+  const orgName = org.name
+  ;(async () => {
+    const { data: admins } = await serviceSupabase
+      .from('users')
+      .select('email')
+      .eq('organization_id', org.id)
+      .eq('role', 'admin')
+      .eq('status', 'active')
+    const adminEmails = (admins ?? []).map((a: { email: string }) => a.email)
+    if (adminEmails.length > 0) {
+      await sendUserPendingApprovalEmail(adminEmails, displayName, userEmail!, orgName)
+    }
+  })().catch(() => {})
+
+  return NextResponse.redirect(`${origin}/pending`)
 }
