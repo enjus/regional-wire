@@ -43,6 +43,26 @@ export async function POST(request: NextRequest) {
       org = allowedOrgs?.[0] ?? null
     }
 
+    // Also accept email addresses that have a pending org invite,
+    // regardless of domain match.
+    if (!org) {
+      const { data: invite } = await serviceSupabase
+        .from('org_invites')
+        .select('org_id, organizations!inner(id, name, status)')
+        .eq('email', email.toLowerCase())
+        .is('used_at', null)
+        .limit(1)
+        .maybeSingle()
+
+      const inviteOrg = invite
+        ? (invite.organizations as unknown as { id: string; name: string; status: string } | null)
+        : null
+
+      if (inviteOrg && inviteOrg.status === 'approved') {
+        org = { id: inviteOrg.id, name: inviteOrg.name }
+      }
+    }
+
     if (!org) {
       return NextResponse.json(
         {

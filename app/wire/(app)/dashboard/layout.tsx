@@ -28,6 +28,14 @@ export default async function DashboardLayout({
     .eq('target_org_id', currentUser?.organization_id)
     .eq('status', 'pending')
 
+  const { count: pendingMemberCount } = isAdmin
+    ? await supabase
+        .from('users')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', currentUser?.organization_id)
+        .eq('status', 'pending')
+    : { count: 0 }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-6">
@@ -51,6 +59,7 @@ export default async function DashboardLayout({
                   </span>
                 </li>
                 <SidebarLink href="/wire/dashboard/settings" label="Settings" />
+                <SidebarLink href="/wire/dashboard/settings/members" label="Members" badge={pendingMemberCount ?? 0} />
                 <SidebarLink href="/wire/dashboard/settings/feeds" label="Feeds" />
                 <SidebarLink href="/wire/dashboard/settings/alerts" label="Alerts" />
                 <SidebarLink href="/wire/dashboard/settings/exclusions" label="Exclusions" />
