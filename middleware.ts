@@ -104,18 +104,26 @@ export async function middleware(request: NextRequest) {
 
   // Authenticated — check they have an active users record (org association)
   if (pathname !== '/auth/callback' && !pathname.startsWith('/api/')) {
-    const { data: userRecord } = await supabase
+    const { data: userRecord, error: userRecordError } = await supabase
       .from('users')
       .select('id, organization_id, status')
       .eq('id', user.id)
       .single()
 
     if (!userRecord) {
-      // Signed up but no org match — redirect to register with message
-      const url = request.nextUrl.clone()
-      url.pathname = '/register'
-      url.searchParams.set('error', 'no-org')
-      return NextResponse.redirect(url)
+      // PGRST116 = "no rows returned" — the user genuinely has no org record.
+      // Any other error code means the DB is temporarily unreachable; don't
+      // redirect to register in that case or we'll sign out a valid user.
+      if (!userRecordError || userRecordError.code === 'PGRST116') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/register'
+        url.searchParams.set('error', 'no-org')
+        return NextResponse.redirect(url)
+      }
+      // Real DB error: user is authenticated (getUser() succeeded above) but we
+      // can't verify their org right now. Let the request through rather than
+      // bouncing them to register with a misleading error.
+      return supabaseResponse
     }
 
     if (userRecord.status === 'pending') {

@@ -75,12 +75,28 @@ export async function GET(request: NextRequest) {
     userMeta = user.user_metadata
   }
 
+  // Use service role for all DB operations in this handler — more reliable than
+  // the anon client (bypasses RLS, avoids session-cookie timing issues) and lets
+  // us distinguish a genuine "no rows" result from a transient Supabase error.
+  const serviceSupabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { cookies: { getAll: () => [], setAll: () => {} } }
+  )
+
   // Single query for id, status, and platform-admin flag (avoids a second round-trip)
-  const { data: existingUser } = await supabase
+  const { data: existingUser, error: existingUserError } = await serviceSupabase
     .from('users')
     .select('id, status, is_platform_admin')
     .eq('id', userId)
     .single()
+
+  // PGRST116 = "no rows returned" — anything else is a real DB error.
+  // Don't fall through to user-creation on a real error: the record may already
+  // exist and the INSERT would fail, signing the user out and showing "no-org".
+  if (existingUserError && existingUserError.code !== 'PGRST116') {
+    return NextResponse.redirect(`${origin}/login?error=auth-failed`)
+  }
 
   if (existingUser) {
     if (existingUser.status === 'pending') {
@@ -91,13 +107,6 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.redirect(`${origin}${next}`)
   }
-
-  // Use service role for org lookup and user creation (bypasses RLS)
-  const serviceSupabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { cookies: { getAll: () => [], setAll: () => {} } }
-  )
 
   // Atomically consume an open invite for this email. Using UPDATE + RETURNING
   // means only one concurrent request can win — the second sees no rows back
