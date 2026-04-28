@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { OrgFeed } from '@/lib/types'
 import { formatDateTime } from '@/lib/utils'
 
@@ -10,8 +9,7 @@ interface Props {
   orgId: string
 }
 
-export default function FeedManager({ feeds: initialFeeds, orgId }: Props) {
-  const router = useRouter()
+export default function FeedManager({ feeds: initialFeeds }: Props) {
   const [feeds, setFeeds] = useState(initialFeeds)
   const [newUrl, setNewUrl] = useState('')
   const [newType, setNewType] = useState<'full_text' | 'headline'>('full_text')

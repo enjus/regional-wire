@@ -32,7 +32,6 @@ interface Props {
 
 export default function RepublicationPackage({
   story,
-  assets,
   embargoed,
   embargoLiftsAt,
 }: Props) {

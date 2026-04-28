@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { MEMBER_ORGS } from '@/lib/member-orgs'
 import { brand } from '@/lib/brand'
 
@@ -131,7 +132,7 @@ export default function HomePage() {
             {MEMBER_ORGS.map((org) => {
               const avatar = org.logo ? (
                 <div className="w-12 h-12 rounded-lg border border-wire-border bg-white flex items-center justify-center flex-shrink-0 overflow-hidden p-1">
-                  <img src={org.logo} alt={org.name} className="w-full h-full object-contain" />
+                  <Image src={org.logo} alt={org.name} width={48} height={48} className="w-full h-full object-contain" />
                 </div>
               ) : (
                 <div

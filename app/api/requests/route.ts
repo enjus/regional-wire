@@ -61,8 +61,7 @@ export async function POST(request: NextRequest) {
         requestingOrgName,
         requested_headline ?? 'Unknown headline',
         requested_url ?? null,
-        message ?? null,
-        req.id
+        message ?? null
       ).catch((err) => console.error('Failed to send request email:', err))
     }
 

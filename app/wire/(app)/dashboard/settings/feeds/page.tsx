@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { formatDateTime } from '@/lib/utils'
 import FeedManager from '@/components/dashboard/feed-manager'
 
 export const metadata = { title: 'Feed Settings' }

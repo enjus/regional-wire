@@ -167,9 +167,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
                     </Link>
                   ) : (
                     <RequestStoryButton
-                      headlineId={h.id}
                       orgId={(h.organizations as { id: string } | null)?.id ?? ''}
-                      orgName={(h.organizations as unknown as { name: string } | null)?.name ?? ''}
                       headline={h.title}
                       url={h.url}
                     />
@@ -394,15 +392,11 @@ function Pagination({
 }
 
 function RequestStoryButton({
-  headlineId,
   orgId,
-  orgName,
   headline,
   url,
 }: {
-  headlineId: string
   orgId: string
-  orgName: string
   headline: string
   url: string
 }) {

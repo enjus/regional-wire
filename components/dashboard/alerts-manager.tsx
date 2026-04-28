@@ -19,7 +19,7 @@ function formatHour(utcHour: number) {
 }
 
 
-export default function AlertsManager({ alerts: initialAlerts, orgId, organizations, digestPrefs: initialPrefs }: Props) {
+export default function AlertsManager({ alerts: initialAlerts, organizations, digestPrefs: initialPrefs }: Props) {
   const [alerts, setAlerts] = useState(initialAlerts)
 
   // Keyword alert form

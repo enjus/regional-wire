@@ -121,9 +121,8 @@ export async function POST(request: NextRequest) {
 
     // Send notification to platform admin
     const approveToken = generateAdminToken(org.id, 'approve')
-    const rejectToken = generateAdminToken(org.id, 'reject')
 
-    await sendOrgRegistrationNotification(org, approveToken, rejectToken).catch(
+    await sendOrgRegistrationNotification(org, approveToken).catch(
       (err) => console.error('Failed to send admin notification:', err)
     )
 

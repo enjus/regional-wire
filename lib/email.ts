@@ -19,8 +19,7 @@ const FROM_ADDRESS = `${brand.name} <${FROM_EMAIL}>`
 // ----------------------------------------------------------------
 export async function sendOrgRegistrationNotification(
   org: Organization,
-  approveToken: string,
-  rejectToken: string
+  approveToken: string
 ) {
   const approveUrl = `${APP_URL}/api/admin/orgs/${org.id}/approve?token=${approveToken}`
   const rejectUrl = `${APP_URL}/admin?review=${org.id}`
@@ -142,8 +141,7 @@ export async function sendRepublicationRequestEmail(
   requestingOrgName: string,
   headline: string,
   url: string | null,
-  message: string | null,
-  requestId: string
+  message: string | null
 ) {
   const text = `
 Republication Request — ${brand.name}

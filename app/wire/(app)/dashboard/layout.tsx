@@ -47,7 +47,7 @@ export default async function DashboardLayout({
         {/* Sidebar */}
         <nav className="hidden sm:block w-48 shrink-0">
           <ul className="space-y-1">
-            <SidebarLink href="/wire/dashboard" label="Our Stories" exact />
+            <SidebarLink href="/wire/dashboard" label="Our Stories" />
             <SidebarLink href="/wire/dashboard/requests" label="Requests" badge={pendingRequestCount ?? 0} />
             <SidebarLink href="/wire/dashboard/republished" label="Republished" />
             <SidebarLink href="/wire/dashboard/log" label="Activity Log" />
@@ -78,12 +78,10 @@ export default async function DashboardLayout({
 function SidebarLink({
   href,
   label,
-  exact,
   badge,
 }: {
   href: string
   label: string
-  exact?: boolean
   badge?: number
 }) {
   return (

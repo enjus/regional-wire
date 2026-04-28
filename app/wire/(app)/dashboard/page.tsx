@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { formatDate, formatDateTime, isEmbargoActive } from '@/lib/utils'
+import { formatDateTime, isEmbargoActive } from '@/lib/utils'
 
 export const metadata = { title: 'Dashboard' }
 
