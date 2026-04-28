@@ -65,6 +65,8 @@ Stories enter the library two ways:
 
 `/components/stories/republication-package.tsx` handles the copy-to-clipboard flow. It writes both `text/html` and `text/plain` via `ClipboardItem`. The HTML includes: `<h1>` headline, `<p><em>By byline</em></p>`, sanitized body, and an italicized attribution line with the story title as SEO-optimized anchor text linking to the canonical URL. Images are stripped; the originating org's uploaded assets are separately available for download on the story detail page.
 
+The attribution line is org-customizable via `organizations.attribution_template`. Rendering logic lives in `lib/attribution.ts` (`renderAttributionHtml` / `renderAttributionPlain`). Supported placeholders: `{{headline}}` (hyperlink in HTML, plain text in plain-text), `{{url}}` (raw URL), `{{org}}` (organization name), `{{website}}` (hyperlink in HTML, raw URL in plain-text). Falls back to `DEFAULT_ATTRIBUTION_TEMPLATE` when `attribution_template` is null.
+
 ### Email
 
 `lib/email.ts` uses Resend. The client is lazy-initialized via `getResend()` to avoid build-time errors when `RESEND_API_KEY` is absent. All email functions are fire-and-forget at call sites (`.catch()` to log, never throw).
@@ -93,6 +95,7 @@ The migration is in `supabase/migrations/001_schema.sql`. Post-migration additio
 - `feed_headlines.author TEXT` — added to capture `dc:creator` from RSS items
 - `users.is_platform_admin BOOLEAN NOT NULL DEFAULT false` — platform admin flag
 - `organizations.republication_guidance TEXT` — optional guidance for republishers
+- `organizations.attribution_template TEXT` — optional custom attribution line template (see Republication Package)
 
 `supabase/migrations/003_alert_enhancements.sql` adds:
 - `story_alerts.followed_organization_id UUID` — org-follow alert type (either this or `keywords` required)

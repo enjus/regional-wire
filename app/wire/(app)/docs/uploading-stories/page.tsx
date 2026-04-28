@@ -60,6 +60,20 @@ export default function UploadingStoriesPage() {
         supported. Scripts, iframes, and embeds are stripped on paste and on display.
       </p>
 
+      <h2>Attribution line</h2>
+      <p>
+        Every republication package ends with an attribution line crediting your newsroom
+        and linking to the original story. By default this reads: <em>This story originally
+        appeared in [Your Org]: [Story title]</em>.
+      </p>
+      <p>
+        You can customize this wording for all of your org&apos;s stories in{' '}
+        <strong>Dashboard → Settings → Attribution line template</strong>. Supported
+        placeholders are <code>{'{{headline}}'}</code>, <code>{'{{url}}'}</code>,{' '}
+        <code>{'{{org}}'}</code>, and <code>{'{{website}}'}</code>. Leave it blank to use
+        the default.
+      </p>
+
       <h2>Uploading image assets</h2>
       <p>
         Attach images and other files to a story using the asset upload section on the

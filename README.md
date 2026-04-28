@@ -50,6 +50,7 @@ Then run these additional statements (post-migration additions not yet in the mi
 ALTER TABLE feed_headlines ADD COLUMN IF NOT EXISTS author TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_platform_admin BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE organizations ADD COLUMN IF NOT EXISTS republication_guidance TEXT;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS attribution_template TEXT;
 ```
 
 #### Storage bucket

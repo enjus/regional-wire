@@ -62,9 +62,9 @@ export default function RepublishingPage() {
         <li>The author byline (formatted as <em>By [Name]</em>) — this is the required author credit; do not remove it</li>
         <li>The story body — sanitized to remove scripts, embeds, iframes, and images</li>
         <li>
-          An attribution line: <em>This story originally appeared in [Publication] and is
-          republished with permission. <a href="#">[Story title]</a></em> — with the title
-          linking to the canonical URL. This is the required publisher credit; do not remove it.
+          An attribution line crediting the originating publication and linking to the canonical
+          URL. This is the required publisher credit; do not remove it. The exact wording may
+          vary — the originating newsroom can customize their attribution line in their settings.
         </li>
       </ul>
       <p>
