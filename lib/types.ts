@@ -17,6 +17,7 @@ export interface Organization {
   description: string | null
   contact_emails: string[]
   republication_guidance: string | null
+  attribution_template: string | null
   created_at: string
 }
 

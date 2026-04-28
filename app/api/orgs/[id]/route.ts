@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Forbidden.' }, { status: 403 })
     }
 
-    const { name, website_url, description, contact_emails, republication_guidance } = await request.json()
+    const { name, website_url, description, contact_emails, republication_guidance, attribution_template } = await request.json()
 
     if (!contact_emails?.length) {
       return NextResponse.json(
@@ -45,6 +45,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         description: description || null,
         contact_emails: contact_emails.filter((e: string) => e.trim()),
         republication_guidance: republication_guidance?.trim() || null,
+        attribution_template: attribution_template?.trim() || null,
       })
       .eq('id', id)
 

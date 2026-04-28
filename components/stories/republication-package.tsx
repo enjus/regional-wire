@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { sanitizeStoryHtml } from '@/lib/utils'
+import { renderAttributionHtml, renderAttributionPlain } from '@/lib/attribution'
 
 interface Asset {
   id: string
@@ -22,7 +23,7 @@ interface Props {
     body_html: string
     body_plain: string
     special_instructions?: string | null
-    organizations?: { name: string }
+    organizations?: { name: string; website_url: string; attribution_template: string | null }
   }
   assets: Asset[]
   embargoed: boolean
@@ -59,12 +60,20 @@ export default function RepublicationPackage({
   }
 
   async function handleCopy() {
-    const orgName = (story.organizations as unknown as { name: string } | null)?.name ?? 'the original publisher'
-    const attributionLine = `<p><em>This story originally appeared in ${orgName}: <a href="${story.canonical_url}">${story.title}</a></em></p>`
+    const org = story.organizations ?? null
+    const orgName = org?.name ?? 'the original publisher'
+    const orgWebsite = org?.website_url ?? ''
+    const attributionLine = renderAttributionHtml({
+      template: org?.attribution_template,
+      orgName,
+      orgWebsite,
+      title: story.title,
+      url: story.canonical_url,
+    })
     const strippedHtml = sanitizeStoryHtml(story.body_html)
     const bylineFormatted = /^by\s/i.test(story.byline.trim()) ? story.byline.trim() : `By ${story.byline.trim()}`
     const html = `<h1>${story.title}</h1><p><em>${bylineFormatted}</em></p>${strippedHtml}${attributionLine}`
-    const plain = `${story.title}\n${bylineFormatted}\n\n${story.body_plain}\n\nThis story originally appeared in ${orgName}: ${story.title} — ${story.canonical_url}`
+    const plain = `${story.title}\n${bylineFormatted}\n\n${story.body_plain}\n\n${renderAttributionPlain({ template: org?.attribution_template, orgName, orgWebsite, title: story.title, url: story.canonical_url })}`
 
     try {
       await navigator.clipboard.write([
@@ -85,9 +94,17 @@ export default function RepublicationPackage({
   }
 
   function handleDownload() {
-    const orgName = (story.organizations as unknown as { name: string } | null)?.name ?? 'the original publisher'
+    const org = story.organizations ?? null
+    const orgName = org?.name ?? 'the original publisher'
+    const orgWebsite = org?.website_url ?? ''
     const bylineFormatted = /^by\s/i.test(story.byline.trim()) ? story.byline.trim() : `By ${story.byline.trim()}`
-    const attributionLine = `<p><em>This story originally appeared in ${orgName}: <a href="${story.canonical_url}">${story.title}</a></em></p>`
+    const attributionLine = renderAttributionHtml({
+      template: org?.attribution_template,
+      orgName,
+      orgWebsite,
+      title: story.title,
+      url: story.canonical_url,
+    })
     const strippedHtml = sanitizeStoryHtml(story.body_html)
     const html = `<!DOCTYPE html>\n<html>\n<head><meta charset="utf-8"><title>${story.title}</title></head>\n<body>\n<h1>${story.title}</h1>\n<p><em>${bylineFormatted}</em></p>\n${strippedHtml}\n${attributionLine}\n</body>\n</html>`
 

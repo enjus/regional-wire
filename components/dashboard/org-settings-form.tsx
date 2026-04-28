@@ -14,6 +14,7 @@ export default function OrgSettingsForm({ org }: Props) {
   const [website, setWebsite] = useState(org.website_url)
   const [description, setDescription] = useState(org.description ?? '')
   const [repGuidance, setRepGuidance] = useState(org.republication_guidance ?? '')
+  const [attributionTemplate, setAttributionTemplate] = useState(org.attribution_template ?? '')
   const [contacts, setContacts] = useState<string[]>(org.contact_emails)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -55,6 +56,7 @@ export default function OrgSettingsForm({ org }: Props) {
         website_url: website.trim(),
         description: description.trim() || null,
         republication_guidance: repGuidance.trim() || null,
+        attribution_template: attributionTemplate.trim() || null,
         contact_emails: validContacts,
       }),
     })
@@ -123,6 +125,26 @@ export default function OrgSettingsForm({ org }: Props) {
         />
         <p className="text-xs text-wire-slate mt-1">
           Displayed alongside standard platform rules on every story your organization shares. Use this to specify any additional requirements — preferred credit line, contact preferences, geographic restrictions, etc.
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-wire-navy mb-1">
+          Attribution line template
+        </label>
+        <input
+          type="text"
+          value={attributionTemplate}
+          onChange={(e) => setAttributionTemplate(e.target.value)}
+          placeholder="This story originally appeared in {{org}}: {{headline}}"
+          className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
+        />
+        <p className="text-xs text-wire-slate mt-1">
+          Appended to every republication package from your organization. Leave blank to use the default.{' '}
+          Available variables: <code className="font-mono">{'{{headline}}'}</code> (title, linked to original),{' '}
+          <code className="font-mono">{'{{url}}'}</code> (original URL),{' '}
+          <code className="font-mono">{'{{org}}'}</code> (your organization name),{' '}
+          <code className="font-mono">{'{{website}}'}</code> (your website URL).
         </p>
       </div>
 

@@ -38,7 +38,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
     .select(
       `
       *,
-      organizations(id, name, website_url, republication_guidance),
+      organizations(id, name, website_url, republication_guidance, attribution_template),
       story_assets(*)
     `
     )
@@ -66,7 +66,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
   // Can't access own org's story for republication package (but can still view via dashboard)
   const isOwnOrg = !isPlatformAdmin && story.organization_id === currentUser.organization_id
   const embargoed = story.status === 'embargoed' && isEmbargoActive(story.embargo_lifts_at)
-  const org = story.organizations as { id: string; name: string; website_url: string; republication_guidance: string | null } | null
+  const org = story.organizations as { id: string; name: string; website_url: string; republication_guidance: string | null; attribution_template: string | null } | null
   const rawAssets = (story.story_assets ?? []) as {
     id: string
     asset_type: string
@@ -360,7 +360,9 @@ export default async function StoryDetailPage({ params }: PageProps) {
               body_html: story.body_html,
               body_plain: story.body_plain,
               special_instructions: story.special_instructions,
-              organizations: org ? { name: org.name } : undefined,
+              organizations: org
+                ? { name: org.name, website_url: org.website_url, attribution_template: org.attribution_template }
+                : undefined,
             }}
             assets={assets}
             embargoed={embargoed}
