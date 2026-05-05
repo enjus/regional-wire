@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, Suspense, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { brand } from '@/lib/brand'
 
 function RegisterForm() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const initialError = searchParams.get('error')
 
@@ -21,6 +22,22 @@ function RegisterForm() {
   const [success, setSuccess] = useState(false)
   const [otp, setOtp] = useState('')
   const [verifying, setVerifying] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.push('/wire/library')
+      } else {
+        setChecking(false)
+      }
+    }
+    checkSession()
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -65,6 +82,26 @@ function RegisterForm() {
 
     // Session is now set client-side; hand off to callback for user setup
     window.location.href = '/auth/callback'
+  }
+
+  async function handleResend() {
+    setResending(true)
+    setResent(false)
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email }),
+    })
+    setResending(false)
+    if (res.ok) setResent(true)
+  }
+
+  if (checking) {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <div className="text-wire-slate text-sm">Loading…</div>
+      </div>
+    )
   }
 
   if (success) {
@@ -115,12 +152,22 @@ function RegisterForm() {
           </button>
         </form>
 
-        <button
-          onClick={() => { setSuccess(false); setOtp(''); setError('') }}
-          className="mt-4 w-full text-center text-sm text-wire-slate hover:text-wire-navy"
-        >
-          ← Use a different email
-        </button>
+        <div className="mt-4 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resending}
+            className="w-full text-center text-sm text-wire-slate hover:text-wire-navy disabled:opacity-50"
+          >
+            {resending ? 'Sending…' : resent ? 'Code resent ✓' : 'Resend code'}
+          </button>
+          <button
+            onClick={() => { setSuccess(false); setOtp(''); setError(''); setResent(false) }}
+            className="w-full text-center text-sm text-wire-slate hover:text-wire-navy"
+          >
+            ← Use a different email
+          </button>
+        </div>
       </div>
     )
   }
@@ -204,6 +251,11 @@ function RegisterForm() {
         >
           {loading ? 'Sending code…' : 'Continue with email'}
         </button>
+
+        <p className="text-xs text-wire-slate leading-relaxed">
+          If your organization already has members, your account will require
+          approval from an org admin before you can access the platform.
+        </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-wire-slate">

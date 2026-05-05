@@ -38,7 +38,6 @@ export async function middleware(request: NextRequest) {
     '/login',
     '/register',
     '/auth/callback',
-    '/auth/confirm',
     '/auth/landing',
     '/pending',
     '/api/orgs/register',

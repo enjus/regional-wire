@@ -22,6 +22,8 @@ function LoginForm() {
   const [otp, setOtp] = useState('')
   const [verifying, setVerifying] = useState(false)
   const [checking, setChecking] = useState(true)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
 
   useEffect(() => {
     const checkSession = async () => {
@@ -85,6 +87,18 @@ function LoginForm() {
     window.location.href = `/auth/callback?next=${encodeURIComponent(redirect)}`
   }
 
+  async function handleResend() {
+    setResending(true)
+    setResent(false)
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    setResending(false)
+    if (res.ok) setResent(true)
+  }
+
   if (checking) {
     return (
       <div className="w-full max-w-sm text-center">
@@ -141,12 +155,22 @@ function LoginForm() {
           </button>
         </form>
 
-        <button
-          onClick={() => { setSent(false); setOtp(''); setError('') }}
-          className="mt-4 w-full text-center text-sm text-wire-slate hover:text-wire-navy"
-        >
-          ← Use a different email
-        </button>
+        <div className="mt-4 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resending}
+            className="w-full text-center text-sm text-wire-slate hover:text-wire-navy disabled:opacity-50"
+          >
+            {resending ? 'Sending…' : resent ? 'Code resent ✓' : 'Resend code'}
+          </button>
+          <button
+            onClick={() => { setSent(false); setOtp(''); setError(''); setResent(false) }}
+            className="w-full text-center text-sm text-wire-slate hover:text-wire-navy"
+          >
+            ← Use a different email
+          </button>
+        </div>
       </div>
     )
   }
