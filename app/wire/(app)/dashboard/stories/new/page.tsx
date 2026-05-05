@@ -17,13 +17,15 @@ export default async function NewStoryPage({
 
   const { data: currentUser } = await supabase
     .from('users')
-    .select('organization_id, organizations(name)')
+    .select('organization_id, organizations(name, website_url)')
     .eq('id', user.id)
     .single()
 
   if (!currentUser) redirect('/register')
 
-  const orgName = (currentUser.organizations as unknown as { name: string } | null)?.name ?? ''
+  const org = currentUser.organizations as unknown as { name: string; website_url: string } | null
+  const orgName = org?.name ?? ''
+  const orgWebsite = org?.website_url ?? ''
 
   const { headline, url, requestId } = await searchParams
   const initialData = headline || url ? { title: headline ?? '', canonical_url: url ?? '' } : undefined
@@ -39,7 +41,7 @@ export default async function NewStoryPage({
           republication.
         </p>
       </div>
-      <StoryUploadForm orgName={orgName} initialData={initialData} requestId={requestId} />
+      <StoryUploadForm orgName={orgName} orgWebsite={orgWebsite} initialData={initialData} requestId={requestId} />
     </div>
   )
 }

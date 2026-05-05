@@ -25,6 +25,7 @@ function emptyAsset(): AssetField {
 
 interface Props {
   orgName: string
+  orgWebsite?: string
   requestId?: string
   initialData?: {
     id?: string
@@ -38,14 +39,12 @@ interface Props {
   }
 }
 
-export default function StoryUploadForm({ orgName, initialData, requestId }: Props) {
+export default function StoryUploadForm({ orgName, orgWebsite, initialData, requestId }: Props) {
   const router = useRouter()
   const isEdit = !!initialData?.id
 
   const [title, setTitle] = useState(initialData?.title ?? '')
-  const [byline, setByline] = useState(
-    initialData?.byline ?? `Your Name, ${orgName}`
-  )
+  const [byline, setByline] = useState(initialData?.byline ?? '')
   const [canonicalUrl, setCanonicalUrl] = useState(initialData?.canonical_url ?? '')
   const [bodyHtml, setBodyHtml] = useState(initialData?.body_html ?? '')
   const [bodyPlain, setBodyPlain] = useState('')
@@ -268,7 +267,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
           value={byline}
           onChange={(e) => setByline(e.target.value)}
           className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-          placeholder="Jane Smith, The Daily Tribune"
+          placeholder={`Jane Smith, ${orgName}`}
         />
       </div>
 
@@ -287,7 +286,7 @@ export default function StoryUploadForm({ orgName, initialData, requestId }: Pro
           value={canonicalUrl}
           onChange={(e) => setCanonicalUrl(e.target.value)}
           className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-          placeholder="https://dailytribune.com/story/..."
+          placeholder={orgWebsite ? `${orgWebsite.replace(/\/$/, '')}/story/...` : 'https://example.com/story/...'}
         />
       </div>
 

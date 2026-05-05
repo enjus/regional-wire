@@ -20,7 +20,7 @@ export default async function EditStoryPage({ params }: PageProps) {
 
   const { data: currentUser } = await supabase
     .from('users')
-    .select('organization_id, organizations(name)')
+    .select('organization_id, organizations(name, website_url)')
     .eq('id', user.id)
     .single()
 
@@ -35,8 +35,9 @@ export default async function EditStoryPage({ params }: PageProps) {
 
   if (!story) notFound()
 
-  const orgName =
-    (currentUser.organizations as unknown as { name: string } | null)?.name ?? ''
+  const org = currentUser.organizations as unknown as { name: string; website_url: string } | null
+  const orgName = org?.name ?? ''
+  const orgWebsite = org?.website_url ?? ''
 
   return (
     <div>
@@ -53,6 +54,7 @@ export default async function EditStoryPage({ params }: PageProps) {
       </div>
       <StoryUploadForm
         orgName={orgName}
+        orgWebsite={orgWebsite}
         initialData={{
           id: story.id,
           title: story.title,
