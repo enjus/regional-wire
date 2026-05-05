@@ -178,7 +178,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
             />
           </div>
           <figcaption className="mt-2">
-            <AssetMeta caption={primaryImage.caption} credit={primaryImage.credit} url={primaryImage.displayUrl} />
+            <AssetMeta caption={primaryImage.caption} credit={primaryImage.credit} url={primaryImage.displayUrl} embargoed={embargoed} />
           </figcaption>
         </figure>
       )}
@@ -218,10 +218,21 @@ export default async function StoryDetailPage({ params }: PageProps) {
       )}
 
       {/* Story body */}
-      <div
-        className="prose prose-wire max-w-none mb-10"
-        dangerouslySetInnerHTML={{ __html: sanitizeStoryHtml(story.body_html) }}
-      />
+      {embargoed && !isOwnOrg && !isPlatformAdmin ? (
+        <div className="mb-10">
+          <div className="relative max-h-36 overflow-hidden">
+            <div className="prose prose-wire max-w-none">
+              <p>{(story.body_plain ?? story.body_html?.replace(/<[^>]+>/g, ' ') ?? '').replace(/\s+/g, ' ').trim().split(' ').slice(0, 150).join(' ')}&hellip;</p>
+            </div>
+            <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+          </div>
+        </div>
+      ) : (
+        <div
+          className="prose prose-wire max-w-none mb-10"
+          dangerouslySetInnerHTML={{ __html: sanitizeStoryHtml(story.body_html) }}
+        />
+      )}
 
       {/* Additional images */}
       {additionalImages.length > 0 && (
@@ -243,7 +254,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
                   />
                 </div>
                 <figcaption className="mt-1">
-                  <AssetMeta caption={img.caption} credit={img.credit} url={img.displayUrl} />
+                  <AssetMeta caption={img.caption} credit={img.credit} url={img.displayUrl} embargoed={embargoed} />
                 </figcaption>
               </figure>
             ))}
@@ -260,7 +271,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
           <video controls className="w-full rounded" src={video.displayUrl}>
             Your browser does not support video.
           </video>
-          <AssetMeta caption={video.caption} credit={video.credit} url={video.displayUrl} />
+          <AssetMeta caption={video.caption} credit={video.credit} url={video.displayUrl} embargoed={embargoed} />
         </div>
       )}
 
@@ -425,10 +436,12 @@ function AssetMeta({
   caption,
   credit,
   url,
+  embargoed,
 }: {
   caption: string | null
   credit: string | null
   url: string
+  embargoed?: boolean
 }) {
   return (
     <div className="mt-1 flex items-start justify-between gap-4">
@@ -446,14 +459,16 @@ function AssetMeta({
           </p>
         )}
       </div>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-xs text-wire-red hover:underline shrink-0"
-      >
-        Download ↓
-      </a>
+      {!embargoed && (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-wire-red hover:underline shrink-0"
+        >
+          Download ↓
+        </a>
+      )}
     </div>
   )
 }
