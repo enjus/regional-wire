@@ -4,10 +4,10 @@ import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email } = await request.json()
+    const { email } = await request.json()
 
-    if (!name || !email) {
-      return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 })
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required.' }, { status: 400 })
     }
 
     const domain = email.split('@')[1]?.toLowerCase()
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send magic link via anon client
+    // Send OTP via anon client
     const anonSupabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -112,7 +112,6 @@ export async function POST(request: NextRequest) {
       email,
       options: {
         emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-        data: { name },
       },
     })
 

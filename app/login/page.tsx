@@ -16,6 +16,7 @@ function LoginForm() {
   const [error, setError] = useState(
     errorParam === 'missing-code' ? 'That sign-in code is invalid or has expired. Request a new one below.' : ''
   )
+  const [errorCode, setErrorCode] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [otp, setOtp] = useState('')
@@ -41,12 +42,19 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setErrorCode(null)
 
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithOtp({ email })
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
 
-    if (authError) {
-      setError('Could not send sign-in code. Please try again.')
+    const data = await res.json().catch(() => ({}))
+
+    if (!res.ok) {
+      setError(data.error ?? 'Could not send sign-in code. Please try again.')
+      setErrorCode(data.code ?? null)
       setLoading(false)
       return
     }
@@ -174,9 +182,15 @@ function LoginForm() {
         </div>
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-            {error}
-          </p>
+          errorCode === 'org_pending' ? (
+            <div className="text-sm bg-amber-50 border border-amber-200 rounded px-3 py-2">
+              <p className="text-amber-800">{error}</p>
+            </div>
+          ) : (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+              {error}
+            </p>
+          )
         )}
 
         <button

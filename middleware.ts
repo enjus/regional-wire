@@ -43,6 +43,7 @@ export async function middleware(request: NextRequest) {
     '/pending',
     '/api/orgs/register',
     '/api/auth/register',
+    '/api/auth/login',
     '/api/cron',
   ]
   if (publicPaths.some((p) => pathname.startsWith(p))) {
@@ -58,6 +59,7 @@ export async function middleware(request: NextRequest) {
     (pathname.startsWith('/api/') &&
       !pathname.startsWith('/api/orgs/register') &&
       !pathname.startsWith('/api/auth/register') &&
+      !pathname.startsWith('/api/auth/login') &&
       !pathname.startsWith('/api/cron'))
 
   if (!requiresAuth) {
