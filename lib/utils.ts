@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { format, formatDistanceToNow } from 'date-fns'
-import { toZonedTime } from 'date-fns-tz'
+import { formatDistanceToNow } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import slugifyLib from 'slugify'
 import crypto from 'crypto'
 import sanitizeHtml from 'sanitize-html'
@@ -17,11 +17,11 @@ export function slugify(text: string): string {
 const DISPLAY_TZ = 'America/Los_Angeles'
 
 export function formatDate(date: string | Date): string {
-  return format(toZonedTime(new Date(date), DISPLAY_TZ), 'MMMM d, yyyy')
+  return formatInTimeZone(new Date(date), DISPLAY_TZ, 'MMMM d, yyyy')
 }
 
 export function formatDateTime(date: string | Date): string {
-  return format(toZonedTime(new Date(date), DISPLAY_TZ), "MMMM d, yyyy 'at' h:mm a")
+  return formatInTimeZone(new Date(date), DISPLAY_TZ, "MMMM d, yyyy 'at' h:mm a zzz")
 }
 
 export function formatRelative(date: string | Date): string {

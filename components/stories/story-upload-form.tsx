@@ -53,9 +53,12 @@ export default function StoryUploadForm({ orgName, orgWebsite, initialData, requ
     initialData?.special_instructions ?? ''
   )
   const [embargoEnabled, setEmbargoEnabled] = useState(!!initialData?.embargo_lifts_at)
-  const [embargoLiftsAt, setEmbargoLiftsAt] = useState(
-    initialData?.embargo_lifts_at?.slice(0, 16) ?? ''
-  )
+  const [embargoLiftsAt, setEmbargoLiftsAt] = useState(() => {
+    if (!initialData?.embargo_lifts_at) return ''
+    const d = new Date(initialData.embargo_lifts_at)
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  })
 
   // Assets
   const [primaryImage, setPrimaryImage] = useState<AssetField>(emptyAsset())

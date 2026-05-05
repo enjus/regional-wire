@@ -48,7 +48,7 @@ export default function AlertsPage() {
       </p>
       <p>
         Each user configures their own digest preferences — including whether to receive
-        it and what UTC hour to receive it — from their personal account settings. The
+        it and what time of day to receive it — from their personal account settings. The
         daily digest and hourly alerts operate independently; you can use either or both.
       </p>
 
