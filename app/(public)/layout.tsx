@@ -1,8 +1,28 @@
 import Link from 'next/link'
 import PublicNavClient from '@/components/public/public-nav-client'
+import NavbarClient from '@/components/layout/navbar-client'
+import { createClient } from '@/lib/supabase/server'
 import { brand } from '@/lib/brand'
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let displayName = ''
+  let orgName = ''
+
+  if (user) {
+    const { data } = await supabase
+      .from('users')
+      .select('display_name, organizations(name)')
+      .eq('id', user.id)
+      .single()
+
+    if (data) {
+      displayName = data.display_name
+      orgName = (data.organizations as unknown as { name: string } | null)?.name ?? ''
+    }
+  }
   return (
     <div className="min-h-screen flex flex-col bg-wire-bg">
       {/* Navigation */}
@@ -17,19 +37,23 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <Link href="/docs" className="hover:text-wire-navy transition-colors">Docs</Link>
           </nav>
 
-          <div className="hidden sm:flex items-center gap-5">
-            <Link href="/login" className="text-[13px] text-wire-slate hover:text-wire-navy transition-colors">
-              Sign in
-            </Link>
-            <Link
-              href="/register/organization"
-              className="text-[13px] text-wire-slate hover:text-wire-navy transition-colors"
-            >
-              Join as newsroom
-            </Link>
-          </div>
+          {user ? (
+            <NavbarClient displayName={displayName} orgName={orgName} variant="light" />
+          ) : (
+            <div className="hidden sm:flex items-center gap-5">
+              <Link href="/login" className="text-[13px] text-wire-slate hover:text-wire-navy transition-colors">
+                Sign in
+              </Link>
+              <Link
+                href="/register/organization"
+                className="text-[13px] text-wire-slate hover:text-wire-navy transition-colors"
+              >
+                Join as newsroom
+              </Link>
+            </div>
+          )}
 
-          <PublicNavClient />
+          <PublicNavClient isLoggedIn={!!user} />
         </div>
       </header>
 

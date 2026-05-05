@@ -8,9 +8,10 @@ import { createClient } from '@/lib/supabase/client'
 interface Props {
   displayName: string
   orgName: string
+  variant?: 'dark' | 'light'
 }
 
-export default function NavbarClient({ displayName, orgName }: Props) {
+export default function NavbarClient({ displayName, orgName, variant = 'dark' }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
@@ -25,10 +26,18 @@ export default function NavbarClient({ displayName, orgName }: Props) {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
+        className={`flex items-center gap-2 text-sm transition-colors ${
+          variant === 'light'
+            ? 'text-wire-slate hover:text-wire-navy'
+            : 'text-white/80 hover:text-white'
+        }`}
       >
         <span className="hidden sm:block">{orgName}</span>
-        <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
+        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+          variant === 'light'
+            ? 'bg-wire-navy/10 text-wire-navy'
+            : 'bg-white/20 text-white'
+        }`}>
           {displayName.charAt(0).toUpperCase()}
         </div>
       </button>
@@ -58,6 +67,13 @@ export default function NavbarClient({ displayName, orgName }: Props) {
                 className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
               >
                 Upload story
+              </Link>
+              <Link
+                href="/wire/library"
+                onClick={() => setOpen(false)}
+                className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
+              >
+                Library
               </Link>
               <Link
                 href="/wire/dashboard/settings"

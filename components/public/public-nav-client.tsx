@@ -3,7 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-export default function PublicNavClient() {
+interface Props {
+  isLoggedIn?: boolean
+}
+
+export default function PublicNavClient({ isLoggedIn }: Props) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -32,8 +36,17 @@ export default function PublicNavClient() {
               <Link href="/how-it-works" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>How it works</Link>
               <Link href="/docs" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Documentation</Link>
               <div className="border-t border-wire-border mt-2 pt-3 flex flex-col gap-1">
-                <Link href="/login" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Sign in</Link>
-                <Link href="/register/organization" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Join as newsroom</Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link href="/wire/library" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Library</Link>
+                    <Link href="/wire/dashboard" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Dashboard</Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Sign in</Link>
+                    <Link href="/register/organization" className="py-2 text-sm text-wire-slate hover:text-wire-navy transition-colors" onClick={() => setOpen(false)}>Join as newsroom</Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
