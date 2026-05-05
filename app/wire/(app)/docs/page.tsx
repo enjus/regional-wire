@@ -25,6 +25,11 @@ const SECTIONS = [
         title: 'Story alerts',
         desc: 'Receiving email digests when member organizations publish.',
       },
+      {
+        href: '/wire/docs/members',
+        title: 'Managing team members',
+        desc: 'Adding colleagues, approving new members, inviting by email, and managing roles.',
+      },
     ],
   },
   {

@@ -19,7 +19,18 @@ Replace `person@gmail.com` with the member's address and `<org_uuid>` with the o
 SELECT id, name, email_domain FROM organizations WHERE name ILIKE '%newsroom name%';
 ```
 
-Once added, the member registers and logs in normally at `/register`. They'll be associated with that org and assigned the `editor` role (or `admin` if they're the first member).
+Once added, the member registers and logs in normally at `/register`. They'll be associated with that org and assigned the `editor` role. **Note:** if the org already has active members, the new user will land in a `pending` state and require org admin approval before gaining access. To skip the approval step and grant immediate access, use an org invite instead (see below).
+
+## Give immediate access via org invite
+
+An `org_invites` row guarantees the user is set to `status = 'active'` the moment they complete registration — no admin approval needed. Use this instead of (or in addition to) `allowed_emails` when you want the member in right away:
+
+```sql
+INSERT INTO org_invites (org_id, email, invited_by, used_at)
+VALUES ('<org_uuid>', 'person@gmail.com', NULL, NULL);
+```
+
+The invite is consumed (marked `used_at`) the first time they log in. It can coexist with an `allowed_emails` entry — both checks happen during registration.
 
 ## Remove an email address
 

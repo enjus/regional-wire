@@ -24,7 +24,7 @@ cd /home/deploy/regional-wire && git pull && npm install && npm run build && pm2
 To trigger cron jobs locally (no auth required in development):
 ```
 GET http://localhost:3000/api/cron/poll-feeds
-GET http://localhost:3000/api/cron/alert-digest
+GET http://localhost:3000/api/cron/hourly-digest
 ```
 
 ## Architecture
@@ -35,8 +35,11 @@ Regional Wire is a Next.js 15 App Router application. Member newsrooms share sto
 
 - **Supabase Auth** handles signup/login via **6-digit OTP code only** — no passwords, no magic links. Users enter their email, receive a code, and enter it on the login page. Magic links were abandoned due to email prefetching consuming tokens before users could click them.
 - **`middleware.ts`** enforces auth on all routes: refreshes the Supabase session, redirects unauthenticated users, and checks that authenticated users have a `users` record (org association). Admin routes (`/admin`, `/api/admin/*`) use HTTP Basic Auth instead. Approve/reject email links bypass Basic Auth via HMAC-signed tokens (`verifyAdminToken`).
-- **`/auth/callback`** handles post-OTP session setup: looks up the user's org by email domain, creates the `users` record, and assigns `admin` (first user from that domain) or `editor` role. Uses `NEXT_PUBLIC_APP_URL` for all redirects (not `request.nextUrl.origin`) to work correctly behind a reverse proxy.
-- **`/register`** requires the email domain to match an approved org. The domain check uses the service role client to bypass RLS.
+- **`/api/auth/login`** and **`/api/auth/register`** are server-side API routes that gate OTP sending on org approval status. Three-step org lookup: domain match → `allowed_emails` → open `org_invites`. Both return `code: 'org_pending'` with a user-facing message when the email's domain matches a pending (not yet approved) org, preventing orphaned `auth.users` entries.
+- **`/auth/callback`** handles post-OTP session setup. First checks for an open `org_invites` row and claims it atomically (UPDATE … RETURNING); falls back to domain/`allowed_emails` match if no invite. Creates the `users` record. Role: `admin` if the org has zero active users, `editor` otherwise. Status: `active` if the user was invited or is the first active user; `pending` otherwise (requires org admin approval). Uses `NEXT_PUBLIC_APP_URL` for all redirects (not `request.nextUrl.origin`) to work correctly behind a reverse proxy.
+- **`/register`** requires the email domain (or an open invite) to match an approved org. Returns a pending-org error if the domain matches an org that is still under review.
+- **Org approval** (`/api/admin/orgs/[id]/approve`) automatically seeds `org_invites` rows for all `contact_emails` on the org record. This ensures contact emails get `status = 'active'` (not `pending`) when they self-register after approval.
+- **`users.status`**: `active` = full access; `pending` = authenticated but blocked (org admin must approve). `is_approved_member()` RLS helper requires `status = 'active'`.
 - All Supabase tables have RLS. Three `SECURITY DEFINER` helper functions (`get_user_org_id()`, `is_approved_member()`, `is_org_admin()`) are used in policies to avoid recursive lookups.
 
 ### Supabase Client Usage
@@ -106,6 +109,13 @@ The migration is in `supabase/migrations/001_schema.sql`. Post-migration additio
 
 `supabase/migrations/004_org_exclusions.sql` adds:
 - `org_exclusions` table — org-to-org exclusion relationships (see Publisher Exclusions below)
+
+`supabase/migrations/006_user_approval.sql` adds:
+- `users.status TEXT` — `'pending'` or `'active'`; existing users backfilled to `'active'`
+- `org_invites` table — org-initiated and auto-seeded invites; claimed atomically in `/auth/callback`
+- Partial unique index `idx_org_invites_open_unique` on `(org_id, email) WHERE used_at IS NULL`
+- Updated `is_approved_member()` to require `users.status = 'active'`
+- RLS policies allowing org admins to approve/role-change/remove org members
 
 When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
 

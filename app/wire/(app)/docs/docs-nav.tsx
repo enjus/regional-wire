@@ -15,6 +15,7 @@ const SECTIONS = [
       { href: '/wire/docs/feeds', label: 'RSS feed ingestion' },
       { href: '/wire/docs/alerts', label: 'Story alerts' },
       { href: '/wire/docs/exclusions', label: 'Publisher exclusions' },
+      { href: '/wire/docs/members', label: 'Managing team members' },
     ],
   },
   {
