@@ -99,6 +99,28 @@ export default function DocsIndexPage() {
           </div>
         ))}
       </div>
+
+      <div className="mt-12 pt-8 border-t border-wire-border">
+        <h2 className="text-[11px] font-semibold uppercase tracking-widest text-wire-slate/50 mb-4">
+          Need more help?
+        </h2>
+        <Link
+          href="/support"
+          className="group flex items-start gap-4 p-4 rounded-lg border border-wire-border bg-white hover:border-wire-navy/15 hover:shadow-sm transition-all"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-wire-navy text-sm group-hover:text-wire-red transition-colors">
+              Contact support
+            </p>
+            <p className="text-xs text-wire-slate mt-0.5 leading-relaxed">
+              Send a message to the {brand.name} team with questions, feedback or issues.
+            </p>
+          </div>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" className="text-wire-border group-hover:text-wire-red transition-colors flex-shrink-0 mt-0.5" aria-hidden>
+            <path d="M3.75 8a.75.75 0 01.75-.75h6.19L8.22 4.78a.75.75 0 011.06-1.06l3.5 3.5a.75.75 0 010 1.06l-3.5 3.5a.75.75 0 11-1.06-1.06L11.25 9.5H4.5A.75.75 0 013.75 8z" />
+          </svg>
+        </Link>
+      </div>
     </div>
   )
 }
