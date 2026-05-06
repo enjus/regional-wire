@@ -127,9 +127,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (embargo_lifts_at !== undefined) updates.embargo_lifts_at = embargo_lifts_at || null
     if (status !== undefined) updates.status = status
 
-    // If embargo is being cleared, set status to available
-    if ('embargo_lifts_at' in updates && !updates.embargo_lifts_at) {
-      updates.status = 'available'
+    // Sync status with embargo state when embargo_lifts_at is explicitly set
+    if ('embargo_lifts_at' in updates) {
+      updates.status = updates.embargo_lifts_at ? 'embargoed' : 'available'
     }
 
     // Set has_correction flag if this is a correction
