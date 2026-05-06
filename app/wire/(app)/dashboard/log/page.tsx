@@ -28,7 +28,7 @@ export default async function ActivityLogPage() {
   const storyIds = orgStories?.map((s) => s.id) ?? []
 
   // Get all log entries for stories this org originated
-  const { data: outgoingLog } = storyIds.length
+  const { data: rawLog } = storyIds.length
     ? await supabase
         .from('republication_log')
         .select(
@@ -42,6 +42,18 @@ export default async function ActivityLogPage() {
         .order('downloaded_at', { ascending: false })
         .limit(100)
     : { data: [] }
+
+  // Deduplicate: one entry per (story, republishing org). Prefer the entry
+  // with a published URL; otherwise keep the most recent (first in DESC order).
+  const seen = new Map<string, NonNullable<typeof rawLog>[0]>()
+  for (const entry of rawLog ?? []) {
+    const key = `${entry.story_id}:${entry.republishing_org_id}`
+    const existing = seen.get(key)
+    if (!existing || (!existing.republished_url && entry.republished_url)) {
+      seen.set(key, entry)
+    }
+  }
+  const outgoingLog = Array.from(seen.values())
 
   return (
     <div>
