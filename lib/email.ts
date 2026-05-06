@@ -569,6 +569,55 @@ Enter your email address (${email}) and follow the prompts to create your accoun
 }
 
 // ----------------------------------------------------------------
+// 20. Support request — to all platform admins
+// ----------------------------------------------------------------
+export async function sendSupportRequest({
+  adminEmails,
+  name,
+  email,
+  subject,
+  message,
+  userContext,
+}: {
+  adminEmails: string[]
+  name: string
+  email: string
+  subject: string
+  message: string
+  userContext?: { userId: string; orgName: string; orgId: string } | null
+}) {
+  const contextBlock = userContext
+    ? `
+Submitted by authenticated user:
+  Name: ${name}
+  Email: ${email}
+  Organization: ${userContext.orgName}
+  Org ID: ${userContext.orgId}
+  User ID: ${userContext.userId}
+`.trim()
+    : `Submitted by unauthenticated visitor:\n  Name: ${name}\n  Email: ${email}`
+
+  const text = `
+Support Request — ${brand.name}
+
+Subject: ${subject}
+
+${contextBlock}
+
+Message:
+${message}
+`.trim()
+
+  return getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: adminEmails,
+    replyTo: email,
+    subject: `[Support] ${subject}`,
+    text,
+  })
+}
+
+// ----------------------------------------------------------------
 // 13. Story withdrawal notice — to republishing orgs
 // ----------------------------------------------------------------
 export async function sendWithdrawalNotice(

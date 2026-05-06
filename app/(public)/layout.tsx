@@ -74,6 +74,7 @@ export default async function PublicLayout({ children }: { children: React.React
               <ul className="space-y-2.5 text-sm text-white/50">
                 <li><Link href="/how-it-works" className="hover:text-white transition-colors">How it works</Link></li>
                 <li><Link href="/docs" className="hover:text-white transition-colors">Documentation</Link></li>
+                <li><Link href="/support" className="hover:text-white transition-colors">Contact support</Link></li>
               </ul>
             </div>
             <div>

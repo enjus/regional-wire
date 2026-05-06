@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface Props {
   displayName: string
@@ -60,7 +61,7 @@ export default function AccountSettingsForm({ displayName: initialName, email }:
         <p className="text-sm text-wire-slate">
           <strong className="text-wire-navy">Email:</strong>{' '}
           {email}
-          <span className="text-xs ml-2">(contact support to change)</span>
+          <Link href="/support" className="text-xs ml-2 underline hover:text-wire-navy">(contact support to change)</Link>
         </p>
       </div>
 

@@ -46,6 +46,7 @@ export async function middleware(request: NextRequest) {
     '/api/auth/login',
     '/api/auth/onboard',
     '/api/cron',
+    '/api/support',
   ]
   if (publicPaths.some((p) => pathname.startsWith(p))) {
     return NextResponse.next()
