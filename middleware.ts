@@ -37,12 +37,14 @@ export async function middleware(request: NextRequest) {
   const publicPaths = [
     '/login',
     '/register',
+    '/onboard',
     '/auth/callback',
     '/auth/landing',
     '/pending',
     '/api/orgs/register',
     '/api/auth/register',
     '/api/auth/login',
+    '/api/auth/onboard',
     '/api/cron',
   ]
   if (publicPaths.some((p) => pathname.startsWith(p))) {
@@ -113,12 +115,14 @@ export async function middleware(request: NextRequest) {
 
     if (!userRecord) {
       // PGRST116 = "no rows returned" — the user genuinely has no org record.
-      // Any other error code means the DB is temporarily unreachable; don't
-      // redirect to register in that case or we'll sign out a valid user.
+      // This can happen mid-onboarding (user authenticated via /login but hasn't
+      // completed /onboard yet). Redirect to /onboard rather than /register so
+      // they can finish account setup without seeing a misleading "no-org" error.
+      // Any other error code means the DB is temporarily unreachable; let through.
       if (!userRecordError || userRecordError.code === 'PGRST116') {
         const url = request.nextUrl.clone()
-        url.pathname = '/register'
-        url.searchParams.set('error', 'no-org')
+        url.pathname = '/onboard'
+        url.search = ''
         return NextResponse.redirect(url)
       }
       // Real DB error: user is authenticated (getUser() succeeded above) but we

@@ -108,6 +108,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${next}`)
   }
 
+  // No name in metadata means the user came through /login rather than /register.
+  // Redirect to /onboard to collect the name before creating the users row.
+  // Do this before any DB writes so the onboard route handles the full creation flow.
+  // IMPORTANT: this early return must stay above the invite-claim block below —
+  // redirecting here leaves the DB clean so the onboard API can run the full flow.
+  const metaName = userMeta?.name
+  if (typeof metaName !== 'string' || !metaName.trim()) {
+    return NextResponse.redirect(`${origin}/onboard`)
+  }
+
   // Atomically consume an open invite for this email. Using UPDATE + RETURNING
   // means only one concurrent request can win — the second sees no rows back
   // because used_at is no longer NULL after the first write.

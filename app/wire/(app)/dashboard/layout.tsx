@@ -51,6 +51,12 @@ export default async function DashboardLayout({
             <SidebarLink href="/wire/dashboard/requests" label="Requests" badge={pendingRequestCount ?? 0} />
             <SidebarLink href="/wire/dashboard/republished" label="Republished" />
             <SidebarLink href="/wire/dashboard/log" label="Activity Log" />
+            <li className="pt-3 pb-1">
+              <span className="text-xs text-wire-slate font-medium uppercase tracking-wide">
+                Account
+              </span>
+            </li>
+            <SidebarLink href="/wire/dashboard/settings/account" label="Profile" />
             {isAdmin && (
               <>
                 <li className="pt-3 pb-1">
