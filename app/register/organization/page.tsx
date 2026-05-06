@@ -236,8 +236,21 @@ export default function RegisterOrganizationPage() {
               <label className="block text-sm font-medium text-wire-navy mb-1">
                 Additional republication guidance
               </label>
+              <details className="mb-2 border border-wire-border rounded text-xs bg-wire-bg">
+                <summary className="px-3 py-2 cursor-pointer font-medium text-wire-navy select-none">
+                  Standard platform rules <span className="font-normal text-wire-slate">(applied to all stories on the network)</span>
+                </summary>
+                <div className="px-3 pb-3 pt-2 border-t border-wire-border space-y-1.5 text-wire-slate">
+                  <p>1. <strong className="text-wire-navy">Attribution required</strong> — include a link back to the original story; do not alter the attribution line.</p>
+                  <p>2. <strong className="text-wire-navy">Headlines may be adapted</strong> — changes must retain the original meaning.</p>
+                  <p>3. <strong className="text-wire-navy">Minor edits acceptable</strong> — style or time references only; do not alter facts, tone or conclusions.</p>
+                  <p>4. <strong className="text-wire-navy">Preserve the byline</strong> — original author&apos;s name must appear exactly as written.</p>
+                  <p>5. <strong className="text-wire-navy">No resyndication</strong> — do not redistribute to third parties or other publications.</p>
+                  <p>6. <strong className="text-wire-navy">Notify originating newsroom</strong> — submit published URL after republishing.</p>
+                </div>
+              </details>
               <p className="text-xs text-wire-slate mb-1">
-                Any specific requirements for newsrooms republishing your stories — e.g. preferred credit line, geo restrictions, or contact preferences. Displayed alongside standard republication rules.
+                Use this field only for requirements beyond the standard rules above — e.g. a specific credit line format or geographic restrictions.
               </p>
               <textarea
                 value={republication_guidance}

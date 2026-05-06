@@ -12,7 +12,7 @@ export default function MembersDocPage() {
       <div className="not-prose mb-8 pb-8 border-b border-wire-border">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-wire-slate/50 mb-2">For publishers</p>
         <h1 className="font-serif text-3xl font-bold text-wire-navy mb-3">Managing team members</h1>
-        <p className="text-wire-slate">Adding colleagues to your newsroom, approving new members, and managing roles.</p>
+        <p className="text-wire-slate">Adding colleagues to your newsroom, approving new members and managing roles.</p>
       </div>
 
       <h2>How staff register</h2>
@@ -59,11 +59,11 @@ export default function MembersDocPage() {
       <ul>
         <li>
           <strong>Editor</strong> — can browse the library, copy republication packages,
-          upload stories, and manage their own alerts and digest preferences.
+          upload stories and manage their own alerts and digest preferences.
         </li>
         <li>
           <strong>Admin</strong> — everything an editor can do, plus: approve or deny pending
-          members, invite colleagues, change member roles, remove members, and manage org
+          members, invite colleagues, change member roles, remove members and manage org
           settings (feeds, exclusions, attribution line).
         </li>
       </ul>

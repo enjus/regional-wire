@@ -12,7 +12,7 @@ export default function RepublishingPage() {
       <div className="not-prose mb-8 pb-8 border-b border-wire-border">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-wire-slate/50 mb-2">For editors</p>
         <h1 className="font-serif text-3xl font-bold text-wire-navy mb-3">Republishing stories</h1>
-        <p className="text-wire-slate">Using the library, copying the republication package, and logging where you published.</p>
+        <p className="text-wire-slate">Using the library, copying the republication package and logging where you published.</p>
       </div>
 
       <h2>Finding stories to republish</h2>
@@ -60,7 +60,7 @@ export default function RepublishingPage() {
       <ul>
         <li>The story headline</li>
         <li>The author byline (formatted as <em>By [Name]</em>) — this is the required author credit; do not remove it</li>
-        <li>The story body — sanitized to remove scripts, embeds, iframes, and images</li>
+        <li>The story body — sanitized to remove scripts, embeds, iframes and images</li>
         <li>
           An attribution line crediting the originating publication and linking to the canonical
           URL. This is the required publisher credit; do not remove it. The exact wording may
@@ -77,7 +77,7 @@ export default function RepublishingPage() {
       <p>
         Images are <strong>not</strong> included in the copy package. This is intentional —
         each newsroom should add images through their own CMS workflow to ensure proper
-        sizing, licensing, and hosting.
+        sizing, licensing and hosting.
       </p>
       <p>
         If the originating newsroom has uploaded image assets, you can download them from

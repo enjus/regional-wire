@@ -12,7 +12,7 @@ export default function UploadingStoriesPage() {
       <div className="not-prose mb-8 pb-8 border-b border-wire-border">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-wire-slate/50 mb-2">For publishers</p>
         <h1 className="font-serif text-3xl font-bold text-wire-navy mb-3">Uploading stories</h1>
-        <p className="text-wire-slate">The manual upload workflow: editor, metadata, embargoes, and assets.</p>
+        <p className="text-wire-slate">The manual upload workflow: editor, metadata, embargoes and assets.</p>
       </div>
 
       <h2>Overview</h2>
@@ -52,12 +52,12 @@ export default function UploadingStoriesPage() {
       <h3>Body content</h3>
       <p>
         The body editor supports rich text: headings (H2/H3), paragraphs, bold, italic,
-        links, bulleted and numbered lists, and blockquotes. Images are not embeddable in
+        links, bulleted and numbered lists and blockquotes. Images are not embeddable in
         the body — upload them as separate downloadable assets instead.
       </p>
       <p>
         You can paste content from a word processor or CMS. Formatting is preserved where
-        supported. Scripts, iframes, and embeds are stripped on paste and on display.
+        supported. Scripts, iframes and embeds are stripped on paste and on display.
       </p>
 
       <h2>Attribution line</h2>
@@ -70,7 +70,7 @@ export default function UploadingStoriesPage() {
         You can customize this wording for all of your org&apos;s stories in{' '}
         <strong>Dashboard → Settings → Attribution line template</strong>. Supported
         placeholders are <code>{'{{headline}}'}</code>, <code>{'{{url}}'}</code>,{' '}
-        <code>{'{{org}}'}</code>, and <code>{'{{website}}'}</code>. Leave it blank to use
+        <code>{'{{org}}'}</code> and <code>{'{{website}}'}</code>. Leave it blank to use
         the default.
       </p>
 

@@ -23,7 +23,7 @@ export default function HomePage() {
 
           <p className="text-lg text-wire-slate max-w-xl mb-10 leading-relaxed">
             {brand.name} is a closed content-sharing platform for member newsrooms.
-            Upload stories, browse the shared library, and republish with full
+            Upload stories, browse the shared library and republish with full
             attribution — and without the back-and-forth.
           </p>
 
@@ -84,17 +84,17 @@ export default function HomePage() {
               {
                 n: '01',
                 title: 'Upload',
-                body: 'Editors share stories using the built-in editor or by connecting an RSS feed. Set embargo dates, add bylines, and attach downloadable image assets.',
+                body: 'Editors share stories using the built-in editor or by connecting an RSS feed. Set embargo dates, add bylines and attach downloadable image assets.',
               },
               {
                 n: '02',
                 title: 'Browse',
-                body: 'Member newsrooms browse the shared library, filter by organization, and request stories. Set alerts to be notified when member orgs publish.',
+                body: 'Member newsrooms browse the shared library, filter by organization and request stories. Set alerts to be notified when member orgs publish.',
               },
               {
                 n: '03',
                 title: 'Republish',
-                body: 'One click copies a formatted package — headline, byline, sanitized body, and attribution link — ready to paste directly into your CMS.',
+                body: 'One click copies a formatted package — headline, byline, sanitized body and attribution link — ready to paste directly into your CMS.',
               },
             ].map((step) => (
               <div key={step.n} className="group">
@@ -242,7 +242,7 @@ export default function HomePage() {
               Read the documentation.
             </h2>
             <p className="text-white/50 text-sm max-w-sm leading-relaxed">
-              Learn how story sharing works, what to expect as a member, and how the
+              Learn how story sharing works, what to expect as a member and how the
               platform handles attribution and republication.
             </p>
           </div>

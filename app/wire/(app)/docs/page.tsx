@@ -13,7 +13,7 @@ const SECTIONS = [
       {
         href: '/wire/docs/uploading-stories',
         title: 'Uploading stories',
-        desc: 'Manual upload workflow: editor, metadata, embargoes, and assets.',
+        desc: 'Manual upload workflow: editor, metadata, embargoes and assets.',
       },
       {
         href: '/wire/docs/feeds',
@@ -28,7 +28,7 @@ const SECTIONS = [
       {
         href: '/wire/docs/members',
         title: 'Managing team members',
-        desc: 'Adding colleagues, approving new members, inviting by email, and managing roles.',
+        desc: 'Adding colleagues, approving new members, inviting by email and managing roles.',
       },
     ],
   },
@@ -38,7 +38,7 @@ const SECTIONS = [
       {
         href: '/wire/docs/republishing',
         title: 'Republishing stories',
-        desc: 'Using the library, copying the republication package, and logging.',
+        desc: 'Using the library, copying the republication package and logging.',
       },
       {
         href: '/wire/docs/requests',
@@ -62,7 +62,7 @@ export default function DocsIndexPage() {
         </h1>
         <p className="text-wire-slate leading-relaxed max-w-lg">
           How to use the platform — uploading stories, setting up feeds, republishing
-          content from other members, and more.
+          content from other members and more.
         </p>
       </div>
 

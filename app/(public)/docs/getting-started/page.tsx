@@ -29,25 +29,26 @@ export default function GettingStartedPage() {
         <Link href="/register/organization">/register/organization</Link>. You&apos;ll need:
       </p>
       <ul>
-        <li>Your newsroom&apos;s full legal name</li>
-        <li>Your primary email domain (e.g. <code>northfieldherald.com</code>)</li>
+        <li>Your newsroom&apos;s name</li>
+        <li>Your staff email domain (e.g. <code>northfieldherald.com</code>)</li>
         <li>A contact email address for the application</li>
       </ul>
       <p>
-        Approval may take 1–2 business days. You&apos;ll receive an email when your
+        Approval typically takes one business day. You&apos;ll receive an email when your
         organization is approved or if there are questions about your application.
       </p>
 
       <h2>Step 2: Create your account</h2>
       <p>
-        Once your organization is approved, any staff member with your registered email domain
-        can sign up at <Link href="/register">/register</Link>. Use your work email address —
-        the domain must match the one associated with your organization.
+        Once your organization is approved, any staff member with a matching email address
+        can sign up at <Link href="/register">/register</Link>. Enter your name and work
+        email — the domain must match the one associated with your organization.
       </p>
       <p>
-        You&apos;ll receive a confirmation email. Click the link to verify your address and
+        You&apos;ll receive an email with a 6-digit code. Enter it on the next screen to
         complete sign-up. The <strong>first user</strong> from your organization is
-        automatically designated as admin.
+        automatically designated as admin. If your organization already has members, your
+        account will require approval from an org admin before you can access the platform.
       </p>
 
       <h2>Step 3: Explore your dashboard</h2>
@@ -57,13 +58,15 @@ export default function GettingStartedPage() {
         is where you manage your organization&apos;s contributed stories and settings.
       </p>
       <p>
-        If you&apos;re the <strong>admin</strong> for your organization, you&apos;ll also
-        have access to:
+        All users have access to <strong>Alerts</strong> under their account — configure
+        keyword and org-follow alerts, plus a daily digest. If you&apos;re the{' '}
+        <strong>admin</strong> for your organization, you&apos;ll also have access to:
       </p>
       <ul>
         <li><strong>Settings</strong> — Update your organization&apos;s profile</li>
+        <li><strong>Members</strong> — Manage team access and pending approvals</li>
         <li><strong>Feeds</strong> — Connect an RSS or Atom feed for automatic story ingestion</li>
-        <li><strong>Alerts</strong> — Configure email digest notifications for member activity</li>
+        <li><strong>Exclusions</strong> — Hide stories from specific publishers</li>
       </ul>
 
       <h2>Roles</h2>
@@ -71,7 +74,7 @@ export default function GettingStartedPage() {
       <ul>
         <li>
           <strong>Admin</strong> — Can upload and manage stories, access all settings, manage
-          feeds and alerts, and see the full activity log. The first user from an org is
+          feeds and alerts and see the full activity log. The first user from an org is
           automatically admin.
         </li>
         <li>
@@ -79,6 +82,23 @@ export default function GettingStartedPage() {
           Cannot access organization settings.
         </li>
       </ul>
+
+      <h2>Republication requirements</h2>
+      <p>
+        All stories on {brand.name} are shared under a common set of republication
+        requirements. By republishing a story, your newsroom agrees to the following:
+      </p>
+      <ol>
+        <li><strong>Attribution is required.</strong> The republished story must include a link back to the original on the originating newsroom&apos;s website. Do not remove or alter the attribution line.</li>
+        <li><strong>Headlines may be adapted.</strong> You may edit the headline for style or to better fit your audience, but it must retain the original meaning.</li>
+        <li><strong>Minor edits are acceptable.</strong> Small changes for style, updated time references (e.g. replacing &ldquo;Wednesday&rdquo; with a date) or minor clarifications are permitted. Do not alter facts, tone or conclusions.</li>
+        <li><strong>Preserve the byline.</strong> The original author&apos;s name must appear exactly as written. Do not substitute your own staff name or remove the byline.</li>
+        <li><strong>No resyndication.</strong> Do not redistribute this story to third parties or other publications.</li>
+        <li><strong>Notify the originating newsroom.</strong> Submit your published URL after republishing so the originating newsroom can track where their story appeared.</li>
+      </ol>
+      <p>
+        Individual newsrooms may add requirements beyond these — those appear on the story detail page when present.
+      </p>
 
       <h2>Next steps</h2>
       <p>Once you&apos;re signed in, the full platform documentation is available under <strong>Help</strong> in the navigation.</p>

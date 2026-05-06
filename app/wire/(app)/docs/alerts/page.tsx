@@ -35,8 +35,8 @@ export default function AlertsPage() {
         receive one email per story.
       </p>
       <p>
-        To set up hourly alerts, go to <strong>Dashboard → Settings → Alerts</strong>
-        (org admin only) and toggle alerts on for the organizations you want to follow.
+        To set up hourly alerts, go to <strong>Dashboard → Account → Alerts</strong>
+        and toggle alerts on for the organizations you want to follow.
         Alerts are configured per organization, not per story.
       </p>
 
@@ -69,7 +69,7 @@ export default function AlertsPage() {
       <h2>Managing alerts</h2>
       <p>
         You can enable or disable hourly alerts for any member organization at any time
-        from <strong>Dashboard → Settings → Alerts</strong>. Changes take effect
+        from <strong>Dashboard → Account → Alerts</strong>. Changes take effect
         immediately for the next digest cycle.
       </p>
 

@@ -104,7 +104,7 @@ export function AdminRemoveAction({ orgId, orgName }: Props) {
     return (
       <div className="space-y-2 w-64">
         <p className="text-xs text-red-600 font-medium">
-          Remove {orgName}? This withdraws all stories, deactivates feeds, and revokes access.
+          Remove {orgName}? This withdraws all stories, deactivates feeds and revokes access.
         </p>
         <textarea
           value={reason}

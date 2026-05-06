@@ -568,7 +568,7 @@ export default function StoryUploadForm({ orgName, orgWebsite, initialData, requ
               />
               <span className="text-sm">
                 <strong className="text-wire-navy">Update</strong>
-                <span className="text-wire-slate"> — minor fix, added detail, formatting, or clarification</span>
+                <span className="text-wire-slate"> — minor fix, added detail, formatting or clarification</span>
               </span>
             </label>
             <label className="flex items-start gap-2 cursor-pointer">

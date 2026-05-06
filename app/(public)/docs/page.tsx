@@ -4,7 +4,7 @@ import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: `Documentation — ${brand.name}`,
-  description: `How ${brand.name} works: applying for membership, onboarding your newsroom, and what to expect.`,
+  description: `How ${brand.name} works: applying for membership, onboarding your newsroom and what to expect.`,
 }
 
 export default function DocsIndexPage() {
@@ -34,7 +34,7 @@ export default function DocsIndexPage() {
               Quick start guide
             </p>
             <p className="text-xs text-wire-slate mt-0.5 leading-relaxed">
-              From application to your first story on the wire — eligibility, approval, and account setup.
+              From application to your first story on the wire — eligibility, approval and account setup.
             </p>
           </div>
           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" className="text-wire-border group-hover:text-wire-red transition-colors flex-shrink-0 mt-0.5" aria-hidden>

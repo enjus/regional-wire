@@ -317,15 +317,15 @@ export default async function StoryDetailPage({ params }: PageProps) {
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">3.</span>
-              <span><strong className="text-wire-navy">Minor edits are acceptable.</strong> Small changes for style, updated time references (e.g. replacing &ldquo;Wednesday&rdquo; with a specific date), or clarifications that resolve genuine ambiguity are permitted. Substantive changes to facts, tone, or conclusions are not.</span>
+              <span><strong className="text-wire-navy">Minor edits are acceptable.</strong> Small changes for style, updated time references (e.g. replacing &ldquo;Wednesday&rdquo; with a date) or minor clarifications are permitted. Do not alter facts, tone or conclusions.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">4.</span>
-              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author&apos;s name must appear exactly as written — this is the author credit. Do not substitute your own staff name or remove the byline.</span>
+              <span><strong className="text-wire-navy">Preserve the byline.</strong> The original author&apos;s name must appear exactly as written. Do not substitute your own staff name or remove the byline.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">5.</span>
-              <span><strong className="text-wire-navy">No resyndication.</strong> You may not redistribute this story to third parties or other publications outside of {brand.name}.</span>
+              <span><strong className="text-wire-navy">No resyndication.</strong> Do not redistribute this story to third parties or other publications.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">6.</span>
