@@ -64,8 +64,6 @@ Once signed up, your editors can:
   - Browse the story library and download republication packages
   - Connect RSS feeds to automatically share stories
 
-Questions? Reply to this email.
-
 — ${brand.name}
 `.trim()
 
@@ -87,8 +85,6 @@ ${org.name} — ${brand.name} Membership
 Thank you for your interest in ${brand.name}. After review, we're unable to approve your newsroom's membership at this time.
 
 ${reason ? `Reason: ${reason}\n` : ''}
-If you believe this is an error or have additional information, please contact us by replying to this email.
-
 — ${brand.name}
 `.trim()
 
