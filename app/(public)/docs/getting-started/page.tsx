@@ -30,6 +30,7 @@ export default function GettingStartedPage() {
       </p>
       <ul>
         <li>Your newsroom&apos;s name</li>
+		<li>Your newsroom&apos;s website URL (e.g. <code>https://northfieldherald.com</code>)</li>
         <li>Your staff email domain (e.g. <code>northfieldherald.com</code>)</li>
         <li>A contact email address for the application</li>
       </ul>
