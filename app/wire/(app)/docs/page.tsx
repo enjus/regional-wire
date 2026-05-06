@@ -26,6 +26,11 @@ const SECTIONS = [
         desc: 'Receiving email digests when member organizations publish.',
       },
       {
+        href: '/wire/docs/corrections',
+        title: 'Correcting and withdrawing stories',
+        desc: 'Issuing corrections, noting updates and removing stories from the library.',
+      },
+      {
         href: '/wire/docs/members',
         title: 'Managing team members',
         desc: 'Adding colleagues, approving new members, inviting by email and managing roles.',

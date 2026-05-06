@@ -74,6 +74,14 @@ export default function UploadingStoriesPage() {
         the default.
       </p>
 
+      <h2>Republication guidance</h2>
+      <p>
+        You can add a short note that will appear on every story detail page for newsrooms
+        browsing your content. Set this in{' '}
+        <strong>Dashboard → Settings → Republication guidance</strong>. Leave it blank if
+        you have no additional requirements beyond the platform defaults.
+      </p>
+
       <h2>Uploading image assets</h2>
       <p>
         Attach images and other files to a story using the asset upload section on the

@@ -247,7 +247,7 @@ export default function HomePage() {
             </p>
           </div>
           <Link
-            href="/docs"
+            href="/docs/getting-started"
             className="flex-shrink-0 border border-white/25 text-white px-6 py-3 rounded text-sm font-medium hover:bg-white/10 transition-colors whitespace-nowrap"
           >
             Browse documentation →

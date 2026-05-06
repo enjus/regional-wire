@@ -45,9 +45,9 @@ export default function HowItWorksPage() {
               </p>
               <ul className="space-y-2 text-sm text-wire-slate">
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Invited newsrooms register at <Link href="/register/organization" className="text-wire-red hover:underline">/register/organization</Link> with their details and primary contact</span></li>
-                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Approval typically takes 1–2 business days; you&apos;ll receive an email when your org is approved</span></li>
+                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>You&apos;ll receive an email when your organization is approved</span></li>
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Once approved, staff sign up at <Link href="/register" className="text-wire-red hover:underline">/register</Link> using their work email address</span></li>
-                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>The first user from your organization is automatically designated admin and can manage feeds, alerts and settings</span></li>
+                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>The first user from your organization is automatically designated admin and can manage the organization&apos;s account and approve other members</span></li>
               </ul>
             </div>
           </div>
@@ -59,7 +59,7 @@ export default function HowItWorksPage() {
               <h2 className="font-serif text-2xl font-bold text-wire-navy mb-4">Upload stories to the wire</h2>
               <p className="text-wire-slate leading-relaxed mb-5">
                 Editors contribute stories using the built-in rich-text editor. Each story
-                includes a headline, byline, canonical URL and optional embargo date.
+                includes a headline, byline, a link to the original story and an optional embargo date.
                 Stories can also enter the wire automatically via RSS or Atom feed ingestion —
                 useful if your CMS already publishes a feed.
               </p>
@@ -105,8 +105,8 @@ export default function HowItWorksPage() {
                 activity log accurate.
               </p>
               <ul className="space-y-2 text-sm text-wire-slate">
-                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>The package includes: headline, byline, sanitized body HTML and an attribution line with a canonical link</span></li>
-                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Images, scripts and embeds are stripped from the package for safety; download images separately</span></li>
+                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>The package includes: headline, byline, story text and an attribution line with a link back to the original story</span></li>
+                <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Images are not included in the copied text — download them separately and attach to your CMS post</span></li>
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Optionally enter the URL where you published the story so the originating newsroom can see it</span></li>
                 <li className="flex gap-3"><span className="text-wire-red font-bold flex-shrink-0">→</span><span>Republication logs appear in both newsrooms&apos; dashboards</span></li>
               </ul>
