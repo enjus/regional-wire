@@ -57,17 +57,17 @@ export default async function DashboardLayout({
               </span>
             </li>
             <SidebarLink href="/wire/dashboard/settings/account" label="Profile" />
+            <SidebarLink href="/wire/dashboard/settings/alerts" label="Alerts" />
             {isAdmin && (
               <>
                 <li className="pt-3 pb-1">
                   <span className="text-xs text-wire-slate font-medium uppercase tracking-wide">
-                    Admin
+                    Org Admin
                   </span>
                 </li>
                 <SidebarLink href="/wire/dashboard/settings" label="Settings" />
                 <SidebarLink href="/wire/dashboard/settings/members" label="Members" badge={pendingMemberCount ?? 0} />
                 <SidebarLink href="/wire/dashboard/settings/feeds" label="Feeds" />
-                <SidebarLink href="/wire/dashboard/settings/alerts" label="Alerts" />
                 <SidebarLink href="/wire/dashboard/settings/exclusions" label="Exclusions" />
               </>
             )}
