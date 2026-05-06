@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation'
 interface Props {
   logId: string
   currentUrl: string | null
+  orgWebsiteUrl?: string | null
 }
 
-export default function RepublishedUrlUpdater({ logId, currentUrl }: Props) {
+export default function RepublishedUrlUpdater({ logId, currentUrl, orgWebsiteUrl }: Props) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState(currentUrl ?? '')
@@ -44,7 +45,7 @@ export default function RepublishedUrlUpdater({ logId, currentUrl }: Props) {
         type="url"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://yournewsroom.com/story/..."
+        placeholder={orgWebsiteUrl ? `${orgWebsiteUrl}/story/...` : 'https://example.com/story/...'}
         className="flex-1 border border-wire-border rounded px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
       />
       <button

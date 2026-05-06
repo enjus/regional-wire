@@ -14,11 +14,13 @@ export default async function RepublishedPage() {
 
   const { data: currentUser } = await supabase
     .from('users')
-    .select('organization_id')
+    .select('organization_id, organizations(website_url)')
     .eq('id', user.id)
     .single()
 
   if (!currentUser) redirect('/register')
+
+  const orgWebsiteUrl = (currentUser.organizations as unknown as { website_url: string } | null)?.website_url ?? null
 
   const { data: log } = await supabase
     .from('republication_log')
@@ -78,6 +80,7 @@ export default async function RepublishedPage() {
                 <RepublishedUrlUpdater
                   logId={entry.id}
                   currentUrl={entry.republished_url}
+                  orgWebsiteUrl={orgWebsiteUrl}
                 />
               </div>
             )

@@ -28,12 +28,14 @@ interface Props {
   assets: Asset[]
   embargoed: boolean
   embargoLiftsAt: string | null
+  republisherWebsiteUrl?: string | null
 }
 
 export default function RepublicationPackage({
   story,
   embargoed,
   embargoLiftsAt,
+  republisherWebsiteUrl,
 }: Props) {
   const [copied, setCopied] = useState(false)
   const [logId, setLogId] = useState<string | null>(null)
@@ -220,7 +222,7 @@ export default function RepublicationPackage({
               type="url"
               value={publishedUrl}
               onChange={(e) => setPublishedUrl(e.target.value)}
-              placeholder="https://yournewsroom.com/story/..."
+              placeholder={republisherWebsiteUrl ? `${republisherWebsiteUrl}/story/...` : 'https://example.com/story/...'}
               className="flex-1 border border-green-300 rounded px-3 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
             />
             <button

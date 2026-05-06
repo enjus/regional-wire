@@ -138,7 +138,7 @@ export default function RegisterOrganizationPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-                placeholder="The Daily Tribune"
+                placeholder="The Example Tribune"
                 autoComplete="organization"
               />
             </div>
@@ -153,7 +153,7 @@ export default function RegisterOrganizationPage() {
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-                placeholder="https://dailytribune.com"
+                placeholder="https://example.com"
                 autoComplete="url"
               />
             </div>
@@ -164,7 +164,7 @@ export default function RegisterOrganizationPage() {
               </label>
               <p className="text-xs text-wire-slate mb-1">
                 Staff must have email addresses on this domain to join (e.g.{' '}
-                <code className="bg-gray-100 px-1 rounded">dailytribune.com</code>
+                <code className="bg-gray-100 px-1 rounded">example.com</code>
                 ).
               </p>
               <input
@@ -173,7 +173,7 @@ export default function RegisterOrganizationPage() {
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-                placeholder="dailytribune.com"
+                placeholder="example.com"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -195,7 +195,7 @@ export default function RegisterOrganizationPage() {
                       value={contact}
                       onChange={(e) => updateContact(i, e.target.value)}
                       className="flex-1 border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
-                      placeholder="editor@dailytribune.com"
+                      placeholder="editor@example.com"
                       autoComplete="email"
                     />
                     {contacts.length > 1 && (
@@ -257,7 +257,7 @@ export default function RegisterOrganizationPage() {
                 onChange={(e) => setRepublicationGuidance(e.target.value)}
                 rows={3}
                 className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent resize-none"
-                placeholder="Please credit us as 'The Daily Tribune' and notify editor@dailytribune.com when you publish."
+                placeholder="Please credit us as 'The Example Tribune' and notify editor@example.com when you publish."
               />
             </div>
 

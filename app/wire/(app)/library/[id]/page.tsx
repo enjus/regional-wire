@@ -24,13 +24,14 @@ export default async function StoryDetailPage({ params }: PageProps) {
 
   const { data: currentUser } = await supabase
     .from('users')
-    .select('organization_id, is_platform_admin')
+    .select('organization_id, is_platform_admin, organizations(website_url)')
     .eq('id', user.id)
     .single()
 
   if (!currentUser) redirect('/register')
 
-  const isPlatformAdmin = (currentUser as { organization_id: string | null; is_platform_admin?: boolean }).is_platform_admin === true
+  const isPlatformAdmin = (currentUser as { organization_id: string | null; is_platform_admin?: boolean; organizations?: unknown }).is_platform_admin === true
+  const republisherWebsiteUrl = (currentUser.organizations as unknown as { website_url: string } | null)?.website_url ?? null
   const queryClient = isPlatformAdmin ? createAdminSupabase() : supabase
 
   const { data: story } = await queryClient
@@ -374,6 +375,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
             assets={assets}
             embargoed={embargoed}
             embargoLiftsAt={story.embargo_lifts_at}
+            republisherWebsiteUrl={republisherWebsiteUrl}
           />
         )}
       </div>
