@@ -63,7 +63,7 @@ export default function FeedManager({ feeds: initialFeeds }: Props) {
             type="url"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
-            placeholder="https://yoursite.com/tag/regional-wire/feed/"
+            placeholder="https://example.com/tag/regional-wire/feed/"
             className="flex-1 min-w-48 border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red"
           />
           <select
