@@ -98,7 +98,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
 
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <LibraryHeader />
+        <LibraryHeader canUpload={!!currentOrgId && !isPlatformAdmin} />
         {isPlatformAdmin && <AdminBanner />}
         <LibraryFilters orgs={orgs ?? []} currentOrgId={currentOrgId} />
         <TabNav active="headlines" />
@@ -230,7 +230,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <LibraryHeader />
+      <LibraryHeader canUpload={!!currentOrgId && !isPlatformAdmin} />
       {isPlatformAdmin && <AdminBanner />}
       <LibraryFilters orgs={orgs ?? []} currentOrgId={currentOrgId} />
       <TabNav active="library" />
@@ -269,15 +269,25 @@ function AdminBanner() {
   )
 }
 
-function LibraryHeader() {
+function LibraryHeader({ canUpload }: { canUpload: boolean }) {
   return (
-    <div className="mb-6">
-      <h1 className="font-serif text-3xl font-bold text-wire-navy">
-        Story Library
-      </h1>
-      <p className="text-wire-slate text-sm mt-1">
-        Stories available for republication from member newsrooms.
-      </p>
+    <div className="flex items-start justify-between mb-6">
+      <div>
+        <h1 className="font-serif text-3xl font-bold text-wire-navy">
+          Story Library
+        </h1>
+        <p className="text-wire-slate text-sm mt-1">
+          Stories available for republication from member newsrooms.
+        </p>
+      </div>
+      {canUpload && (
+        <Link
+          href="/wire/dashboard/stories/new"
+          className="bg-wire-navy text-white text-sm font-medium px-4 py-2 rounded hover:bg-wire-navy-light transition-colors shrink-0"
+        >
+          + Upload story
+        </Link>
+      )}
     </div>
   )
 }
