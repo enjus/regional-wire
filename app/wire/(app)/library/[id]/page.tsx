@@ -195,6 +195,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
               year: 'numeric',
               hour: 'numeric',
               minute: '2-digit',
+              timeZone: 'America/Los_Angeles',
               timeZoneName: 'short',
             })}
             .

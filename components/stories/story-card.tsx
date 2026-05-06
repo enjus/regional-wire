@@ -78,6 +78,7 @@ export default function StoryCard({ story, previewUrl }: Props) {
               day: 'numeric',
               hour: 'numeric',
               minute: '2-digit',
+              timeZone: 'America/Los_Angeles',
               timeZoneName: 'short',
             })}
           </div>

@@ -150,6 +150,7 @@ export default function RepublicationPackage({
               year: 'numeric',
               hour: 'numeric',
               minute: '2-digit',
+              timeZone: 'America/Los_Angeles',
               timeZoneName: 'short',
             })}
           </p>
