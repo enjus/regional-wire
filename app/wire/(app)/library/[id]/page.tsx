@@ -220,13 +220,8 @@ export default async function StoryDetailPage({ params }: PageProps) {
 
       {/* Story body */}
       {embargoed && !isOwnOrg && !isPlatformAdmin ? (
-        <div className="mb-10">
-          <div className="relative max-h-36 overflow-hidden">
-            <div className="prose prose-wire max-w-none">
-              <p>{(story.body_plain ?? story.body_html?.replace(/<[^>]+>/g, ' ') ?? '').replace(/\s+/g, ' ').trim().split(' ').slice(0, 150).join(' ')}&hellip;</p>
-            </div>
-            <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-          </div>
+        <div className="prose prose-wire max-w-none mb-10">
+          <p>{(story.body_plain ?? story.body_html?.replace(/<[^>]+>/g, ' ') ?? '').replace(/\s+/g, ' ').trim().split(' ').slice(0, 150).join(' ')}…</p>
         </div>
       ) : (
         <div
