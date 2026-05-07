@@ -91,7 +91,12 @@ export async function POST(request: NextRequest) {
         is_primary: a.is_primary,
       }))
 
-      await serviceSupabase.from('story_assets').insert(assetRows)
+      const { error: assetError } = await serviceSupabase.from('story_assets').insert(assetRows)
+      if (assetError) {
+        console.error('Story assets insert error:', assetError)
+        await serviceSupabase.from('stories').delete().eq('id', story.id)
+        return NextResponse.json({ error: 'Failed to save story assets.' }, { status: 500 })
+      }
     }
 
     if (status === 'available') {

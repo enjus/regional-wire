@@ -92,6 +92,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       special_instructions,
       embargo_lifts_at,
       status,
+      assets = [],
       // Change tracking fields
       change_type,
       change_note,
@@ -147,6 +148,43 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (error) {
       return NextResponse.json({ error: 'Update failed.' }, { status: 500 })
+    }
+
+    // Insert any newly uploaded assets
+    if (assets.length > 0) {
+      const typedAssets = assets as {
+        asset_type: string
+        file_url: string
+        caption: string | null
+        credit: string | null
+        is_primary: boolean
+      }[]
+
+      // If a new primary image is being added, demote any existing primary first
+      const replacingPrimary = typedAssets.some((a) => a.is_primary && a.asset_type === 'image')
+      if (replacingPrimary) {
+        await serviceSupabase
+          .from('story_assets')
+          .update({ is_primary: false })
+          .eq('story_id', id)
+          .eq('asset_type', 'image')
+          .eq('is_primary', true)
+      }
+
+      const assetRows = typedAssets.map((a) => ({
+        story_id: id,
+        asset_type: a.asset_type,
+        file_url: a.file_url,
+        caption: a.caption,
+        credit: a.credit,
+        is_primary: a.is_primary,
+      }))
+
+      const { error: assetError } = await serviceSupabase.from('story_assets').insert(assetRows)
+      if (assetError) {
+        console.error('Story assets insert error:', assetError)
+        return NextResponse.json({ error: 'Failed to save story assets.' }, { status: 500 })
+      }
     }
 
     // Record the change (for edits with change_type, or withdrawals)

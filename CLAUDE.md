@@ -95,8 +95,8 @@ GET http://localhost:3000/api/cron/hourly-digest
 
 ### Schema Notes
 
-The migration is in `supabase/migrations/001_schema.sql`. Post-migration additions made directly in Supabase SQL Editor (not yet in the migration file):
-- `feed_headlines.author TEXT` — added to capture `dc:creator` from RSS items
+The migration is in `supabase/migrations/001_schema.sql`. Columns added after initial migration are in `007_missing_columns.sql`:
+- `feed_headlines.author TEXT` — captures `dc:creator` from RSS items
 - `users.is_platform_admin BOOLEAN NOT NULL DEFAULT false` — platform admin flag
 - `organizations.republication_guidance TEXT` — optional guidance for republishers
 - `organizations.attribution_template TEXT` — optional custom attribution line template (see Republication Package)
