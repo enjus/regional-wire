@@ -42,6 +42,7 @@ Regional Wire is a Next.js 15 App Router application. Member newsrooms share sto
 - **Org approval** (`/api/admin/orgs/[id]/approve`) automatically seeds `org_invites` rows for all `contact_emails` on the org record. This ensures contact emails get `status = 'active'` (not `pending`) when they self-register after approval.
 - **`users.status`**: `active` = full access; `pending` = authenticated but blocked (org admin must approve). `is_approved_member()` RLS helper requires `status = 'active'`.
 - All Supabase tables have RLS. Three `SECURITY DEFINER` helper functions (`get_user_org_id()`, `is_approved_member()`, `is_org_admin()`) are used in policies to avoid recursive lookups.
+- **OTP rate limiting** is enforced in `lib/otp-rate-limit.ts` before the Supabase call in both `/api/auth/login` and `/api/auth/register`: 3 sends per email and 10 per IP per 15-minute window. The store is in-memory (module-level Maps) — fine for a single PM2 instance, but would need to move to Redis if the app ever runs on multiple instances.
 
 ### Supabase Client Usage
 

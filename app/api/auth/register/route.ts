@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { checkOtpRateLimit } from '@/lib/otp-rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,12 @@ export async function POST(request: NextRequest) {
     const domain = email.split('@')[1]?.toLowerCase()
     if (!domain) {
       return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 })
+    }
+
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    const rateLimit = checkOtpRateLimit(email, ip)
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: rateLimit.reason }, { status: 429 })
     }
 
     const cookieStore = await cookies()
