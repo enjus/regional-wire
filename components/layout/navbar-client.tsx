@@ -18,8 +18,7 @@ export default function NavbarClient({ displayName, orgName, variant = 'dark' }:
   async function handleSignOut() {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+    window.location.href = '/login'
   }
 
   return (
