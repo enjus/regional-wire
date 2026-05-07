@@ -189,7 +189,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     .from('stories')
     .select(
       `
-      id, title, byline, summary, status, source, published_at, organization_id, embargo_lifts_at,
+      id, title, byline, summary, status, source, published_at, created_at, organization_id, embargo_lifts_at,
       organizations(id, name),
       story_assets(id, file_url, asset_type, is_primary, caption)
     `,
@@ -199,7 +199,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   if (excludedOrgIds.length > 0) query = query.not('organization_id', 'in', `(${excludedOrgIds.join(',')})`)
   query = query
     .in('status', isPlatformAdmin ? ['available', 'embargoed', 'withdrawn'] : ['available', 'embargoed'])
-    .order('published_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1)
 
   if (params.org) query = query.eq('organization_id', params.org)
