@@ -278,7 +278,7 @@ export default async function StoryDetailPage({ params }: PageProps) {
           <p className="text-xs font-semibold text-wire-navy uppercase tracking-wide mb-2">
             Media
           </p>
-          {story.source === 'feed' ? (
+          {story.source === 'feed' && assets.length === 0 ? (
             <>
               <p className="text-sm text-wire-slate mb-3">
                 This story was ingested from a feed. Images and video are not stored here — request them directly from {org?.name ?? 'the originating newsroom'}.
