@@ -81,7 +81,9 @@ export default function RepublishingPage() {
       </p>
       <p>
         If the originating newsroom has uploaded image assets, you can download them from
-        the story detail page using the asset download links.
+        the story detail page using the asset download links. Downloadable assets are available
+        for <strong>30 days</strong> from the story&apos;s publication date. If you intend to
+        use a story&apos;s assets, download them when you first access the story.
       </p>
 
       <h2>Logging a republication</h2>

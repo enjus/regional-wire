@@ -87,9 +87,17 @@ export default function CorrectionsPage() {
         This is another reason to encourage republishing members to log their published URLs.
       </p>
 
+      <h2>Timing</h2>
+      <p>
+        Stories are automatically removed from the library 90 days after publication. Corrections
+        and withdrawal notifications can only be issued while the story still exists in the
+        platform. If a story has aged out, you will need to contact republishing newsrooms
+        directly.
+      </p>
+
       <h2>See also</h2>
       <ul>
-        <li><Link href="/wire/docs/uploading-stories">Uploading stories</Link> — The full upload and edit workflow</li>
+        <li><Link href="/wire/docs/uploading-stories">Uploading stories</Link> — The full upload and edit workflow, including story retention</li>
         <li><Link href="/wire/docs/republishing">Republishing stories</Link> — How to log a republication URL</li>
       </ul>
     </article>

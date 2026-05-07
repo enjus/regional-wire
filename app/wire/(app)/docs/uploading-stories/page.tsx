@@ -103,6 +103,29 @@ export default function UploadingStoriesPage() {
         are not affected.
       </p>
 
+      <h2>Story retention</h2>
+      <p>
+        {brand.name} is a rolling wire service, not a permanent archive. Stories are retained
+        on the following schedule:
+      </p>
+      <ul>
+        <li>
+          <strong>Downloadable assets</strong> — Image and document downloads are available
+          for <strong>30 days</strong> from the story&apos;s publication date. After that, the
+          story remains in the library but the asset download links are removed.
+        </li>
+        <li>
+          <strong>Stories</strong> — Story text and metadata are available in the library for
+          <strong> 90 days</strong> from publication, then deleted automatically. No notification
+          is sent when a story ages out.
+        </li>
+      </ul>
+      <p>
+        Republication records are not affected by story deletion — newsrooms&apos; reach data
+        is retained indefinitely. If you need to issue a correction or withdrawal notification
+        to republishing newsrooms, do so before the story reaches 90 days.
+      </p>
+
       <h2>Embargo behavior</h2>
       <p>
         Embargoed stories are hidden from other member newsrooms until the embargo lifts.

@@ -81,16 +81,18 @@ Assets are stored in the `story-assets` Supabase Storage bucket as **private** (
 
 ### Cron Jobs
 
-Defined via `crontab` on the DigitalOcean droplet (not Vercel). Both routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
+Defined via `crontab` on the DigitalOcean droplet (not Vercel). All routes check `Authorization: Bearer {CRON_SECRET}` in production but skip auth in development.
 
 - `/api/cron/poll-feeds` (every 15 min): ingests RSS feeds, deduplicates by `feed_guid`, lifts expired embargoes.
 - `/api/cron/hourly-digest` (every hour): sends alerts and daily digests. Two passes per run:
   1. **Consolidated alert pass** — stories from the last ~61 minutes matched against all active `story_alerts` (keyword match or org follow). All of a user's matches are merged into one email, at most once per 55 minutes, tracked in `alert_send_log`.
   2. **Daily digest pass** — for users with `user_digest_prefs.daily_digest_enabled = true` whose `delivery_hour_utc` matches the current UTC hour. Pulls up to 10 stories from last 24h, sorted by republication count (from `republication_log`) then recency. Guarded by `alert_send_log` (23h window).
+- `/api/cron/cleanup` (daily at 3am UTC): two-pass purge. Pass 1: deletes Storage files and `story_assets` rows for stories published >30 days ago. Pass 2: hard-deletes story rows published >90 days ago (cascades `story_assets`, `story_changes`; nulls `republication_log.story_id` and `republication_requests.story_id`). Republication log rows are intentionally preserved for contributor reach reporting.
 
 To trigger locally (no auth required in development):
 ```
 GET http://localhost:3000/api/cron/hourly-digest
+GET http://localhost:3000/api/cron/cleanup
 ```
 
 ### Schema Notes
