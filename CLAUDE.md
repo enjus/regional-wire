@@ -75,6 +75,13 @@ The attribution line is org-customizable via `organizations.attribution_template
 
 `lib/email.ts` uses Resend. The client is lazy-initialized via `getResend()` to avoid build-time errors when `RESEND_API_KEY` is absent. All email functions are fire-and-forget at call sites (`.catch()` to log, never throw).
 
+All 20 notification functions send both `html` and `text`. HTML is composed using helpers from `lib/email-template.ts` — a pure string-building module with no side effects. Two visual variants:
+
+- **`default`** — standard navy header, white content card, green CTA button.
+- **`critical`** — adds an amber accent stripe and "Action Required" badge. Use for corrections, withdrawals, and org removal.
+
+**To add a new email:** import the helpers you need from `lib/email-template.ts`, build a `content` string by composing `renderSection()`, `renderHeading()`, `renderParagraph()`, `renderButton()`, etc., then pass it to `renderEmailHtml()`. Always include a plain-text `text` fallback. User-supplied strings passed to inline helpers (`renderParagraph`, `renderHeading`, etc.) are HTML-escaped automatically. URLs passed to `renderButton` and `renderLinkList` use `escUrl()` internally (escapes `&` in query strings).
+
 ### Story Assets
 
 Assets are stored in the `story-assets` Supabase Storage bucket as **private** (not public). The upload form stores the relative path (`data.path`), not the public URL. The story detail page generates signed URLs at render time via the service role client (`createSignedUrls`, 1-hour expiry). `next.config.mjs` allows the signed URL hostname pattern (`*.supabase.co/storage/v1/object/sign/**`) for `next/image`.
