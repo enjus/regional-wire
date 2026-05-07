@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface Props {
   content?: string
@@ -17,6 +17,9 @@ export default function TiptapEditor({
   onChange,
   placeholder = 'Paste or type the story body here…',
 }: Props) {
+  const [isHtmlMode, setIsHtmlMode] = useState(false)
+  const [htmlValue, setHtmlValue] = useState('')
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -44,6 +47,18 @@ export default function TiptapEditor({
       editor?.destroy()
     }
   }, [editor])
+
+  function toggleHtmlMode() {
+    if (!editor) return
+    if (!isHtmlMode) {
+      setHtmlValue(editor.getHTML())
+      setIsHtmlMode(true)
+    } else {
+      editor.commands.setContent(htmlValue, false)
+      onChange(editor.getHTML(), editor.getText())
+      setIsHtmlMode(false)
+    }
+  }
 
   if (!editor) return null
 
@@ -139,11 +154,34 @@ export default function TiptapEditor({
         >
           ↪
         </ToolbarButton>
+        <div className="w-px h-5 bg-wire-border mx-1" />
+        <ToolbarButton
+          onClick={toggleHtmlMode}
+          active={isHtmlMode}
+          title={isHtmlMode ? 'Switch to visual editor' : 'Edit raw HTML'}
+        >
+          &lt;/&gt;
+        </ToolbarButton>
       </div>
 
       {/* Editor */}
       <div className="p-4 min-h-[300px]">
-        <EditorContent editor={editor} />
+        {isHtmlMode ? (
+          <textarea
+            value={htmlValue}
+            onChange={(e) => {
+              const html = e.target.value
+              setHtmlValue(html)
+              const plain = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+              onChange(html, plain)
+            }}
+            className="w-full h-full min-h-[280px] font-mono text-base border-0 outline-none resize-none bg-transparent"
+            style={{ fontSize: '1rem' }}
+            spellCheck={false}
+          />
+        ) : (
+          <EditorContent editor={editor} />
+        )}
       </div>
     </div>
   )
