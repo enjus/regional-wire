@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import Parser from 'rss-parser'
+import pLimit from 'p-limit'
 import { slugify, sanitizeStoryHtml } from '@/lib/utils'
 
 // This route is called via crontab every 15 minutes.
@@ -10,6 +11,8 @@ import { slugify, sanitizeStoryHtml } from '@/lib/utils'
 // service role key and rss-parser package.
 
 export const maxDuration = 300 // 5 minutes max execution
+const FEED_POLL_CONCURRENCY = 10
+const FEED_FETCH_TIMEOUT_MS = 30_000
 
 type FeedItem = {
   guid?: string
@@ -56,95 +59,109 @@ export async function GET(request: NextRequest) {
   let processed = 0
   const errors: string[] = []
 
-  for (const feed of feeds) {
-    const org = feed.organizations as { id: string; status: string } | null
-    if (org?.status !== 'approved') continue
+  const limit = pLimit(FEED_POLL_CONCURRENCY)
 
-    try {
-      const result = await parser.parseURL(feed.feed_url)
+  const settled = await Promise.allSettled(
+    feeds.map((feed) =>
+      limit(async () => {
+        const org = feed.organizations as { id: string; status: string } | null
+        if (org?.status !== 'approved') return
 
-      for (const item of result.items) {
-        const guid = item.guid || item.link
-        if (!guid) continue
+        try {
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Feed fetch timed out')), FEED_FETCH_TIMEOUT_MS)
+          )
+          const result = await Promise.race([parser.parseURL(feed.feed_url), timeout])
 
-        if (feed.feed_type === 'full_text') {
-          // Check if already ingested
-          const { data: existing } = await supabase
-            .from('stories')
-            .select('id')
-            .eq('feed_guid', guid)
-            .single()
+          for (const item of result.items) {
+            const guid = item.guid || item.link
+            if (!guid) continue
 
-          if (existing) continue
+            if (feed.feed_type === 'full_text') {
+              // Check if already ingested
+              const { data: existing } = await supabase
+                .from('stories')
+                .select('id')
+                .eq('feed_guid', guid)
+                .single()
 
-          const rawBodyHtml = item.contentEncoded || item.content || ''
-          const bodyHtml = rawBodyHtml ? sanitizeStoryHtml(rawBodyHtml) : ''
-          const bodyPlain =
-            item.contentSnippet ||
-            bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+              if (existing) continue
 
-          if (!bodyHtml) {
-            console.log(`[poll-feeds] Empty body for ${guid} — skipping`)
-            continue
+              const rawBodyHtml = item.contentEncoded || item.content || ''
+              const bodyHtml = rawBodyHtml ? sanitizeStoryHtml(rawBodyHtml) : ''
+              const bodyPlain =
+                item.contentSnippet ||
+                bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+
+              if (!bodyHtml) {
+                console.log(`[poll-feeds] Empty body for ${guid} — skipping`)
+                continue
+              }
+
+              const title = item.title ?? 'Untitled'
+              const slug = slugify(title)
+
+              const { data: story, error: storyError } = await supabase
+                .from('stories')
+                .insert({
+                  organization_id: org.id,
+                  title,
+                  byline: item.creator || item.author || result.title || org.id,
+                  body_html: bodyHtml,
+                  body_plain: bodyPlain,
+                  canonical_url: item.link ?? guid,
+                  slug: `${slug}-${Date.now()}`,
+                  status: 'available',
+                  source: 'feed',
+                  feed_guid: guid,
+                  published_at: item.isoDate || item.pubDate || new Date().toISOString(),
+                })
+                .select()
+                .single()
+
+              if (storyError) {
+                console.error(`[poll-feeds] Failed to insert story for ${guid}:`, storyError)
+              } else if (story) {
+                processed++
+              }
+            } else if (feed.feed_type === 'headline') {
+              // Upsert into feed_headlines
+              await supabase
+                .from('feed_headlines')
+                .upsert(
+                  {
+                    org_feed_id: feed.id,
+                    organization_id: org.id,
+                    title: item.title ?? 'Untitled',
+                    url: item.link ?? guid,
+                    summary: item.contentSnippet || item.summary || null,
+                    published_at: item.isoDate || item.pubDate || null,
+                    author: item.creator || item.author || null,
+                    guid,
+                  },
+                  { onConflict: 'org_feed_id,guid' }
+                )
+              processed++
+            }
           }
 
-          const title = item.title ?? 'Untitled'
-          const slug = slugify(title)
-
-          const { data: story, error: storyError } = await supabase
-            .from('stories')
-            .insert({
-              organization_id: org.id,
-              title,
-              byline: item.creator || item.author || result.title || org.id,
-              body_html: bodyHtml,
-              body_plain: bodyPlain,
-              canonical_url: item.link ?? guid,
-              slug: `${slug}-${Date.now()}`,
-              status: 'available',
-              source: 'feed',
-              feed_guid: guid,
-              published_at: item.isoDate || item.pubDate || new Date().toISOString(),
-            })
-            .select()
-            .single()
-
-          if (storyError) {
-            console.error(`[poll-feeds] Failed to insert story for ${guid}:`, storyError)
-          } else if (story) {
-            processed++
-          }
-        } else if (feed.feed_type === 'headline') {
-          // Upsert into feed_headlines
           await supabase
-            .from('feed_headlines')
-            .upsert(
-              {
-                org_feed_id: feed.id,
-                organization_id: org.id,
-                title: item.title ?? 'Untitled',
-                url: item.link ?? guid,
-                summary: item.contentSnippet || item.summary || null,
-                published_at: item.isoDate || item.pubDate || null,
-                author: item.creator || item.author || null,
-                guid,
-              },
-              { onConflict: 'org_feed_id,guid' }
-            )
-          processed++
+            .from('org_feeds')
+            .update({ last_polled_at: new Date().toISOString() })
+            .eq('id', feed.id)
+        } catch (err) {
+          const msg = `Feed ${feed.id} (${feed.feed_url}): ${err instanceof Error ? err.message : 'Unknown error'}`
+          console.error('[poll-feeds]', msg)
+          errors.push(msg)
+          // Never crash the cron — log and continue
         }
-      }
+      })
+    )
+  )
 
-      // Update last_polled_at
-      await supabase
-        .from('org_feeds')
-        .update({ last_polled_at: new Date().toISOString() })
-        .eq('id', feed.id)
-    } catch (err) {
-      const msg = `Feed ${feed.id} (${feed.feed_url}): ${err instanceof Error ? err.message : 'Unknown error'}`
-      console.error('[poll-feeds]', msg)
-      errors.push(msg)
-      // Never crash the cron — log and continue
+  for (const result of settled) {
+    if (result.status === 'rejected') {
+      console.error('[poll-feeds] Unhandled task rejection:', result.reason)
     }
   }
 
