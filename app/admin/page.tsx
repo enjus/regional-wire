@@ -40,7 +40,11 @@ export default async function AdminPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
-      <div className="mb-8">
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-4 text-sm">
+          <a href="/wire/library" className="text-wire-red hover:underline">Story Library</a>
+          <a href="/wire/dashboard" className="text-wire-red hover:underline">Dashboard</a>
+        </div>
         <h1 className="font-serif text-3xl font-bold text-wire-navy">
           Platform Admin
         </h1>
