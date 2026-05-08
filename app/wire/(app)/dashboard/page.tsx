@@ -2,11 +2,19 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { formatDateTime, isEmbargoActive } from '@/lib/utils'
+import Pagination from '@/components/ui/pagination'
 
 export const metadata = { title: 'Dashboard' }
 
-export default async function DashboardPage() {
+const PAGE_SIZE = 25
+
+interface PageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function DashboardPage({ searchParams }: PageProps) {
   const supabase = await createClient()
+  const params = await searchParams
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -20,17 +28,24 @@ export default async function DashboardPage() {
 
   if (!currentUser) redirect('/register')
 
-  const { data: stories } = await supabase
+  const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1)
+  const offset = (page - 1) * PAGE_SIZE
+
+  const { data: stories, count } = await supabase
     .from('stories')
     .select(
       `
       id, title, status, source, published_at, embargo_lifts_at, created_at,
       republication_log(count),
       story_assets(id, asset_type, is_primary)
-    `
+    `,
+      { count: 'exact' }
     )
     .eq('organization_id', currentUser.organization_id)
     .order('created_at', { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1)
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   return (
     <div>
@@ -111,6 +126,8 @@ export default async function DashboardPage() {
           })}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} basePath="/wire/dashboard" />
     </div>
   )
 }

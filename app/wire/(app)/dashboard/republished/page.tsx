@@ -2,11 +2,19 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatDateTime } from '@/lib/utils'
 import RepublishedUrlUpdater from '@/components/dashboard/republished-url-updater'
+import Pagination from '@/components/ui/pagination'
 
 export const metadata = { title: 'Stories We\'ve Republished' }
 
-export default async function RepublishedPage() {
+const PAGE_SIZE = 25
+
+interface PageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function RepublishedPage({ searchParams }: PageProps) {
   const supabase = await createClient()
+  const params = await searchParams
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -22,11 +30,17 @@ export default async function RepublishedPage() {
 
   const orgWebsiteUrl = (currentUser.organizations as unknown as { website_url: string } | null)?.website_url ?? null
 
-  const { data: log } = await supabase
+  const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1)
+  const offset = (page - 1) * PAGE_SIZE
+
+  const { data: log, count } = await supabase
     .from('republication_log')
-    .select('*, stories(id, title, organizations(name))')
+    .select('*, stories(id, title, organizations(name))', { count: 'exact' })
     .eq('republishing_org_id', currentUser.organization_id)
     .order('downloaded_at', { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1)
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   return (
     <div>
@@ -87,6 +101,8 @@ export default async function RepublishedPage() {
           })}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} basePath="/wire/dashboard/republished" />
     </div>
   )
 }

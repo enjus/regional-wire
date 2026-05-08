@@ -3,11 +3,19 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 import RequestActions from '@/components/dashboard/request-actions'
+import Pagination from '@/components/ui/pagination'
 
 export const metadata = { title: 'Requests' }
 
-export default async function RequestsPage() {
+const PAGE_SIZE = 25
+
+interface PageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function RequestsPage({ searchParams }: PageProps) {
   const supabase = await createClient()
+  const params = await searchParams
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -21,20 +29,29 @@ export default async function RequestsPage() {
 
   if (!currentUser) redirect('/register')
 
-  const { data: incoming } = await supabase
+  const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1)
+  const offset = (page - 1) * PAGE_SIZE
+
+  const SELECT = `*, requesting_org:requesting_org_id(name), story:story_id(id, title)`
+
+  // All pending requests are always shown — these require action
+  const { data: pending } = await supabase
     .from('republication_requests')
-    .select(
-      `
-      *,
-      requesting_org:requesting_org_id(name),
-      story:story_id(id, title)
-    `
-    )
+    .select(SELECT)
     .eq('target_org_id', currentUser.organization_id)
+    .eq('status', 'pending')
     .order('created_at', { ascending: false })
 
-  const pending = incoming?.filter((r) => r.status === 'pending') ?? []
-  const resolved = incoming?.filter((r) => r.status !== 'pending') ?? []
+  // Resolved requests are paginated
+  const { data: resolved, count: resolvedCount } = await supabase
+    .from('republication_requests')
+    .select(SELECT, { count: 'exact' })
+    .eq('target_org_id', currentUser.organization_id)
+    .neq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1)
+
+  const totalPages = Math.ceil((resolvedCount ?? 0) / PAGE_SIZE)
 
   return (
     <div>
@@ -50,33 +67,34 @@ export default async function RequestsPage() {
         </Link>
       </div>
 
-      {pending.length === 0 && resolved.length === 0 ? (
+      {(pending?.length ?? 0) === 0 && (resolvedCount ?? 0) === 0 ? (
         <p className="text-sm text-wire-slate">No republication requests yet.</p>
       ) : (
         <>
-          {pending.length > 0 && (
+          {(pending?.length ?? 0) > 0 && (
             <div className="mb-8">
               <h3 className="text-sm font-semibold text-wire-navy uppercase tracking-wide mb-3">
-                Pending ({pending.length})
+                Pending ({pending!.length})
               </h3>
               <div className="space-y-3">
-                {pending.map((req) => (
+                {pending!.map((req) => (
                   <RequestCard key={req.id} req={req} showActions />
                 ))}
               </div>
             </div>
           )}
 
-          {resolved.length > 0 && (
+          {(resolved?.length ?? 0) > 0 && (
             <div>
               <h3 className="text-sm font-semibold text-wire-navy uppercase tracking-wide mb-3">
                 Resolved
               </h3>
               <div className="space-y-3">
-                {resolved.map((req) => (
+                {resolved!.map((req) => (
                   <RequestCard key={req.id} req={req} />
                 ))}
               </div>
+              <Pagination page={page} totalPages={totalPages} basePath="/wire/dashboard/requests" />
             </div>
           )}
         </>

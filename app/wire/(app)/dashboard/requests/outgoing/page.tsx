@@ -2,11 +2,19 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
+import Pagination from '@/components/ui/pagination'
 
 export const metadata = { title: 'Outgoing Requests' }
 
-export default async function OutgoingRequestsPage() {
+const PAGE_SIZE = 25
+
+interface PageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function OutgoingRequestsPage({ searchParams }: PageProps) {
   const supabase = await createClient()
+  const params = await searchParams
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -20,17 +28,24 @@ export default async function OutgoingRequestsPage() {
 
   if (!currentUser) redirect('/register')
 
-  const { data: requests } = await supabase
+  const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1)
+  const offset = (page - 1) * PAGE_SIZE
+
+  const { data: requests, count } = await supabase
     .from('republication_requests')
     .select(
       `
       *,
       target_org:target_org_id(name),
       story:story_id(id, title)
-    `
+    `,
+      { count: 'exact' }
     )
     .eq('requesting_org_id', currentUser.organization_id)
     .order('created_at', { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1)
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   return (
     <div>
@@ -112,6 +127,8 @@ export default async function OutgoingRequestsPage() {
           })}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} basePath="/wire/dashboard/requests/outgoing" />
     </div>
   )
 }
