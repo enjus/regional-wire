@@ -7,7 +7,6 @@ import Image from 'next/image'
 import { formatDate, formatDateTime, isEmbargoActive, sanitizeStoryHtml } from '@/lib/utils'
 import RepublicationPackage from '@/components/stories/republication-package'
 import AssetRequestButton from '@/components/stories/asset-request-button'
-import { brand } from '@/lib/brand'
 
 interface PageProps {
   params: Promise<{ id: string }>

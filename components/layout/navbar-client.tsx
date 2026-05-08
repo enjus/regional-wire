@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export default function NavbarClient({ displayName, orgName, variant = 'dark' }: Props) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
 
   async function handleSignOut() {
