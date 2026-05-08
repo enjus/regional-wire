@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
   const errors: string[] = []
   let assetsDeleted = 0
   let storiesDeleted = 0
+  let headlinesDeleted = 0
 
   const cutoff30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
   const cutoff90 = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()
@@ -94,9 +95,27 @@ export async function GET(request: NextRequest) {
     errors.push(`Story purge error: ${String(err)}`)
   }
 
+  // Pass 3: Delete feed_headlines older than 30 days.
+  try {
+    const { data: deleted, error: headlineError } = await supabase
+      .from('feed_headlines')
+      .delete()
+      .lt('published_at', cutoff30)
+      .select('id')
+
+    if (headlineError) {
+      errors.push(`Headline delete failed: ${headlineError.message}`)
+    } else {
+      headlinesDeleted = deleted?.length ?? 0
+      console.log(`[cleanup] Deleted ${headlinesDeleted} feed headlines`)
+    }
+  } catch (err) {
+    errors.push(`Headline purge error: ${String(err)}`)
+  }
+
   if (errors.length > 0) {
     console.error('[cleanup] Errors:', errors)
   }
 
-  return NextResponse.json({ ok: true, assetsDeleted, storiesDeleted, errors })
+  return NextResponse.json({ ok: true, assetsDeleted, storiesDeleted, headlinesDeleted, errors })
 }
