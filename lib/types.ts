@@ -1,5 +1,6 @@
 export type OrgStatus = 'pending' | 'approved' | 'suspended'
 export type UserRole = 'admin' | 'editor'
+export type UserStatus = 'pending' | 'active'
 export type StoryStatus = 'available' | 'embargoed' | 'withdrawn'
 export type ChangeType = 'update' | 'correction' | 'withdrawal'
 export type StorySource = 'manual' | 'feed'
@@ -16,6 +17,7 @@ export interface Organization {
   status: OrgStatus
   description: string | null
   contact_emails: string[]
+  allowed_emails?: string[]
   republication_guidance: string | null
   attribution_template: string | null
   created_at: string
@@ -27,6 +29,8 @@ export interface User {
   display_name: string
   email: string
   role: UserRole
+  status: UserStatus
+  is_platform_admin?: boolean
   created_at: string
 }
 
@@ -85,6 +89,7 @@ export interface FeedHeadline {
   summary: string | null
   published_at: string | null
   guid: string
+  author: string | null
   // Joined
   organizations?: Organization
 }
@@ -109,7 +114,7 @@ export interface RepublicationRequest {
 
 export interface RepublicationLogEntry {
   id: string
-  story_id: string
+  story_id: string | null
   republishing_org_id: string
   republished_url: string | null
   downloaded_at: string

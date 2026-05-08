@@ -111,6 +111,12 @@ The migration is in `supabase/migrations/001_schema.sql`. Columns added after in
 - `organizations.republication_guidance TEXT` — optional guidance for republishers
 - `organizations.attribution_template TEXT` — optional custom attribution line template (see Republication Package)
 
+`organizations.allowed_emails TEXT[] NOT NULL DEFAULT '{}'` — whitelist of specific email addresses that can register/login regardless of email domain match; used as step 2 of the three-step org lookup in the auth flow. **Not in any numbered migration** (was added directly via the Supabase SQL editor). If recreating the schema from migrations, run `ALTER TABLE organizations ADD COLUMN IF NOT EXISTS allowed_emails TEXT[] NOT NULL DEFAULT '{}'`, or use `supabase/migrations/010_allowed_emails.sql`.
+
+`supabase/migrations/005_rls_users_hardening.sql` adds:
+- `prevent_user_privilege_escalation()` trigger on `users` — blocks any UPDATE that changes `role`, `organization_id`, or `is_platform_admin` on the user's own row; service role bypasses the check
+- Note: `feed_headlines` RLS allows all approved members to read all headlines; publisher exclusion filtering must be applied at the application layer via `getExcludedOrgIds()` in `lib/exclusions.ts`
+
 `supabase/migrations/003_alert_enhancements.sql` adds:
 - `story_alerts.followed_organization_id UUID` — org-follow alert type (either this or `keywords` required)
 - `story_alerts.keywords` — made nullable (was NOT NULL)
@@ -127,6 +133,13 @@ The migration is in `supabase/migrations/001_schema.sql`. Columns added after in
 - Partial unique index `idx_org_invites_open_unique` on `(org_id, email) WHERE used_at IS NULL`
 - Updated `is_approved_member()` to require `users.status = 'active'`
 - RLS policies allowing org admins to approve/role-change/remove org members
+
+`supabase/migrations/009_stories_created_at_index.sql` adds:
+- `idx_stories_created` index on `stories(created_at DESC)` — speeds up the library feed query
+
+`supabase/migrations/008_purge_setup.sql` changes:
+- `republication_log.story_id` → nullable with `ON DELETE SET NULL` — republication history rows survive when a story is hard-deleted by the cleanup cron
+- `republication_requests.story_id` → nullable with `ON DELETE SET NULL` — same reason; request history is preserved even after story deletion
 
 When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
 

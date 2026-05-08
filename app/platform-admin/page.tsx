@@ -58,7 +58,7 @@ export default async function PlatformAdminPage() {
       highlight: false,
     },
     {
-      label: 'Available Stories',
+      label: 'Stories available',
       value: storyCount ?? 0,
       href: '/platform-admin/stories',
       highlight: false,
