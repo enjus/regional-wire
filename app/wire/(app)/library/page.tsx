@@ -76,6 +76,10 @@ export default async function LibraryPage({ searchParams }: PageProps) {
 
     if (params.org) headlineQuery = headlineQuery.eq('organization_id', params.org)
     if (excludedOrgIds.length > 0) headlineQuery = headlineQuery.not('organization_id', 'in', `(${excludedOrgIds.join(',')})`)
+    if (params.q) {
+      const safeQ = params.q.replace(/[,()]/g, ' ').trim()
+      if (safeQ) headlineQuery = headlineQuery.or(`title.ilike.%${safeQ}%,author.ilike.%${safeQ}%`)
+    }
 
     const { data: headlines, count } = await headlineQuery
     const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
