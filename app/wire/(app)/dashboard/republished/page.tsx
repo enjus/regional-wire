@@ -35,7 +35,7 @@ export default async function RepublishedPage({ searchParams }: PageProps) {
 
   const { data: log, count } = await supabase
     .from('republication_log')
-    .select('*, stories(id, title, organizations(name))', { count: 'exact' })
+    .select('*, stories(id, title, organizations(name))', { count: 'planned' })
     .eq('republishing_org_id', currentUser.organization_id)
     .order('downloaded_at', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1)

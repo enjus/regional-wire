@@ -45,7 +45,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   // Resolved requests are paginated
   const { data: resolved, count: resolvedCount } = await supabase
     .from('republication_requests')
-    .select(SELECT, { count: 'exact' })
+    .select(SELECT, { count: 'planned' })
     .eq('target_org_id', currentUser.organization_id)
     .neq('status', 'pending')
     .order('created_at', { ascending: false })

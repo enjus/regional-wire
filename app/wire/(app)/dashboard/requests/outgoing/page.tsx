@@ -39,7 +39,7 @@ export default async function OutgoingRequestsPage({ searchParams }: PageProps) 
       target_org:target_org_id(name),
       story:story_id(id, title)
     `,
-      { count: 'exact' }
+      { count: 'planned' }
     )
     .eq('requesting_org_id', currentUser.organization_id)
     .order('created_at', { ascending: false })

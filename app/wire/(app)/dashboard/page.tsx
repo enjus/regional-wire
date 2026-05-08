@@ -39,7 +39,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       republication_log(count),
       story_assets(id, asset_type, is_primary)
     `,
-      { count: 'exact' }
+      { count: 'planned' }
     )
     .eq('organization_id', currentUser.organization_id)
     .order('created_at', { ascending: false })
