@@ -55,19 +55,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .single()
     const targetOrgName = targetOrgData?.name ?? 'The newsroom'
 
-    let recipientEmails: string[] = []
+    const recipientSet = new Set<string>()
     if (req.requesting_user_id) {
       const { data: authUser } = await serviceSupabase.auth.admin.getUserById(req.requesting_user_id)
-      if (authUser.user?.email) recipientEmails = [authUser.user.email]
+      if (authUser.user?.email) recipientSet.add(authUser.user.email)
     }
-    if (!recipientEmails.length) {
-      const { data: requestingOrg } = await serviceSupabase
-        .from('organizations')
-        .select('contact_emails')
-        .eq('id', req.requesting_org_id)
-        .single()
-      recipientEmails = requestingOrg?.contact_emails ?? []
-    }
+    const { data: requestingOrg } = await serviceSupabase
+      .from('organizations')
+      .select('contact_emails')
+      .eq('id', req.requesting_org_id)
+      .single()
+    for (const email of requestingOrg?.contact_emails ?? []) recipientSet.add(email)
+    const recipientEmails = [...recipientSet]
 
     if (recipientEmails.length) {
       await sendRequestDeclinedEmail(
