@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     const { data: deleted, error: headlineError } = await supabase
       .from('feed_headlines')
       .delete()
-      .lt('published_at', cutoff30)
+      .or(`published_at.lt.${cutoff30},published_at.is.null`)
       .select('id')
 
     if (headlineError) {
