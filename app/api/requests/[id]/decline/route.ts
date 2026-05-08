@@ -28,9 +28,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const { data: req } = await supabase
       .from('republication_requests')
-      .select(
-        'id, requested_headline, story:story_id(title), requesting_org:requesting_org_id(contact_emails, name)'
-      )
+      .select('id, requesting_org_id, requesting_user_id, requested_headline, story:story_id(title)')
       .eq('id', id)
       .eq('target_org_id', currentUser.organization_id)
       .single()
@@ -47,23 +45,33 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       })
       .eq('id', id)
 
-    const requestingOrg = req.requesting_org as unknown as {
-      contact_emails: string[]
-      name: string
-    } | null
     const story = req.story as unknown as { title: string } | null
     const headline = story?.title ?? req.requested_headline ?? 'Untitled'
 
-    const serviceData = await supabase
+    const { data: targetOrgData } = await supabase
       .from('organizations')
       .select('name')
       .eq('id', currentUser.organization_id)
       .single()
-    const targetOrgName = serviceData.data?.name ?? 'The newsroom'
+    const targetOrgName = targetOrgData?.name ?? 'The newsroom'
 
-    if (requestingOrg?.contact_emails?.length) {
+    let recipientEmails: string[] = []
+    if (req.requesting_user_id) {
+      const { data: authUser } = await serviceSupabase.auth.admin.getUserById(req.requesting_user_id)
+      if (authUser.user?.email) recipientEmails = [authUser.user.email]
+    }
+    if (!recipientEmails.length) {
+      const { data: requestingOrg } = await serviceSupabase
+        .from('organizations')
+        .select('contact_emails')
+        .eq('id', req.requesting_org_id)
+        .single()
+      recipientEmails = requestingOrg?.contact_emails ?? []
+    }
+
+    if (recipientEmails.length) {
       await sendRequestDeclinedEmail(
-        requestingOrg.contact_emails,
+        recipientEmails,
         targetOrgName,
         headline,
         reason || null

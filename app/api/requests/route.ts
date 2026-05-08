@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       .from('republication_requests')
       .insert({
         requesting_org_id: currentUser.organization_id,
+        requesting_user_id: user.id,
         target_org_id,
         story_id: story_id || null,
         requested_headline: requested_headline || null,

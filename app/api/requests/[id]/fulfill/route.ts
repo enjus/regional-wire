@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const { data: req } = await supabase
       .from('republication_requests')
-      .select('*, story:story_id(id, title), requesting_org:requesting_org_id(contact_emails, name)')
+      .select('*, story:story_id(id, title)')
       .eq('id', id)
       .eq('target_org_id', currentUser.organization_id)
       .single()
@@ -48,24 +48,36 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       })
       .eq('id', id)
 
-    // Notify requesting org
-    const requestingOrg = req.requesting_org as {
-      contact_emails: string[]
-      name: string
-    } | null
     const story = req.story as { id: string; title: string } | null
     const resolvedStoryId = story?.id ?? storyId
 
-    if (requestingOrg?.contact_emails?.length && resolvedStoryId) {
+    if (resolvedStoryId) {
       const title = story?.title ?? req.requested_headline ?? 'Your requested story'
       const fulfillingOrgName =
         (currentUser.organization as unknown as { name: string } | null)?.name ?? 'A member newsroom'
-      await sendRequestFulfilledEmail(
-        requestingOrg.contact_emails,
-        fulfillingOrgName,
-        title,
-        resolvedStoryId
-      ).catch((err) => console.error('Failed to send fulfillment email:', err))
+
+      let recipientEmails: string[] = []
+      if (req.requesting_user_id) {
+        const { data: authUser } = await serviceSupabase.auth.admin.getUserById(req.requesting_user_id)
+        if (authUser.user?.email) recipientEmails = [authUser.user.email]
+      }
+      if (!recipientEmails.length) {
+        const { data: requestingOrg } = await serviceSupabase
+          .from('organizations')
+          .select('contact_emails')
+          .eq('id', req.requesting_org_id)
+          .single()
+        recipientEmails = requestingOrg?.contact_emails ?? []
+      }
+
+      if (recipientEmails.length) {
+        await sendRequestFulfilledEmail(
+          recipientEmails,
+          fulfillingOrgName,
+          title,
+          resolvedStoryId
+        ).catch((err) => console.error('Failed to send fulfillment email:', err))
+      }
     }
 
     return NextResponse.json({ ok: true })
