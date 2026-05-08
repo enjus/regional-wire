@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Props {
   orgs: { id: string; name: string }[]
@@ -12,11 +12,13 @@ export default function LibraryFilters({ orgs }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [searchValue, setSearchValue] = useState(searchParams.get('q') ?? '')
+  const qParam = searchParams.get('q') ?? ''
+  const [searchValue, setSearchValue] = useState(qParam)
+  const justSubmitted = useRef(false)
 
   useEffect(() => {
-    setSearchValue(searchParams.get('q') ?? '')
-  }, [searchParams])
+    setSearchValue(qParam)
+  }, [qParam])
 
   const updateParam = useCallback(
     (key: string, value: string) => {
@@ -60,9 +62,15 @@ export default function LibraryFilters({ orgs }: Props) {
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') updateParam('q', searchValue.trim())
+            if (e.key === 'Enter') {
+              justSubmitted.current = true
+              updateParam('q', searchValue.trim())
+            }
           }}
-          onBlur={() => updateParam('q', searchValue.trim())}
+          onBlur={() => {
+            if (!justSubmitted.current) updateParam('q', searchValue.trim())
+            justSubmitted.current = false
+          }}
           className="border border-wire-border rounded px-2 py-1.5 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent w-48"
         />
       </div>

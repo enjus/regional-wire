@@ -207,7 +207,11 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   if (params.source) query = query.eq('source', params.source)
   if (params.from) query = query.gte('created_at', params.from)
   if (params.to) query = query.lte('created_at', params.to + 'T23:59:59')
-  if (params.q) query = query.or(`title.ilike.%${params.q}%,byline.ilike.%${params.q}%`)
+  if (params.q) {
+    // Strip PostgREST DSL-special chars (commas/parens) that could inject extra filter conditions
+    const safeQ = params.q.replace(/[,()]/g, ' ').trim()
+    if (safeQ) query = query.or(`title.ilike.%${safeQ}%,byline.ilike.%${safeQ}%`)
+  }
 
   const { data: stories, count } = await query
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
