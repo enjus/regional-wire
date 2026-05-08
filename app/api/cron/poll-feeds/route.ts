@@ -11,6 +11,8 @@ import { slugify, sanitizeStoryHtml } from '@/lib/utils'
 // service role key and rss-parser package.
 
 export const maxDuration = 300 // 5 minutes max execution
+const FEED_POLL_CONCURRENCY = 10
+const FEED_FETCH_TIMEOUT_MS = 30_000
 
 type FeedItem = {
   guid?: string
@@ -57,22 +59,26 @@ export async function GET(request: NextRequest) {
   let processed = 0
   const errors: string[] = []
 
-  const limit = pLimit(10)
+  const limit = pLimit(FEED_POLL_CONCURRENCY)
 
-  await Promise.allSettled(
+  const settled = await Promise.allSettled(
     feeds.map((feed) =>
       limit(async () => {
         const org = feed.organizations as { id: string; status: string } | null
         if (org?.status !== 'approved') return
 
         try {
-          const result = await parser.parseURL(feed.feed_url)
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Feed fetch timed out')), FEED_FETCH_TIMEOUT_MS)
+          )
+          const result = await Promise.race([parser.parseURL(feed.feed_url), timeout])
 
           for (const item of result.items) {
             const guid = item.guid || item.link
             if (!guid) continue
 
             if (feed.feed_type === 'full_text') {
+              // Check if already ingested
               const { data: existing } = await supabase
                 .from('stories')
                 .select('id')
@@ -119,6 +125,7 @@ export async function GET(request: NextRequest) {
                 processed++
               }
             } else if (feed.feed_type === 'headline') {
+              // Upsert into feed_headlines
               await supabase
                 .from('feed_headlines')
                 .upsert(
@@ -146,10 +153,17 @@ export async function GET(request: NextRequest) {
           const msg = `Feed ${feed.id} (${feed.feed_url}): ${err instanceof Error ? err.message : 'Unknown error'}`
           console.error('[poll-feeds]', msg)
           errors.push(msg)
+          // Never crash the cron — log and continue
         }
       })
     )
   )
+
+  for (const result of settled) {
+    if (result.status === 'rejected') {
+      console.error('[poll-feeds] Unhandled task rejection:', result.reason)
+    }
+  }
 
   // ----------------------------------------------------------------
   // Embargo enforcement: lift embargoes that have expired
