@@ -16,6 +16,7 @@ export interface Organization {
   status: OrgStatus
   description: string | null
   contact_emails: string[]
+  allowed_emails: string[]
   republication_guidance: string | null
   attribution_template: string | null
   created_at: string
@@ -27,6 +28,8 @@ export interface User {
   display_name: string
   email: string
   role: UserRole
+  status: 'pending' | 'active'
+  is_platform_admin: boolean
   created_at: string
 }
 
@@ -85,6 +88,7 @@ export interface FeedHeadline {
   summary: string | null
   published_at: string | null
   guid: string
+  author: string | null
   // Joined
   organizations?: Organization
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface Props {
   orgs: { id: string; name: string }[]
@@ -12,6 +12,11 @@ export default function LibraryFilters({ orgs }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [searchValue, setSearchValue] = useState(searchParams.get('q') ?? '')
+
+  useEffect(() => {
+    setSearchValue(searchParams.get('q') ?? '')
+  }, [searchParams])
 
   const updateParam = useCallback(
     (key: string, value: string) => {
@@ -37,6 +42,7 @@ export default function LibraryFilters({ orgs }: Props) {
   }
 
   const hasFilters =
+    searchParams.has('q') ||
     searchParams.has('org') ||
     searchParams.has('from') ||
     searchParams.has('to') ||
@@ -44,6 +50,23 @@ export default function LibraryFilters({ orgs }: Props) {
 
   return (
     <div className="flex flex-wrap items-end gap-3 mb-5">
+      <div>
+        <label className="block text-xs font-medium text-wire-slate mb-1">
+          Search
+        </label>
+        <input
+          type="search"
+          placeholder="Title or byline…"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') updateParam('q', searchValue.trim())
+          }}
+          onBlur={() => updateParam('q', searchValue.trim())}
+          className="border border-wire-border rounded px-2 py-1.5 text-base bg-white focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent w-48"
+        />
+      </div>
+
       <div>
         <label className="block text-xs font-medium text-wire-slate mb-1">
           Newsroom
