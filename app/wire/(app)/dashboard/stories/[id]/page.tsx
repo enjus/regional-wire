@@ -34,11 +34,24 @@ export default async function StoryManagePage({ params }: PageProps) {
 
   if (!story) notFound()
 
-  const { data: log } = await supabase
+  const { data: rawLog } = await supabase
     .from('republication_log')
     .select('*, organizations(name)')
     .eq('story_id', id)
     .order('downloaded_at', { ascending: false })
+
+  // Deduplicate: one entry per republishing org. Prefer entry with a URL.
+  const seen = new Map<string, NonNullable<typeof rawLog>[0]>()
+  for (const entry of rawLog ?? []) {
+    const key = entry.republishing_org_id
+    const existing = seen.get(key)
+    if (!existing || (!existing.republished_url && entry.republished_url)) {
+      seen.set(key, entry)
+    }
+  }
+  const log = Array.from(seen.values()).sort(
+    (a, b) => new Date(b.downloaded_at).getTime() - new Date(a.downloaded_at).getTime()
+  )
 
   const { data: storyChanges } = await supabase
     .from('story_changes')
