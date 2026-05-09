@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## What this app is
+
+Regional Wire (production: **Northwest Newswire**) is a B2B republication platform for professional journalists at vetted newsrooms. Member orgs share stories; other member orgs can copy and republish them. There is no public-facing reader UX.
+
+**Users are trusted professionals**, not anonymous members of the public. Error messages can be informative, flows can assume good faith, and UX friction should be low.
+
+**Single operator** (Elliot), no engineering team. Prefer straightforward implementations over clever abstractions — a readable 50-line route beats a reusable pattern that saves 10 lines. No need for audit trails, feature flags, or multi-admin change controls.
+
+**Reliability over features.** Newsrooms depend on republication notifications to do their jobs. A missed email or silent failure is worse than a missing UI affordance.
+
+**Solo-maintained on modest infrastructure** (single DigitalOcean droplet, Supabase, Resend). Minimize subscription costs where reasonable, but paid tiers are acceptable when they meaningfully reduce complexity or improve reliability. Avoid solutions that require horizontal scaling or managed queues.
+
 ## Commands
 
 ```bash
@@ -19,12 +31,6 @@ Hosted on a DigitalOcean droplet, managed by PM2. To deploy:
 ```bash
 # On the droplet (ssh deploy@nwnewswire.com)
 cd /home/deploy/regional-wire && git pull && npm install && npm run build && pm2 restart regional-wire
-```
-
-To trigger cron jobs locally (no auth required in development):
-```
-GET http://localhost:3000/api/cron/poll-feeds
-GET http://localhost:3000/api/cron/hourly-digest
 ```
 
 ## Architecture
@@ -105,43 +111,13 @@ GET http://localhost:3000/api/cron/cleanup
 
 ### Schema Notes
 
-The migration is in `supabase/migrations/001_schema.sql`. Columns added after initial migration are in `007_missing_columns.sql`:
-- `feed_headlines.author TEXT` — captures `dc:creator` from RSS items
-- `users.is_platform_admin BOOLEAN NOT NULL DEFAULT false` — platform admin flag
-- `organizations.republication_guidance TEXT` — optional guidance for republishers
-- `organizations.attribution_template TEXT` — optional custom attribution line template (see Republication Package)
+`organizations.allowed_emails TEXT[] NOT NULL DEFAULT '{}'` — **not in any numbered migration** (added directly via Supabase SQL editor). If recreating the schema from migrations, run `ALTER TABLE organizations ADD COLUMN IF NOT EXISTS allowed_emails TEXT[] NOT NULL DEFAULT '{}'`, or use `supabase/migrations/010_allowed_emails.sql`.
 
-`organizations.allowed_emails TEXT[] NOT NULL DEFAULT '{}'` — whitelist of specific email addresses that can register/login regardless of email domain match; used as step 2 of the three-step org lookup in the auth flow. **Not in any numbered migration** (was added directly via the Supabase SQL editor). If recreating the schema from migrations, run `ALTER TABLE organizations ADD COLUMN IF NOT EXISTS allowed_emails TEXT[] NOT NULL DEFAULT '{}'`, or use `supabase/migrations/010_allowed_emails.sql`.
+`republication_log.story_id` and `republication_requests.story_id` are nullable with `ON DELETE SET NULL` — history rows intentionally survive when a story is hard-deleted by the cleanup cron.
 
-`supabase/migrations/005_rls_users_hardening.sql` adds:
-- `prevent_user_privilege_escalation()` trigger on `users` — blocks any UPDATE that changes `role`, `organization_id`, or `is_platform_admin` on the user's own row; service role bypasses the check
-- Note: `feed_headlines` RLS allows all approved members to read all headlines; publisher exclusion filtering must be applied at the application layer via `getExcludedOrgIds()` in `lib/exclusions.ts`
+`feed_headlines` RLS allows all approved members to read all headlines; publisher exclusion filtering must be applied at the application layer via `getExcludedOrgIds()` in `lib/exclusions.ts`.
 
-`supabase/migrations/003_alert_enhancements.sql` adds:
-- `story_alerts.followed_organization_id UUID` — org-follow alert type (either this or `keywords` required)
-- `story_alerts.keywords` — made nullable (was NOT NULL)
-- `story_alerts.alert_type` — dropped (all alerts now batch hourly)
-- `user_digest_prefs` table — per-user daily digest opt-in and `delivery_hour_utc`
-- `alert_send_log` table — dedup/throttle log for hourly and daily_digest sends
-
-`supabase/migrations/004_org_exclusions.sql` adds:
-- `org_exclusions` table — org-to-org exclusion relationships (see Publisher Exclusions below)
-
-`supabase/migrations/006_user_approval.sql` adds:
-- `users.status TEXT` — `'pending'` or `'active'`; existing users backfilled to `'active'`
-- `org_invites` table — org-initiated and auto-seeded invites; claimed atomically in `/auth/callback`
-- Partial unique index `idx_org_invites_open_unique` on `(org_id, email) WHERE used_at IS NULL`
-- Updated `is_approved_member()` to require `users.status = 'active'`
-- RLS policies allowing org admins to approve/role-change/remove org members
-
-`supabase/migrations/009_stories_created_at_index.sql` adds:
-- `idx_stories_created` index on `stories(created_at DESC)` — speeds up the library feed query
-
-`supabase/migrations/008_purge_setup.sql` changes:
-- `republication_log.story_id` → nullable with `ON DELETE SET NULL` — republication history rows survive when a story is hard-deleted by the cleanup cron
-- `republication_requests.story_id` → nullable with `ON DELETE SET NULL` — same reason; request history is preserved even after story deletion
-
-When adding columns not in the migration, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
+When adding columns not in the migrations, run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` in the Supabase SQL Editor.
 
 ### Publisher Exclusions
 
@@ -151,12 +127,7 @@ Org admins can exclude other publishers via **Dashboard → Settings → Exclusi
 
 **`lib/exclusions.ts`** exports `getExcludedOrgIds(client, orgId)` — pass the anon Supabase client and the current user's org ID; returns an array of org IDs that should be hidden. Queries both `initiator_id = orgId` and `excluded_id = orgId` in one call. Returns `[]` if no exclusions exist.
 
-**Enforcement points:**
-- `app/wire/(app)/library/page.tsx` — filters excluded orgs from the stories query, org filter dropdown, and headlines tab feed query. All three sites check `excludedOrgIds.length > 0` before applying the filter.
-- `app/wire/(app)/library/[id]/page.tsx` — calls `getExcludedOrgIds` after fetching the story; returns `notFound()` if the story's org is excluded.
-- Platform admins bypass all exclusion filtering.
-
-**Scope:** Exclusions affect library visibility only. Story alerts, email digests, and republication log history are unaffected.
+Exclusions affect library visibility only — story alerts, email digests, and republication log history are unaffected. Platform admins bypass all exclusion filtering.
 
 **API routes:**
 - `POST /api/orgs/[id]/exclusions` — create exclusion (initiating org admin only; checks for existing exclusion in either direction, returns 409 on duplicate)
@@ -172,13 +143,11 @@ Stories support two tiers of post-publication changes tracked in the `story_chan
 - **Correction**: error of fact — wrong name, wrong number, misattribution. Requires publication-ready correction text. Emailed to all orgs in `republication_log`. Correction notices displayed prominently on the library detail page (stacked, newest first). Sets `stories.has_correction = true`.
 - **Withdrawal**: story pulled from library. Requires a reason. All republishing orgs notified by email.
 
-The edit form (`story-upload-form.tsx`) shows a change classification section in edit mode (radio: update/correction, change note field, correction text field). The withdraw button (`story-withdraw-button.tsx`) shows an inline form requiring a reason.
-
-The PATCH endpoint (`/api/stories/[id]`) validates change metadata, inserts `story_changes` rows via service role, and fires off notification emails (fire-and-forget). The migration is in `supabase/migrations/002_story_changes.sql`.
+The PATCH endpoint (`/api/stories/[id]`) validates change metadata, inserts `story_changes` rows via service role, and fires off notification emails (fire-and-forget).
 
 ### Admin Dashboard
 
-`/admin` is a server component protected by HTTP Basic Auth (credentials in `.env.local`). It uses a service role Supabase client with no-op cookies. Approve/reject actions are in `/app/admin/admin-org-actions.tsx` (client component) and hit `/api/admin/orgs/[id]/approve` and `/api/admin/orgs/[id]/reject`.
+`/admin` uses HTTP Basic Auth (credentials in `.env.local`) and a service role Supabase client with no-op cookies.
 
 ### Branding
 
