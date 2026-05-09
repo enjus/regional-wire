@@ -165,7 +165,9 @@ export function checkBasicAuth(authHeader: string | null): boolean {
 // interactive embeds, scripts, styles, forms, and media that can't transfer.
 // Also strips event handlers and javascript: hrefs to prevent XSS.
 export function sanitizeStoryHtml(html: string): string {
-  return sanitizeHtml(html, {
+  // figcaption <p> children survive sanitize-html's discard mode; strip figures before sanitizing.
+  const withoutFigures = html.replace(/<figure[\s\S]*?<\/figure>/gi, '')
+  return sanitizeHtml(withoutFigures, {
     allowedTags: [
       'p', 'br', 'strong', 'em', 'b', 'i', 'u',
       'a', 'ul', 'ol', 'li', 'blockquote',
