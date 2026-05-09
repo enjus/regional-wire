@@ -231,7 +231,7 @@ Questions? Contact your organization's admin or reply to this email.
 export async function sendRepublicationRequestEmail(
   targetOrgContacts: string[],
   requestingOrgName: string,
-  headline: string,
+  headline: string | null,
   url: string | null,
   message: string | null
 ) {
@@ -239,7 +239,7 @@ export async function sendRepublicationRequestEmail(
 Republication Request — ${brand.name}
 
 ${requestingOrgName} is requesting permission to republish:
-  Headline: ${headline}
+  ${headline ? `Headline: ${headline}` : ''}
   ${url ? `URL: ${url}` : ''}
   ${message ? `Message: ${message}` : ''}
 
@@ -249,17 +249,22 @@ ${APP_URL}/dashboard/requests
 — ${brand.name}
 `.trim()
 
-  const metaRows = [{ label: 'Headline', value: headline }]
+  const metaRows: { label: string; value: string }[] = []
+  if (headline) metaRows.push({ label: 'Headline', value: headline })
   if (url) metaRows.push({ label: 'URL', value: url })
   if (message) metaRows.push({ label: 'Message', value: message })
 
+  const preheader = headline
+    ? `${requestingOrgName} is requesting permission to republish "${headline}"`
+    : `${requestingOrgName} is requesting a story`
+
   const html = renderEmailHtml({
-    preheader: `${requestingOrgName} is requesting permission to republish "${headline}"`,
+    preheader,
     title: 'Republication request',
     content: renderSection(
       renderHeading(`Republication request from ${requestingOrgName}`) +
-      renderParagraph(`${requestingOrgName} is requesting permission to republish the following story. Review the details below and respond from your dashboard.`) +
-      renderMetaTable(metaRows) +
+      renderParagraph(`${requestingOrgName} is requesting permission to republish a story. Review the details below and respond from your dashboard.`) +
+      (metaRows.length ? renderMetaTable(metaRows) : '') +
       renderButton('Review request →', `${APP_URL}/wire/dashboard/requests`)
     ),
     brandName: brand.name,
@@ -268,10 +273,14 @@ ${APP_URL}/dashboard/requests
     footerLinkUrl: `${APP_URL}/wire/dashboard`,
   })
 
+  const subject = headline
+    ? `Republication request from ${requestingOrgName}: "${headline}"`
+    : `Republication request from ${requestingOrgName}`
+
   return getResend().emails.send({
     from: FROM_ADDRESS,
     to: targetOrgContacts,
-    subject: `Republication request from ${requestingOrgName}: "${headline}"`,
+    subject,
     text,
     html,
   })

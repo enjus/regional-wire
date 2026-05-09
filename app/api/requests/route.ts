@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       await sendRepublicationRequestEmail(
         targetOrg.contact_emails,
         requestingOrgName,
-        requested_headline ?? 'Unknown headline',
+        requested_headline ?? null,
         requested_url ?? null,
         message ?? null
       ).catch((err) => console.error('Failed to send request email:', err))

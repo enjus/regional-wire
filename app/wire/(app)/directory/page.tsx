@@ -110,6 +110,14 @@ export default async function DirectoryPage() {
                       View stories →
                     </Link>
                   )}
+                  {!isOwnOrg && (
+                    <Link
+                      href={`/wire/dashboard/requests/new?org=${org.id}&orgName=${encodeURIComponent(org.name)}&from=directory`}
+                      className="text-xs text-wire-slate hover:text-wire-navy block mt-1"
+                    >
+                      Request story →
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
