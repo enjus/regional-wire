@@ -59,8 +59,8 @@ function RequestFormContent() {
 
       <h2 className="font-serif text-xl font-bold text-wire-navy mb-1">Request Story</h2>
       <p className="text-wire-slate text-sm mb-6">
-        Your request will be emailed to the newsroom&apos;s editors. They&apos;ll upload the
-        full story and notify you when it&apos;s available.
+        Your request will be emailed to the newsroom&apos;s editors. If they&apos;re able to
+        share it, they&apos;ll upload the full story and notify you when it&apos;s available.
       </p>
 
       {fromDirectory ? (
