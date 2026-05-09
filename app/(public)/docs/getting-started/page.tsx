@@ -84,6 +84,14 @@ export default function GettingStartedPage() {
         </li>
       </ul>
 
+      <h2>Membership expectations</h2>
+      <p>
+        {brand.name} is a reciprocal network. Members are expected to contribute at
+        least as many stories as they republish from other member newsrooms — the wire
+        is not a one-way distribution channel. Content shared to the wire should be
+        publication-ready and of genuine interest to other member newsrooms.
+      </p>
+
       <h2>Republication requirements</h2>
       <p>
         All stories on {brand.name} are shared under a common set of republication

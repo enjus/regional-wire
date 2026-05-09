@@ -88,7 +88,7 @@ export default async function DirectoryPage() {
                   <div className="mt-2">
                     <p className="text-xs text-wire-slate">
                       <span className="font-medium text-wire-navy">Contact: </span>
-                      {org.contact_emails.map((email, i) => (
+                      {org.contact_emails.map((email: string, i: number) => (
                         <span key={email}>
                           {i > 0 && ', '}
                           <a href={`mailto:${email}`} className="hover:text-wire-navy hover:underline">

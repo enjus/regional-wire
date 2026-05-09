@@ -9,7 +9,7 @@ export default async function AdminOrgsPage() {
   await requirePlatformAdmin()
   const supabase = createAdminSupabase()
 
-  const [{ data: pending }, { data: approved }, { data: suspended }] = await Promise.all([
+  const [{ data: pending }, { data: approved }, { data: suspended }, { data: storyOrgs }, { data: repubOrgs }] = await Promise.all([
     supabase
       .from('organizations')
       .select('*')
@@ -25,7 +25,20 @@ export default async function AdminOrgsPage() {
       .select('id, name, email_domain, created_at')
       .eq('status', 'suspended')
       .order('name'),
+    supabase
+      .from('stories')
+      .select('organization_id')
+      .in('status', ['active', 'embargoed']),
+    supabase
+      .from('republication_log')
+      .select('republishing_org_id'),
   ])
+
+  const contributedMap = new Map<string, number>()
+  storyOrgs?.forEach(s => contributedMap.set(s.organization_id, (contributedMap.get(s.organization_id) ?? 0) + 1))
+
+  const republishedMap = new Map<string, number>()
+  repubOrgs?.forEach(r => republishedMap.set(r.republishing_org_id, (republishedMap.get(r.republishing_org_id) ?? 0) + 1))
 
   return (
     <div className="p-8">
@@ -100,30 +113,40 @@ export default async function AdminOrgsPage() {
           <p className="text-sm text-slate-500">No approved members.</p>
         ) : (
           <div className="space-y-2">
-            {approved.map((org) => (
-              <div
-                key={org.id}
-                className="bg-white border border-gray-200 rounded p-4 flex items-center justify-between"
-              >
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{org.name}</p>
-                  <p className="text-xs text-slate-500">
-                    {org.email_domain} · Approved {formatDate(org.created_at)}
-                  </p>
+            {approved.map((org) => {
+              const contributed = contributedMap.get(org.id) ?? 0
+              const republished = republishedMap.get(org.id) ?? 0
+              const flagged = republished > 0 && contributed < republished
+              return (
+                <div
+                  key={org.id}
+                  className={`bg-white border rounded p-4 flex items-center justify-between ${flagged ? 'border-amber-300' : 'border-gray-200'}`}
+                >
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{org.name}</p>
+                    <p className="text-xs text-slate-500">
+                      {org.email_domain} · Approved {formatDate(org.created_at)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className={`text-xs font-medium ${flagged ? 'text-amber-700' : 'text-slate-500'}`}>
+                        {contributed} contributed · {republished} republished
+                      </p>
+                    </div>
+                    <a
+                      href={org.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-wire-red hover:underline"
+                    >
+                      Website ↗
+                    </a>
+                    <OrgActions orgId={org.id} orgName={org.name} status="approved" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <a
-                    href={org.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-wire-red hover:underline"
-                  >
-                    Website ↗
-                  </a>
-                  <OrgActions orgId={org.id} orgName={org.name} status="approved" />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </section>
