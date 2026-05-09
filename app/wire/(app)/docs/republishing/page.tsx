@@ -85,6 +85,11 @@ export default function RepublishingPage() {
         for <strong>30 days</strong> from the story&apos;s publication date. If you intend to
         use a story&apos;s assets, download them when you first access the story.
       </p>
+      <p>
+        Photos and video are licensed for one-time use in connection with the associated story —
+        including social media promotion — with credit to the creator and to the originating newsroom.
+        Do not use assets for other stories or unrelated purposes.
+      </p>
 
       <h2>Logging a republication</h2>
       <p>

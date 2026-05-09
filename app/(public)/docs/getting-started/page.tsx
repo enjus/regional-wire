@@ -95,6 +95,7 @@ export default function GettingStartedPage() {
         <li><strong>Minor edits are acceptable.</strong> Small changes for style, updated time references (e.g. replacing &ldquo;Wednesday&rdquo; with a date) or minor clarifications are permitted. Do not alter facts, tone or conclusions.</li>
         <li><strong>Preserve the byline.</strong> The original author&apos;s name must appear exactly as written. Do not substitute your own staff name or remove the byline.</li>
         <li><strong>No resyndication.</strong> Do not redistribute this story to third parties or other publications.</li>
+        <li><strong>Media is licensed for one-time use.</strong> Photos and video may be used only in connection with this story — including to promote it on social media — with credit to the creator and to the originating newsroom. Do not use assets for other stories or unrelated purposes.</li>
         <li><strong>Notify the originating newsroom.</strong> Submit your published URL after republishing so the originating newsroom can track where their story appeared.</li>
       </ol>
       <p>

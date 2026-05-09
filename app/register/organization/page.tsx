@@ -246,7 +246,8 @@ export default function RegisterOrganizationPage() {
                   <p>3. <strong className="text-wire-navy">Minor edits acceptable</strong> — style or time references only; do not alter facts, tone or conclusions.</p>
                   <p>4. <strong className="text-wire-navy">Preserve the byline</strong> — original author&apos;s name must appear exactly as written.</p>
                   <p>5. <strong className="text-wire-navy">No resyndication</strong> — do not redistribute to third parties or other publications.</p>
-                  <p>6. <strong className="text-wire-navy">Notify originating newsroom</strong> — submit published URL after republishing.</p>
+                  <p>6. <strong className="text-wire-navy">Media is one-time use</strong> — photos and video may be used only with this story, with credit to the creator and originating newsroom.</p>
+                  <p>7. <strong className="text-wire-navy">Notify originating newsroom</strong> — submit published URL after republishing.</p>
                 </div>
               </details>
               <p className="text-xs text-wire-slate mb-1">

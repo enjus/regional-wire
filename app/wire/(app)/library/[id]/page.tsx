@@ -329,6 +329,10 @@ export default async function StoryDetailPage({ params }: PageProps) {
             </li>
             <li className="flex gap-2">
               <span className="text-wire-navy font-bold shrink-0">6.</span>
+              <span><strong className="text-wire-navy">Media is licensed for one-time use.</strong> Photos and video may be used only in connection with this story — including to promote it on social media — with credit to the creator and to the originating newsroom. Do not use assets for other stories or unrelated purposes.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-wire-navy font-bold shrink-0">7.</span>
               <span><strong className="text-wire-navy">Notify the originating newsroom.</strong> Submit your published URL after republishing so the originating newsroom can track where their story appeared.</span>
             </li>
           </ul>
