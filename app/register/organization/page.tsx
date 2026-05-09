@@ -116,7 +116,7 @@ export default function RegisterOrganizationPage() {
             your team can sign up using email addresses on your domain.
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
             <p className="text-sm text-blue-800">
               <strong>Already a member newsroom?</strong> If your organization is already on the network,
               you don&apos;t need to register it again —{' '}
@@ -124,6 +124,12 @@ export default function RegisterOrganizationPage() {
                 create a user account
               </Link>{' '}
               using your work email instead.
+            </p>
+          </div>
+
+          <div className="bg-wire-bg border border-wire-border rounded-lg px-4 py-3 mb-8">
+            <p className="text-sm text-wire-slate">
+              <strong className="text-wire-navy">Membership expectation:</strong> Member newsrooms are expected to contribute at least as many stories as they republish from other members. Content shared to the wire should be publication-ready and of genuine interest to other member newsrooms.
             </p>
           </div>
 
@@ -236,9 +242,6 @@ export default function RegisterOrganizationPage() {
               <label className="block text-sm font-medium text-wire-navy mb-1">
                 Additional republication guidance
               </label>
-              <p className="text-xs text-wire-slate mb-2">
-                <strong className="text-wire-navy">Membership expectation:</strong> Member newsrooms are expected to contribute at least as many stories as they republish from other members. Content shared to the wire should be publication-ready and of genuine interest to other member newsrooms.
-              </p>
               <details className="mb-2 border border-wire-border rounded text-xs bg-wire-bg">
                 <summary className="px-3 py-2 cursor-pointer font-medium text-wire-navy select-none">
                   Standard platform rules <span className="font-normal text-wire-slate">(applied to all stories on the network)</span>
