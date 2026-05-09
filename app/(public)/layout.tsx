@@ -34,7 +34,7 @@ export default async function PublicLayout({ children }: { children: React.React
 
           <nav className="hidden sm:flex items-center gap-8 text-[13px] text-wire-slate">
             <Link href="/how-it-works" className="hover:text-wire-navy transition-colors">How it works</Link>
-            <Link href="/docs/getting-started" className="hover:text-wire-navy transition-colors">Docs</Link>
+            <Link href="/docs/getting-started" className="hover:text-wire-navy transition-colors">Quick start guide</Link>
           </nav>
 
           {user ? (
