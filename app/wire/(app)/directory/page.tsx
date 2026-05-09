@@ -107,7 +107,7 @@ export default async function DirectoryPage() {
                     rel="noopener noreferrer"
                     className="text-sm text-wire-red hover:underline block"
                   >
-                    Website ↗
+                    Website →
                   </a>
                   {!isOwnOrg && storiesCount > 0 && (
                     <Link
