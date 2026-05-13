@@ -100,6 +100,31 @@ export async function GET(request: NextRequest) {
 
   if (existingUser) {
     if (existingUser.status === 'pending') {
+      // The user may have been invited after self-registering as pending.
+      // If an open invite exists for their email, claim it and promote them now.
+      if (userEmail) {
+        const { data: claimedInvite } = await serviceSupabase
+          .from('org_invites')
+          .update({ used_at: new Date().toISOString() })
+          .eq('email', userEmail.toLowerCase())
+          .is('used_at', null)
+          .select('id')
+
+        if (claimedInvite && claimedInvite.length > 0) {
+          await serviceSupabase
+            .from('users')
+            .update({ status: 'active' })
+            .eq('id', userId)
+
+          fetch(`${origin}/api/auth/welcome`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId }),
+          }).catch(() => {})
+
+          return NextResponse.redirect(`${origin}${next}`)
+        }
+      }
       return NextResponse.redirect(`${origin}/pending`)
     }
     if (existingUser.is_platform_admin) {
