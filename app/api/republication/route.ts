@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { getExcludedOrgIds } from '@/lib/exclusions'
+import { getExcludedOrgIds, getSharingFilter, isOrgVisible } from '@/lib/exclusions'
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,9 +50,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Exclusion check — requester's org must not be excluded by the story's org
-    const excludedOrgIds = await getExcludedOrgIds(supabase, currentUser.organization_id)
-    if (excludedOrgIds.includes(story.organization_id)) {
+    const [excludedOrgIds, sharingFilter] = await Promise.all([
+      getExcludedOrgIds(supabase, currentUser.organization_id),
+      getSharingFilter(supabase, currentUser.organization_id),
+    ])
+    if (!isOrgVisible(story.organization_id, excludedOrgIds, sharingFilter)) {
       return NextResponse.json({ error: 'Story is not available.' }, { status: 403 })
     }
 

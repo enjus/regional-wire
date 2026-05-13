@@ -1,6 +1,6 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createAdminSupabase } from '@/lib/platform-admin'
-import { getExcludedOrgIds } from '@/lib/exclusions'
+import { getExcludedOrgIds, getSharingFilter, applyOrgVisibilityFilter } from '@/lib/exclusions'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Story } from '@/lib/types'
@@ -42,9 +42,12 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   const queryClient = isPlatformAdmin ? createAdminSupabase() : supabase
   const currentOrgId = currentUser.organization_id ?? ''
 
-  const excludedOrgIds = (!isPlatformAdmin && currentOrgId)
-    ? await getExcludedOrgIds(supabase, currentOrgId)
-    : []
+  const [excludedOrgIds, sharingFilter] = (!isPlatformAdmin && currentOrgId)
+    ? await Promise.all([
+        getExcludedOrgIds(supabase, currentOrgId),
+        getSharingFilter(supabase, currentOrgId),
+      ])
+    : [[], { type: 'blocklist' as const, orgIds: [] }]
 
   const page = parseInt(params.page ?? '1', 10)
   const offset = (page - 1) * PAGE_SIZE
@@ -59,8 +62,8 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   let orgsResult = (currentOrgId && !isPlatformAdmin)
     ? orgsQuery.neq('id', currentOrgId)
     : orgsQuery
-  if (excludedOrgIds.length > 0) {
-    orgsResult = orgsResult.not('id', 'in', `(${excludedOrgIds.join(',')})`)
+  if (!isPlatformAdmin) {
+    orgsResult = applyOrgVisibilityFilter(orgsResult, sharingFilter, excludedOrgIds, 'id')
   }
   const { data: orgs } = await orgsResult
 
@@ -75,7 +78,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
       .range(offset, offset + PAGE_SIZE - 1)
 
     if (params.org) headlineQuery = headlineQuery.eq('organization_id', params.org)
-    if (excludedOrgIds.length > 0) headlineQuery = headlineQuery.not('organization_id', 'in', `(${excludedOrgIds.join(',')})`)
+    if (!isPlatformAdmin) headlineQuery = applyOrgVisibilityFilter(headlineQuery, sharingFilter, excludedOrgIds)
     if (params.q) {
       const safeQ = params.q.replace(/[,()]/g, ' ').trim()
       if (safeQ) headlineQuery = headlineQuery.or(`title.ilike.%${safeQ}%,author.ilike.%${safeQ}%`)
@@ -94,7 +97,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         .in('canonical_url', headlineUrls)
         .in('status', ['available', 'embargoed'])
       if (currentOrgId && !isPlatformAdmin) matchedQuery = matchedQuery.neq('organization_id', currentOrgId)
-      if (excludedOrgIds.length > 0) matchedQuery = matchedQuery.not('organization_id', 'in', `(${excludedOrgIds.join(',')})`)
+      if (!isPlatformAdmin) matchedQuery = applyOrgVisibilityFilter(matchedQuery, sharingFilter, excludedOrgIds)
       const { data: matchedStories } = await matchedQuery
       for (const s of (matchedStories ?? []) as { id: string; canonical_url: string | null; published_at: string }[]) {
         if (s.canonical_url) libraryByUrl[s.canonical_url] = { id: s.id, published_at: s.published_at }
@@ -201,7 +204,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
       { count: 'exact' }
     )
   if (currentOrgId && !isPlatformAdmin) query = query.neq('organization_id', currentOrgId)
-  if (excludedOrgIds.length > 0) query = query.not('organization_id', 'in', `(${excludedOrgIds.join(',')})`)
+  if (!isPlatformAdmin) query = applyOrgVisibilityFilter(query, sharingFilter, excludedOrgIds)
   query = query
     .in('status', isPlatformAdmin ? ['available', 'embargoed', 'withdrawn'] : ['available', 'embargoed'])
     .order('created_at', { ascending: false })

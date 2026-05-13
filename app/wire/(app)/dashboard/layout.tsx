@@ -69,6 +69,7 @@ export default async function DashboardLayout({
                 <SidebarLink href="/wire/dashboard/settings/members" label="Members" badge={pendingMemberCount ?? 0} />
                 <SidebarLink href="/wire/dashboard/settings/feeds" label="Feeds" />
                 <SidebarLink href="/wire/dashboard/settings/exclusions" label="Exclusions" />
+                <SidebarLink href="/wire/dashboard/settings/sharing-partners" label="Sharing partners" />
               </>
             )}
           </ul>

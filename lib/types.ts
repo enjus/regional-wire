@@ -8,6 +8,8 @@ export type FeedType = 'full_text' | 'headline'
 export type RequestStatus = 'pending' | 'fulfilled' | 'declined'
 export type AssetType = 'image' | 'video' | 'document'
 
+export type SharingMode = 'open' | 'restricted'
+
 export interface Organization {
   id: string
   name: string
@@ -15,6 +17,7 @@ export interface Organization {
   website_url: string
   email_domain: string
   status: OrgStatus
+  sharing_mode: SharingMode
   description: string | null
   contact_emails: string[]
   allowed_emails?: string[]

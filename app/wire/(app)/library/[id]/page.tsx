@@ -1,6 +1,6 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createAdminSupabase } from '@/lib/platform-admin'
-import { getExcludedOrgIds } from '@/lib/exclusions'
+import { getExcludedOrgIds, getSharingFilter, isOrgVisible } from '@/lib/exclusions'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -47,10 +47,13 @@ export default async function StoryDetailPage({ params }: PageProps) {
 
   if (!story) notFound()
 
-  // Block access if the story's org is excluded
+  // Block access based on exclusions and sharing mode
   if (!isPlatformAdmin && currentUser.organization_id) {
-    const excludedOrgIds = await getExcludedOrgIds(supabase, currentUser.organization_id)
-    if (excludedOrgIds.includes(story.organization_id)) notFound()
+    const [excludedOrgIds, sharingFilter] = await Promise.all([
+      getExcludedOrgIds(supabase, currentUser.organization_id),
+      getSharingFilter(supabase, currentUser.organization_id),
+    ])
+    if (!isOrgVisible(story.organization_id, excludedOrgIds, sharingFilter)) notFound()
   }
 
   // Fetch change history for this story

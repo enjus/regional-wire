@@ -135,6 +135,34 @@ Exclusions affect library visibility only — story alerts, email digests, and r
 
 Both routes use the service role client for the write; application-layer auth check is the gate.
 
+### Selective Sharing (Sharing Partners)
+
+**Core principle: all sharing relationships are bilateral.** No org should benefit from seeing another publisher's work without that publisher also being able to see theirs. If you restrict who you share with, you can only see the work of your own listed partners.
+
+Org admins can switch to **selective mode** via **Dashboard → Settings → Sharing partners**. In selective mode, only their named partners can see their stories, and they can only see their partners' stories. Open-mode orgs (the default) see all other open-mode orgs plus any restricted orgs that have listed them as partners.
+
+**Visibility rules:**
+- Open publisher + Open viewer: visible (default)
+- Restricted publisher + Open viewer: visible only if the restricted publisher has listed the viewer as a partner
+- Open publisher + Restricted viewer: visible only if the restricted viewer has listed the publisher as a partner
+- Restricted publisher + Restricted viewer: visible if either has listed the other
+
+Platform admins bypass all sharing-mode filtering.
+
+**Schema:** `organizations.sharing_mode TEXT DEFAULT 'open'` (added in `013_sharing_mode.sql`). `org_sharing_partners` table with `org_id` and `partner_id`. A row `(org_id=A, partner_id=B)` means A has opted to share with B — granting B visibility into A's stories AND A visibility into B's stories.
+
+**`lib/exclusions.ts`** also exports:
+- `getSharingFilter(client, viewerOrgId)` — returns `{ type: 'allowlist', orgIds }` for restricted viewers (only these orgs are visible) or `{ type: 'blocklist', orgIds }` for open viewers (these orgs are hidden)
+- `isOrgVisible(orgId, excludedOrgIds, sharingFilter)` — point check for detail pages and API guards
+- `applyOrgVisibilityFilter(query, sharingFilter, excludedOrgIds, column?)` — applies filter to a Supabase query chain
+
+Sharing-mode filtering is applied at the same 6 call sites as exclusions: library page (4 points), story detail page, asset-requests API, republication API. Exclusions and sharing filters are always combined; `getExcludedOrgIds` and `getSharingFilter` are fetched in parallel.
+
+**API routes:**
+- `POST /api/orgs/[id]/sharing-partners` — add partner (`{ partner_id }`, initiating org admin only, 409 on duplicate)
+- `DELETE /api/orgs/[id]/sharing-partners/[partner_id]` — remove partner (initiating org admin only)
+- `PATCH /api/orgs/[id]` also accepts `sharing_mode` to toggle between `'open'` and `'restricted'`
+
 ### Story Corrections & Withdrawals
 
 Stories support two tiers of post-publication changes tracked in the `story_changes` table:
