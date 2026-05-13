@@ -60,14 +60,14 @@ export async function getSharingFilter(
 }
 
 // Returns true if the given org's stories should be visible to the viewer.
-// Restricted viewers are governed entirely by their partner list — exclusions don't apply.
+// Exclusions always apply first — each org controls who can see its content.
 export function isOrgVisible(
   orgId: string,
   excludedOrgIds: string[],
   sharingFilter: SharingFilter
 ): boolean {
-  if (sharingFilter.type === 'allowlist') return sharingFilter.orgIds.includes(orgId)
   if (excludedOrgIds.includes(orgId)) return false
+  if (sharingFilter.type === 'allowlist') return sharingFilter.orgIds.includes(orgId)
   return !sharingFilter.orgIds.includes(orgId)
 }
 
