@@ -29,17 +29,15 @@ export default async function SharingPartnersSettingsPage() {
   const orgId = currentUser.organization_id
   const serviceClient = createServiceClient()
 
-  const { data: org } = await serviceClient
-    .from('organizations')
-    .select('id, sharing_mode')
-    .eq('id', orgId)
-    .single()
-
-  const { data: partnerRows } = await serviceClient
-    .from('org_sharing_partners')
-    .select('id, partner_id, created_at, partner:organizations!partner_id(name)')
-    .eq('org_id', orgId)
-    .order('created_at', { ascending: false })
+  const [{ data: org }, { data: partnerRows }, { data: allOrgs }] = await Promise.all([
+    serviceClient.from('organizations').select('id, sharing_mode').eq('id', orgId).single(),
+    serviceClient
+      .from('org_sharing_partners')
+      .select('id, partner_id, created_at, partner:organizations!partner_id(name)')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false }),
+    serviceClient.from('organizations').select('id, name').eq('status', 'approved').neq('id', orgId).order('name'),
+  ])
 
   const partners = (partnerRows ?? []).map((row) => ({
     id: row.id as string,
@@ -49,13 +47,6 @@ export default async function SharingPartnersSettingsPage() {
   }))
 
   const alreadyPartneredIds = new Set(partners.map((p) => p.partner_id))
-  const { data: allOrgs } = await serviceClient
-    .from('organizations')
-    .select('id, name')
-    .eq('status', 'approved')
-    .neq('id', orgId)
-    .order('name')
-
   const availableOrgs = (allOrgs ?? []).filter((o) => !alreadyPartneredIds.has(o.id))
 
   return (
