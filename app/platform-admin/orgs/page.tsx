@@ -17,7 +17,7 @@ export default async function AdminOrgsPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('organizations')
-      .select('id, name, email_domain, website_url, contact_emails, created_at')
+      .select('id, name, email_domain, website_url, contact_emails, created_at, purged_story_count')
       .eq('status', 'approved')
       .order('name'),
     supabase
@@ -27,8 +27,7 @@ export default async function AdminOrgsPage() {
       .order('name'),
     supabase
       .from('stories')
-      .select('organization_id')
-      .in('status', ['active', 'embargoed']),
+      .select('organization_id'),
     supabase
       .from('republication_log')
       .select('republishing_org_id'),
@@ -114,7 +113,7 @@ export default async function AdminOrgsPage() {
         ) : (
           <div className="space-y-2">
             {approved.map((org) => {
-              const contributed = contributedMap.get(org.id) ?? 0
+              const contributed = (contributedMap.get(org.id) ?? 0) + ((org as unknown as { purged_story_count: number }).purged_story_count ?? 0)
               const republished = republishedMap.get(org.id) ?? 0
               const flagged = republished > 0 && contributed < republished
               return (
