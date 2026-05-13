@@ -22,13 +22,16 @@ export async function getSharingFilter(
   client: SupabaseClient,
   viewerOrgId: string
 ): Promise<SharingFilter> {
-  const { data: viewer } = await client
+  // Single query: fetch viewer's own mode + all restricted orgs together.
+  // For open viewers with no restricted orgs in the network (common early case) this is the only query needed.
+  const { data: orgs } = await client
     .from('organizations')
-    .select('sharing_mode')
-    .eq('id', viewerOrgId)
-    .single()
+    .select('id, sharing_mode')
+    .or(`id.eq.${viewerOrgId},sharing_mode.eq.restricted`)
 
-  if (viewer?.sharing_mode === 'restricted') {
+  const viewerMode = orgs?.find((o: { id: string }) => o.id === viewerOrgId)?.sharing_mode ?? 'open'
+
+  if (viewerMode === 'restricted') {
     const { data: partners } = await client
       .from('org_sharing_partners')
       .select('partner_id')
@@ -37,15 +40,12 @@ export async function getSharingFilter(
   }
 
   // Open viewer: blocked = restricted orgs that haven't listed viewer as a partner
-  const { data: restricted } = await client
-    .from('organizations')
-    .select('id')
-    .eq('sharing_mode', 'restricted')
-    .neq('id', viewerOrgId)
+  const restrictedIds = (orgs ?? [])
+    .filter((o: { id: string; sharing_mode: string }) => o.id !== viewerOrgId && o.sharing_mode === 'restricted')
+    .map((o: { id: string }) => o.id)
 
-  if (!restricted?.length) return { type: 'blocklist', orgIds: [] }
+  if (!restrictedIds.length) return { type: 'blocklist', orgIds: [] }
 
-  const restrictedIds = restricted.map((r: { id: string }) => r.id)
   const { data: partnerships } = await client
     .from('org_sharing_partners')
     .select('org_id')
@@ -60,13 +60,14 @@ export async function getSharingFilter(
 }
 
 // Returns true if the given org's stories should be visible to the viewer.
+// Restricted viewers are governed entirely by their partner list — exclusions don't apply.
 export function isOrgVisible(
   orgId: string,
   excludedOrgIds: string[],
   sharingFilter: SharingFilter
 ): boolean {
-  if (excludedOrgIds.includes(orgId)) return false
   if (sharingFilter.type === 'allowlist') return sharingFilter.orgIds.includes(orgId)
+  if (excludedOrgIds.includes(orgId)) return false
   return !sharingFilter.orgIds.includes(orgId)
 }
 

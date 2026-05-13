@@ -17,11 +17,12 @@ interface AvailableOrg {
 
 interface Props {
   orgId: string
+  sharingMode: 'open' | 'restricted'
   initialExclusions: ExclusionRow[]
   availableOrgs: AvailableOrg[]
 }
 
-export default function ExclusionsManager({ orgId, initialExclusions, availableOrgs }: Props) {
+export default function ExclusionsManager({ orgId, sharingMode, initialExclusions, availableOrgs }: Props) {
   const [exclusions, setExclusions] = useState(initialExclusions)
   const [selectedOrgId, setSelectedOrgId] = useState('')
   const [confirming, setConfirming] = useState(false)
@@ -96,6 +97,13 @@ export default function ExclusionsManager({ orgId, initialExclusions, availableO
         </p>
       </div>
 
+      {sharingMode === 'restricted' && (
+        <div className="rounded border border-wire-border bg-wire-bg px-4 py-3 text-sm text-wire-slate">
+          Exclusions are inactive in selective sharing mode. Your partner list controls all visibility.
+          Any exclusions listed below are preserved but have no effect until you switch back to open mode.
+        </div>
+      )}
+
       {exclusions.length > 0 ? (
         <ul className="divide-y divide-wire-border border border-wire-border rounded">
           {exclusions.map((ex) => {
@@ -139,7 +147,7 @@ export default function ExclusionsManager({ orgId, initialExclusions, availableO
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      {pickableOrgs.length > 0 && (
+      {sharingMode !== 'restricted' && pickableOrgs.length > 0 && (
         <div className="border border-wire-border rounded p-4 space-y-3">
           <p className="text-sm font-medium text-wire-navy">Exclude an organization</p>
           <select

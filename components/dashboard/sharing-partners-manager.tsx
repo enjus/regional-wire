@@ -31,6 +31,7 @@ export default function SharingPartnersManager({
   const [partners, setPartners] = useState(initialPartners)
   const [availableOrgs, setAvailableOrgs] = useState(initialAvailableOrgs)
   const [selectedOrgId, setSelectedOrgId] = useState('')
+  const [confirmingRestricted, setConfirmingRestricted] = useState(false)
   const [modeLoading, setModeLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -119,7 +120,7 @@ export default function SharingPartnersManager({
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <button
-            onClick={() => sharingMode !== 'open' && handleModeChange('open')}
+            onClick={() => { setConfirmingRestricted(false); if (sharingMode !== 'open') handleModeChange('open') }}
             disabled={modeLoading}
             className={`flex-1 rounded border px-4 py-3 text-left transition-colors disabled:opacity-50 ${
               sharingMode === 'open'
@@ -133,7 +134,9 @@ export default function SharingPartnersManager({
             </p>
           </button>
           <button
-            onClick={() => sharingMode !== 'restricted' && handleModeChange('restricted')}
+            onClick={() => {
+              if (sharingMode !== 'restricted') setConfirmingRestricted(true)
+            }}
             disabled={modeLoading}
             className={`flex-1 rounded border px-4 py-3 text-left transition-colors disabled:opacity-50 ${
               sharingMode === 'restricted'
@@ -147,7 +150,31 @@ export default function SharingPartnersManager({
             </p>
           </button>
         </div>
-        {modeLoading && <p className="text-xs text-wire-slate mt-2">Saving…</p>}
+
+        {confirmingRestricted && (
+          <div className="mt-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 space-y-3">
+            <p className="text-sm text-amber-800">
+              Switching to selective mode takes effect immediately. Your stories will become invisible to everyone except your listed partners, and you will only see their stories. You can switch back to open mode at any time.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setConfirmingRestricted(false); handleModeChange('restricted') }}
+                disabled={modeLoading}
+                className="text-sm font-medium text-white bg-wire-red hover:bg-wire-red-dark rounded px-4 py-1.5 transition-colors disabled:opacity-50"
+              >
+                {modeLoading ? 'Saving…' : 'Switch to selective'}
+              </button>
+              <button
+                onClick={() => setConfirmingRestricted(false)}
+                disabled={modeLoading}
+                className="text-sm text-wire-slate hover:text-wire-navy transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+        {!confirmingRestricted && modeLoading && <p className="text-xs text-wire-slate mt-2">Saving…</p>}
       </div>
 
       {/* Partner list */}

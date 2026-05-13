@@ -29,12 +29,25 @@ export default async function ExclusionsSettingsPage() {
   const orgId = currentUser.organization_id
   const serviceClient = createServiceClient()
 
-  // Fetch current exclusions with org names
-  const { data: exclusionRows } = await serviceClient
-    .from('org_exclusions')
-    .select('id, initiator_id, excluded_id, created_at, initiator:organizations!initiator_id(name), excluded:organizations!excluded_id(name)')
-    .or(`initiator_id.eq.${orgId},excluded_id.eq.${orgId}`)
-    .order('created_at', { ascending: false })
+  // Fetch org mode, exclusions, and available orgs in parallel
+  const [orgResult, exclusionRows, allOrgsResult] = await Promise.all([
+    serviceClient.from('organizations').select('sharing_mode').eq('id', orgId).single(),
+    serviceClient
+      .from('org_exclusions')
+      .select('id, initiator_id, excluded_id, created_at, initiator:organizations!initiator_id(name), excluded:organizations!excluded_id(name)')
+      .or(`initiator_id.eq.${orgId},excluded_id.eq.${orgId}`)
+      .order('created_at', { ascending: false })
+      .then((r) => r.data),
+    serviceClient
+      .from('organizations')
+      .select('id, name')
+      .eq('status', 'approved')
+      .neq('id', orgId)
+      .order('name')
+      .then((r) => r.data),
+  ])
+
+  const sharingMode = (orgResult.data?.sharing_mode ?? 'open') as 'open' | 'restricted'
 
   const exclusions = (exclusionRows ?? []).map((row) => {
     const isInitiator = row.initiator_id === orgId
@@ -50,19 +63,12 @@ export default async function ExclusionsSettingsPage() {
     }
   })
 
-  // All approved orgs except own, for the add dropdown
-  const { data: allOrgs } = await serviceClient
-    .from('organizations')
-    .select('id, name')
-    .eq('status', 'approved')
-    .neq('id', orgId)
-    .order('name')
-
   return (
     <ExclusionsManager
       orgId={orgId}
+      sharingMode={sharingMode}
       initialExclusions={exclusions}
-      availableOrgs={allOrgs ?? []}
+      availableOrgs={allOrgsResult ?? []}
     />
   )
 }

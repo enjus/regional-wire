@@ -44,27 +44,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const serviceClient = createServiceClient()
 
-    // Verify target org exists and is approved
-    const { data: targetOrg } = await serviceClient
-      .from('organizations')
-      .select('id, status')
-      .eq('id', excluded_org_id)
-      .single()
+    // Verify initiator mode, target org, and duplicate — in parallel
+    const [initiatorResult, targetResult, existingResult] = await Promise.all([
+      serviceClient.from('organizations').select('sharing_mode').eq('id', id).single(),
+      serviceClient.from('organizations').select('id, status').eq('id', excluded_org_id).single(),
+      serviceClient.from('org_exclusions').select('id')
+        .or(`and(initiator_id.eq.${id},excluded_id.eq.${excluded_org_id}),and(initiator_id.eq.${excluded_org_id},excluded_id.eq.${id})`)
+        .maybeSingle(),
+    ])
 
-    if (!targetOrg || targetOrg.status !== 'approved') {
+    if (initiatorResult.data?.sharing_mode === 'restricted') {
+      return NextResponse.json(
+        { error: 'Exclusions are not available in selective sharing mode. Use your partner list to control visibility.' },
+        { status: 400 }
+      )
+    }
+
+    if (!targetResult.data || targetResult.data.status !== 'approved') {
       return NextResponse.json({ error: 'Organization not found.' }, { status: 404 })
     }
 
-    // Check for existing exclusion in either direction
-    const { data: existing } = await serviceClient
-      .from('org_exclusions')
-      .select('id')
-      .or(
-        `and(initiator_id.eq.${id},excluded_id.eq.${excluded_org_id}),and(initiator_id.eq.${excluded_org_id},excluded_id.eq.${id})`
-      )
-      .maybeSingle()
-
-    if (existing) {
+    if (existingResult.data) {
       return NextResponse.json({ error: 'Exclusion already exists.' }, { status: 409 })
     }
 
