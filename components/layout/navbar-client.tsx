@@ -52,13 +52,6 @@ export default function NavbarClient({ displayName, orgName, variant = 'dark' }:
             </div>
             <div className="py-1">
               <Link
-                href="/wire/dashboard"
-                onClick={() => setOpen(false)}
-                className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
                 href="/wire/dashboard/stories/new"
                 onClick={() => setOpen(false)}
                 className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
@@ -71,6 +64,13 @@ export default function NavbarClient({ displayName, orgName, variant = 'dark' }:
                 className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
               >
                 Library
+              </Link>
+              <Link
+                href="/wire/dashboard"
+                onClick={() => setOpen(false)}
+                className="block px-4 py-2 text-sm hover:bg-wire-bg transition-colors"
+              >
+                Dashboard
               </Link>
               <Link
                 href="/wire/dashboard/settings"
