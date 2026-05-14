@@ -4,6 +4,7 @@ import { formatDateTime } from '@/lib/utils'
 import RepublishedUrlUpdater from '@/components/dashboard/republished-url-updater'
 import Pagination from '@/components/ui/pagination'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Stories We\'ve Republished' }
 
 const PAGE_SIZE = 25
@@ -35,7 +36,7 @@ export default async function RepublishedPage({ searchParams }: PageProps) {
 
   const { data: log, count } = await supabase
     .from('republication_log')
-    .select('*, stories(id, title, organizations(name))', { count: 'planned' })
+    .select('*, not_republished, stories(id, title, organizations(name))', { count: 'planned' })
     .eq('republishing_org_id', currentUser.organization_id)
     .order('downloaded_at', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1)
@@ -94,6 +95,7 @@ export default async function RepublishedPage({ searchParams }: PageProps) {
                 <RepublishedUrlUpdater
                   logId={entry.id}
                   currentUrl={entry.republished_url}
+                  notRepublished={entry.not_republished ?? false}
                   orgWebsiteUrl={orgWebsiteUrl}
                 />
               </div>

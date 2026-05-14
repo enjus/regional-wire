@@ -44,6 +44,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
     story_id: string | null
     republishing_org_id: string
     republished_url: string | null
+    not_republished: boolean
     downloaded_at: string
     stories: { title: string } | null
     organizations: { name: string } | null
@@ -51,7 +52,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
 
   let analyticsQuery = supabase
     .from('republication_log')
-    .select('id, story_id, republishing_org_id, republished_url, downloaded_at, stories(title), organizations:republishing_org_id(name)')
+    .select('id, story_id, republishing_org_id, republished_url, not_republished, downloaded_at, stories(title), organizations:republishing_org_id(name)')
     .order('downloaded_at', { ascending: false })
 
   let logQuery = supabase
@@ -83,19 +84,24 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
   for (const entry of (analyticsRaw ?? []) as LogRow[]) {
     const key = `${entry.story_id ?? '__deleted__'}:${entry.republishing_org_id}`
     const existing = analyticsSeen.get(key)
-    if (!existing || (!existing.republished_url && entry.republished_url)) {
+    if (
+      !existing ||
+      (!existing.republished_url && entry.republished_url) ||
+      (!existing.republished_url && !entry.republished_url && existing.not_republished && !entry.not_republished)
+    ) {
       analyticsSeen.set(key, entry)
     }
   }
   const dedupedEntries = Array.from(analyticsSeen.values())
 
-  // Compute summary stats from deduplicated entries
-  const totalRepublications = dedupedEntries.length
-  const uniqueNewsrooms = new Set(dedupedEntries.map((e) => e.republishing_org_id)).size
-  const publishedUrlCount = dedupedEntries.filter((e) => e.republished_url).length
+  // Compute summary stats from deduplicated entries, excluding explicitly canceled downloads
+  const confirmedEntries = dedupedEntries.filter((e) => !e.not_republished)
+  const totalRepublications = confirmedEntries.length
+  const uniqueNewsrooms = new Set(confirmedEntries.map((e) => e.republishing_org_id)).size
+  const publishedUrlCount = confirmedEntries.filter((e) => e.republished_url).length
 
   const storyCountMap = new Map<string, { title: string; count: number }>()
-  for (const entry of dedupedEntries) {
+  for (const entry of confirmedEntries) {
     const key = entry.story_id ?? '__deleted__'
     const title = entry.stories?.title ?? 'Deleted story'
     const ex = storyCountMap.get(key)
@@ -106,7 +112,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
     .slice(0, 5)
 
   const orgCountMap = new Map<string, { name: string; count: number }>()
-  for (const entry of dedupedEntries) {
+  for (const entry of confirmedEntries) {
     const name =
       (entry.organizations as unknown as { name: string } | null)?.name ?? 'Unknown'
     const ex = orgCountMap.get(entry.republishing_org_id)
@@ -121,7 +127,11 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
   for (const entry of rawLog ?? []) {
     const key = `${entry.story_id}:${entry.republishing_org_id}`
     const existing = seen.get(key)
-    if (!existing || (!existing.republished_url && entry.republished_url)) {
+    if (
+      !existing ||
+      (!existing.republished_url && entry.republished_url) ||
+      (!existing.republished_url && !entry.republished_url && existing.not_republished && !entry.not_republished)
+    ) {
       seen.set(key, entry)
     }
   }
@@ -235,8 +245,10 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                     >
                       Published ↗
                     </a>
+                  ) : entry.not_republished ? (
+                    <span className="text-xs text-wire-slate line-through">Not published</span>
                   ) : (
-                    <span className="text-xs text-wire-slate">URL pending</span>
+                    <span className="text-xs text-wire-slate">Unconfirmed</span>
                   )}
                 </div>
               </div>

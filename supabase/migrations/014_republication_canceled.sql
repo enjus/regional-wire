@@ -1,0 +1,2 @@
+ALTER TABLE republication_log
+  ADD COLUMN IF NOT EXISTS not_republished BOOLEAN NOT NULL DEFAULT FALSE;
