@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, website_url, email_domain, contact_emails, description, republication_guidance } = body
 
-    if (!name || !website_url || !email_domain || !contact_emails?.length) {
+    if (!name || !website_url || !contact_emails?.length) {
       return NextResponse.json(
-        { error: 'Name, website, email domain, and at least one contact email are required.' },
+        { error: 'Name, website, and at least one contact email are required.' },
         { status: 400 }
       )
     }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const domain = email_domain.toLowerCase().replace(/^@/, '').trim()
+    const domain = email_domain ? email_domain.toLowerCase().replace(/^@/, '').trim() : ''
 
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -75,27 +75,29 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    // Check domain not already registered
-    const { data: existing } = await supabase
-      .from('organizations')
-      .select('id, status')
-      .eq('email_domain', domain)
-      .single()
+    // Check domain not already registered (only when a domain was provided)
+    if (domain) {
+      const { data: existing } = await supabase
+        .from('organizations')
+        .select('id, status')
+        .eq('email_domain', domain)
+        .single()
 
-    if (existing) {
-      if (existing.status === 'pending') {
+      if (existing) {
+        if (existing.status === 'pending') {
+          return NextResponse.json(
+            { error: 'An application for this domain is already pending review.' },
+            { status: 400 }
+          )
+        }
         return NextResponse.json(
-          { error: 'An application for this domain is already pending review.' },
+          {
+            error: 'This domain is already registered as a member organization.',
+            code: 'domain_registered',
+          },
           { status: 400 }
         )
       }
-      return NextResponse.json(
-        {
-          error: 'This domain is already registered as a member organization.',
-          code: 'domain_registered',
-        },
-        { status: 400 }
-      )
     }
 
     const slug = slugify(name)
