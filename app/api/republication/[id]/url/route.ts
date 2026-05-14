@@ -48,7 +48,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const serviceSupabase = await createServiceClient()
     await serviceSupabase
       .from('republication_log')
-      .update({ republished_url: url })
+      .update({ republished_url: url, not_republished: false })
       .eq('id', id)
 
     // Notify original org

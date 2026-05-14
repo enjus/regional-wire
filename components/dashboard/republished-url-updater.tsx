@@ -15,6 +15,7 @@ export default function RepublishedUrlUpdater({ logId, currentUrl, notRepublishe
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState(currentUrl ?? '')
   const [saving, setSaving] = useState(false)
+  const [toggling, setToggling] = useState(false)
 
   async function handleSave() {
     if (!url.trim()) return
@@ -30,6 +31,8 @@ export default function RepublishedUrlUpdater({ logId, currentUrl, notRepublishe
   }
 
   async function handleNotRepublished(value: boolean) {
+    if (toggling) return
+    setToggling(true)
     await fetch(`/api/republication/${logId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -44,7 +47,8 @@ export default function RepublishedUrlUpdater({ logId, currentUrl, notRepublishe
         <span className="text-xs text-wire-slate italic">Marked as not published</span>
         <button
           onClick={() => handleNotRepublished(false)}
-          className="text-xs text-wire-slate hover:text-wire-navy underline"
+          disabled={toggling}
+          className="text-xs text-wire-slate hover:text-wire-navy underline disabled:opacity-50"
         >
           Undo
         </button>
@@ -64,7 +68,8 @@ export default function RepublishedUrlUpdater({ logId, currentUrl, notRepublishe
         {!currentUrl && (
           <button
             onClick={() => handleNotRepublished(true)}
-            className="text-xs text-wire-slate hover:text-wire-navy underline"
+            disabled={toggling}
+            className="text-xs text-wire-slate hover:text-wire-navy underline disabled:opacity-50"
           >
             Not published
           </button>
