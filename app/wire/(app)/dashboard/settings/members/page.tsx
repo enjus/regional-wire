@@ -29,7 +29,7 @@ export default async function MembersSettingsPage() {
   const orgId = currentUser.organization_id
   const service = createServiceClient()
 
-  const [{ data: members }, { data: invites }] = await Promise.all([
+  const [{ data: members }, { data: invites }, { data: org }] = await Promise.all([
     service
       .from('users')
       .select('id, display_name, email, role, status, created_at')
@@ -41,14 +41,23 @@ export default async function MembersSettingsPage() {
       .eq('org_id', orgId)
       .is('used_at', null)
       .order('created_at', { ascending: false }),
+    service
+      .from('organizations')
+      .select('email_domain')
+      .eq('id', orgId)
+      .single(),
   ])
+
+  const emailDomain = org?.email_domain || null
 
   return (
     <div>
       <div className="mb-6">
         <h2 className="font-serif text-xl font-bold text-wire-navy">Members</h2>
         <p className="text-wire-slate text-sm mt-1">
-          Approve new members, manage roles, and invite colleagues to your newsroom.
+          {emailDomain
+            ? `Anyone with a @${emailDomain} email address can request access and will appear here for approval.`
+            : 'Approve new members, manage roles, and invite colleagues to your newsroom.'}
         </p>
       </div>
 
@@ -57,6 +66,7 @@ export default async function MembersSettingsPage() {
         currentUserId={currentUser.id}
         initialMembers={members ?? []}
         initialInvites={invites ?? []}
+        emailDomain={emailDomain}
       />
     </div>
   )

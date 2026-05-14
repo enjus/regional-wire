@@ -22,9 +22,10 @@ interface Props {
   currentUserId: string
   initialMembers: Member[]
   initialInvites: Invite[]
+  emailDomain: string | null
 }
 
-export default function MembersManager({ orgId, currentUserId, initialMembers, initialInvites }: Props) {
+export default function MembersManager({ orgId, currentUserId, initialMembers, initialInvites, emailDomain }: Props) {
   const [members, setMembers] = useState(initialMembers)
   const [invites, setInvites] = useState(initialInvites)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -277,6 +278,11 @@ export default function MembersManager({ orgId, currentUserId, initialMembers, i
         <h3 className="text-sm font-semibold text-wire-navy uppercase tracking-wide mb-3">
           Invite a Colleague
         </h3>
+        {!emailDomain && (
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-3">
+            Your organization has no registered email domain. New members can only join by invitation — they cannot self-register.
+          </p>
+        )}
         <form onSubmit={handleInvite} className="flex gap-2 max-w-sm">
           <input
             type="email"
