@@ -113,7 +113,7 @@ export default function RegisterOrganizationPage() {
           </h1>
           <p className="text-wire-slate text-sm mb-6">
             All member organizations are vetted before approval. Once approved,
-            your team can sign up using email addresses on your domain.
+            your team can sign up using their work email addresses.
           </p>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4">
@@ -166,16 +166,18 @@ export default function RegisterOrganizationPage() {
 
             <div>
               <label className="block text-sm font-medium text-wire-navy mb-1">
-                Staff email domain <span className="text-wire-red">*</span>
+                Staff email domain{' '}
+                <span className="font-normal text-wire-slate">(optional)</span>
               </label>
               <p className="text-xs text-wire-slate mb-1">
-                Staff must have email addresses on this domain to join (e.g.{' '}
+                If your staff share a common email domain (e.g.{' '}
                 <code className="bg-gray-100 px-1 rounded">example.com</code>
-                ).
+                ), enter it here and anyone on that domain can self-register.
+                Leave blank if your staff use personal or mixed-domain email addresses — contact
+                emails listed below will be sent individual registration links at approval.
               </p>
               <input
                 type="text"
-                required
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 className="w-full border border-wire-border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-wire-red focus:border-transparent"
