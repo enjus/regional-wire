@@ -81,11 +81,6 @@ export async function GET(request: NextRequest) {
   // Increments organizations.purged_story_count first so all-time contribution
   // counts remain accurate on the admin org page after deletion.
   try {
-    const { error: countError } = await supabase.rpc('increment_purged_story_count', { p_cutoff: cutoff90 })
-    if (countError) {
-      errors.push(`purged_story_count increment failed: ${countError.message}`)
-    }
-
     const { data: deleted, error: storyError } = await supabase
       .from('stories')
       .delete()
@@ -97,6 +92,11 @@ export async function GET(request: NextRequest) {
     } else {
       storiesDeleted = deleted?.length ?? 0
       console.log(`[cleanup] Deleted ${storiesDeleted} stories`)
+
+      const { error: countError } = await supabase.rpc('increment_purged_story_count', { p_cutoff: cutoff90 })
+      if (countError) {
+        errors.push(`purged_story_count increment failed: ${countError.message}`)
+      }
     }
   } catch (err) {
     errors.push(`Story purge error: ${String(err)}`)

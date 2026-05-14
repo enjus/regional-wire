@@ -111,10 +111,14 @@ export async function GET(request: NextRequest) {
           .select('id')
 
         if (claimedInvite && claimedInvite.length > 0) {
-          await serviceSupabase
+          const { error: promoteError } = await serviceSupabase
             .from('users')
             .update({ status: 'active' })
             .eq('id', userId)
+
+          if (promoteError) {
+            return NextResponse.redirect(`${origin}/login?error=auth-failed`)
+          }
 
           fetch(`${origin}/api/auth/welcome`, {
             method: 'POST',

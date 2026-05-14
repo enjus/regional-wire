@@ -72,12 +72,21 @@ export async function POST(request: NextRequest) {
 
     if (!org) {
       // Distinguish a pending org for this domain from "no match at all"
-      const { data: pendingOrgs } = await serviceSupabase
+      const { data: pendingByDomain } = await serviceSupabase
         .from('organizations')
         .select('id, name')
         .eq('email_domain', domain)
         .eq('status', 'pending')
         .limit(1)
+
+      const { data: pendingByEmail } = await serviceSupabase
+        .from('organizations')
+        .select('id, name')
+        .eq('status', 'pending')
+        .contains('contact_emails', [email.toLowerCase()])
+        .limit(1)
+
+      const pendingOrgs = pendingByDomain?.length ? pendingByDomain : pendingByEmail
 
       if (pendingOrgs && pendingOrgs.length > 0) {
         return NextResponse.json(
